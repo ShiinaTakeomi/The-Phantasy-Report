@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Phantasy Report</title>
+  <style>
+    /* Basic styling for The Phantasy Report */
+    body {
+      background-image: url('https://i.pinimg.com/736x/f5/73/6e/f5736e5639012c90ba7988fe93a7854b.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    #currentRoom {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+    }
+    #chatBox {
+      width: 90%;
+      max-width: 600px;
+      height: 300px;
+      overflow-y: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    .chat-input {
+      display: flex;
+      width: 90%;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+    #messageInput {
+      flex: 1;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-right: 5px;
+    }
+    .chat-input button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+    }
+    .chat-input button:hover {
+      background-color: #666;
+    }
+    .rooms-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      width: 90%;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+    .rooms-container button {
+      flex: 1 0 21%; /* roughly 4 buttons per row */
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      min-width: 80px;
+    }
+    .rooms-container button:hover {
+      background-color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to The Phantasy Report</h1>
+  <div id="currentRoom">Current Room: Dissonance Heights - Room 1</div>
+  <div id="chatBox"></div>
+  <div class="chat-input">
+    <input type="text" id="messageInput" placeholder="Type your message here" />
+    <button id="sendMessage" onclick="sendMessage()">Send</button>
+    <button id="clearChat" onclick="clearChat()">Clear Chat</button>
+  </div>
+
+  <!-- Container for the 40 room buttons -->
+  <div class="rooms-container" id="roomsContainer">
+    <!-- Room buttons are generated via JavaScript -->
+  </div>
+
+  <!-- Firebase and game logic -->
+  <script type="module">
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { 
+      getFirestore, collection, addDoc, onSnapshot, query, orderBy, where, serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+
+    // Firebase configuration (replace with your own if needed)
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5avvNbSB5L_YtpyxbBYYnvUpjMa0WglE",
+      authDomain: "thephantasyreport.firebaseapp.com",
+      projectId: "thephantasyreport",
+      storageBucket: "thephantasyreport.firebasestorage.app",
+      messagingSenderId: "887983841070",
+      appId: "1:887983841070:web:252290aa7b51d7d8f7a4bf",
+      measurementId: "G-9MS36H0YV4"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+
+    // Retrieve character info (or use a default)
+    let character = JSON.parse(localStorage.getItem('character')) || {};
+    const characterName = character.aliasName || 'Anonymous';
+
+    // Set the current room (default is Room 1)
+    let currentRoom = "Room 1";
+
+    // Render chat messages for the current room
+    function renderMessages() {
+      const chatBox = document.getElementById('chatBox');
+      const messagesRef = collection(db, "messages");
+      // Query messages filtered by the current room and ordered by timestamp
+      const q = query(messagesRef, where("room", "==", currentRoom), orderBy("timestamp"));
+
+      onSnapshot(q, (querySnapshot) => {
+        chatBox.innerHTML = "";
+        querySnapshot.forEach((doc) => {
+          const message = doc.data();
+          const messageElement = document.createElement('div');
+          messageElement.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+          chatBox.appendChild(messageElement);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+    }
+
+    // Send a chat message
+    async function sendMessage() {
+      const messageInput = document.getElementById('messageInput');
+      const content = messageInput.value.trim();
+      if (!content) return;
+      try {
+        await addDoc(collection(db, "messages"), {
+          sender: characterName,
+          content: content,
+          room: currentRoom,
+          timestamp: serverTimestamp()
+        });
+        messageInput.value = "";
+      } catch (e) {
+        console.error("Error sending message: ", e);
+      }
+    }
+
+    // Clear the chat display (for demo purposes only)
+    async function clearChat() {
+      document.getElementById('chatBox').innerHTML = "";
+    }
+
+    // Generate 40 room buttons dynamically
+    function generateRoomButtons() {
+      const roomsContainer = document.getElementById('roomsContainer');
+      for (let i = 1; i <= 40; i++) {
+        const roomButton = document.createElement('button');
+        roomButton.textContent = "Room " + i;
+        roomButton.addEventListener('click', () => {
+          currentRoom = "Room " + i;
+          document.getElementById('currentRoom').textContent =
+            "Current Room: Dissonance Heights - Room " + i;
+          renderMessages(); // Reload messages for the newly selected room
+        });
+        roomsContainer.appendChild(roomButton);
+      }
+    }
+
+    // Initialize the app on window load
+    window.onload = () => {
+      generateRoomButtons();
+      renderMessages();
+    };
+
+    // Allow sending messages by pressing the Enter key
+    document.getElementById('messageInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+  </script>
+</body>
+</html>
