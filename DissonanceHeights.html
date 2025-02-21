@@ -117,7 +117,7 @@
       font-size: 14px;
     }
   </style>
-  <!-- Firebase SDKs: Auth must be loaded before Firestore -->
+  <!-- Firebase SDKs: Auth (if needed elsewhere) and Firestore -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
@@ -163,8 +163,6 @@
     <button onclick="handleClick('Community Kitchen')">Community Kitchen</button>
     <button onclick="handleClick('Groceries Stand')">Groceries Stand</button>
     <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
-    <!-- Sign In with Google Button -->
-    <button onclick="signInWithGoogle()">Sign In with Google</button>
     <!-- Toggle Status Button -->
     <button onclick="togglePlayerStatus()">Toggle Status</button>
   </div>
@@ -262,43 +260,7 @@
     }
   }
 
-  // Sign In with Google
-  function signInWithGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider)
-      .then((result) => {
-        const user = result.user;
-        localStorage.setItem('playerName', user.displayName);
-        // Set up default player data (you might want to merge with existing data)
-        const playerData = {
-          name: user.displayName,
-          health: 100,
-          hunger: 0,
-          injury: 0,
-          mood: 100,
-          conditions: {
-            physical: "Healthy",
-            mental: "Content",
-            activity: "Idle"
-          },
-          lastUpdated: Date.now()
-        };
-        db.collection('players').doc(user.displayName).set(playerData, { merge: true });
-        socket.emit('playerJoin', playerData);
-        updatePlayerStatus();
-      })
-      .catch((error) => {
-        console.error("Error signing in: ", error);
-      });
-  }
-
-  // Automatically check auth state and update status if already signed in
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      localStorage.setItem('playerName', user.displayName);
-      updatePlayerStatus();
-    }
-  });
+  // (Sign in with Google is handled on index.html, so it's removed here)
 
   // Initialize Socket.IO
   const socket = io();
@@ -328,7 +290,6 @@
     document.getElementById('main-screen').style.display = 'block';
   }
   function handleClick(label) {
-    // For room buttons, open the chat panel for that room
     openRoomChat(label);
   }
 
@@ -339,7 +300,6 @@
   function openRoomChat(roomName) {
     currentRoom = roomName;
     document.getElementById('chatRoomTitle').textContent = roomName + " Chat";
-    // Clear the chat log so each room has its own fresh history
     document.getElementById('chatLog').innerHTML = "";
     document.getElementById('chatPanel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
@@ -354,13 +314,11 @@
   function sendChatMessage() {
     const msg = document.getElementById('chatInput').value;
     if (msg.trim() !== "") {
-      // Append message locally immediately for feedback:
       const chatLog = document.getElementById('chatLog');
       const p = document.createElement('p');
       p.textContent = `[${new Date().toLocaleTimeString()}] You: ${msg}`;
       chatLog.appendChild(p);
       chatLog.scrollTop = chatLog.scrollHeight;
-      // Emit message to server
       socket.emit('chatMessage', { room: currentRoom, message: msg });
       document.getElementById('chatInput').value = "";
     }
@@ -468,7 +426,6 @@
   function updatePlayerStatus() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
-    // Listen for real-time updates to the player's document
     db.collection('players').doc(playerName)
       .onSnapshot((doc) => {
         if (doc.exists) {
@@ -499,20 +456,16 @@
   // Initialization
   // ----------------------------
   window.onload = function() {
-    // Initialize power panel values
     document.getElementById('windSpeedSlider').value = windSpeed;
     document.getElementById('windSpeedValue').textContent = windSpeed;
     document.getElementById('brakeButton').textContent = brakeEngaged ? "Release Brake" : "Engage Brake";
     document.getElementById('powerOutputConfirm').textContent = powerOutputConfirmed ? "Output Confirmed" : "Confirm Output";
     updateVoltage();
     updateGarbageDisplay();
-
-    // If a player is already signed in, update the status; otherwise, prompt to sign in via the button
+    // If a player is already signed in, update the status
     if (localStorage.getItem('playerName')) {
       updatePlayerStatus();
     }
-
-    // Start simulation intervals:
     setInterval(updateVoltage, 5000);
     setInterval(simulateRandomEvent, 3600000);
     setInterval(updateGarbageDisplay, 3600000);
