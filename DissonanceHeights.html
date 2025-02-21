@@ -163,8 +163,8 @@
     <button onclick="handleClick('Community Kitchen')">Community Kitchen</button>
     <button onclick="handleClick('Groceries Stand')">Groceries Stand</button>
     <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
-    <!-- New Test Firestore Button -->
-    <button onclick="testFirestoreWrite()">Test Firestore Write</button>
+    <!-- Toggle Status Button -->
+    <button onclick="togglePlayerStatus()">Toggle Status</button>
   </div>
 </div>
 
@@ -251,19 +251,14 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  // New Firestore Test Function
-  function testFirestoreWrite() {
-    db.collection('chats').add({
-      sender: 'Alice',
-      message: 'Hello, world!',
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then(() => {
-      console.log("Document successfully written and collection created!");
-    })
-    .catch((error) => {
-      console.error("Error writing document: ", error);
-    });
+  // Toggle Status Visibility
+  function togglePlayerStatus() {
+    const statusBox = document.getElementById('playerStatus');
+    if (statusBox.style.display === "none") {
+      statusBox.style.display = "block";
+    } else {
+      statusBox.style.display = "none";
+    }
   }
 
   // Initialize Socket.IO
@@ -483,7 +478,6 @@
   // Listen for global game state updates from the server
   socket.on('gameStateUpdate', gameState => {
     logPowerMessage(`Global update: Electricity: ${gameState.resources.electricity}, Heat: ${gameState.resources.heat}, Water: ${gameState.resources.water}`);
-    // You can update UI for players' conditions using gameState.players here.
   });
 
   // ----------------------------
@@ -505,9 +499,9 @@
     }
 
     // Start simulation intervals:
-    setInterval(updateVoltage, 5000);            // Update power data every 5 sec
-    setInterval(simulateRandomEvent, 3600000);     // Power random event every 1 hour
-    setInterval(updateGarbageDisplay, 3600000);    // Garbage update every 1 hour
+    setInterval(updateVoltage, 5000);
+    setInterval(simulateRandomEvent, 3600000);
+    setInterval(updateGarbageDisplay, 3600000);
   };
 </script>
 </body>
