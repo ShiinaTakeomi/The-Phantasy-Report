@@ -126,6 +126,14 @@
       font-size: 14px;
       display: none;
     }
+    #characterCreation input, 
+    #characterCreation select, 
+    #characterCreation textarea {
+      width: 95%;
+      margin-bottom: 10px;
+      padding: 5px;
+      font-size: 14px;
+    }
   </style>
   <!-- Firebase SDKs: Auth, Firestore, and Socket.IO -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
@@ -139,8 +147,19 @@
 <div id="characterCreation">
   <h3>Create Your Character</h3>
   <p>Welcome, <span id="displayName"></span>!</p>
-  <p>Please click the button below to create your character profile.</p>
-  <button onclick="createCharacter()">Create Character</button>
+  <form id="createCharacterForm" onsubmit="event.preventDefault(); createCharacter();">
+    <!-- You can pre-fill the name field using localStorage if desired -->
+    <input type="text" id="charName" placeholder="Name" required>
+    <input type="number" id="charAge" placeholder="Age" required>
+    <select id="charGender" required>
+      <option value="">Select Gender</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+      <option value="Other">Other</option>
+    </select>
+    <textarea id="charReason" placeholder="Reason for staying at Dissonance Heights" required></textarea>
+    <button type="submit">Create Character</button>
+  </form>
 </div>
 
 <!-- Main Game Section -->
@@ -186,10 +205,10 @@
       <!-- Toggle Status Button -->
       <button onclick="togglePlayerStatus()">Toggle Status</button>
     </div>
-    <!-- Character Status Box placed below the facilities -->
+    <!-- Character Status Box -->
     <div id="playerStatus">
       <h3>Character Status</h3>
-      <p>Please sign in to view your status.</p>
+      <p>Your character data will appear here.</p>
     </div>
   </div>
 
@@ -247,7 +266,7 @@
     <div id="garbageLog"></div>
   </div>
 
-  <!-- Chat Panel (for room door chat) -->
+  <!-- Chat Panel -->
   <div id="chatPanel" class="panel">
     <h2 id="chatRoomTitle"></h2>
     <div id="chatLog"></div>
@@ -284,7 +303,7 @@
   // Initialize Socket.IO
   const socket = io();
 
-  // Persistent state loaded from localStorage
+  // Persistent state from localStorage
   let windSpeed = localStorage.getItem('windSpeed') || 50;
   let brakeEngaged = JSON.parse(localStorage.getItem('brakeEngaged')) || false;
   let powerOutputConfirmed = JSON.parse(localStorage.getItem('powerOutputConfirmed')) || false;
@@ -455,6 +474,9 @@
           statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
           statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
           statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+          statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
+          statusHTML += `<p><strong>Age:</strong> ${data.age || "N/A"}</p>`;
+          statusHTML += `<p><strong>Reason:</strong> ${data.reason || "N/A"}</p>`;
           statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
           statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
           statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
@@ -481,6 +503,8 @@
         document.getElementById('characterCreation').style.display = 'block';
         document.getElementById('mainGame').style.display = 'none';
         document.getElementById('displayName').innerText = playerName;
+        // Pre-fill the name field
+        document.getElementById('charName').value = playerName;
       }
     }).catch((error) => {
       console.error("Error checking character existence:", error);
@@ -490,8 +514,16 @@
   function createCharacter() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
+    const charName = document.getElementById('charName').value;
+    const charAge = document.getElementById('charAge').value;
+    const charGender = document.getElementById('charGender').value;
+    const charReason = document.getElementById('charReason').value;
+
     const playerData = {
-      name: playerName,
+      name: charName,
+      age: charAge,
+      gender: charGender,
+      reason: charReason,
       health: 100,
       hunger: 0,
       injury: 0,
@@ -503,6 +535,7 @@
       },
       lastUpdated: Date.now()
     };
+
     db.collection('players').doc(playerName).set(playerData, { merge: true })
       .then(() => {
         document.getElementById('characterCreation').style.display = 'none';
@@ -523,7 +556,6 @@
   // Initialization
   // ----------------------------
   window.onload = function() {
-    // Initialize power panel values
     document.getElementById('windSpeedSlider').value = windSpeed;
     document.getElementById('windSpeedValue').textContent = windSpeed;
     document.getElementById('brakeButton').textContent = brakeEngaged ? "Release Brake" : "Engage Brake";
@@ -531,7 +563,7 @@
     updateVoltage();
     updateGarbageDisplay();
 
-    // Check if player is signed in and then check character existence
+    // Check if a player is signed in and then check for their character document
     if (localStorage.getItem('playerName')) {
       checkCharacterExistence();
     }
