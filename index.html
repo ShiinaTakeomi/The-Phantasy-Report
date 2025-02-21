@@ -2,10 +2,66 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=DissonanceHeights.html">
-  <title>Redirecting...</title>
+  <title>Welcome to Dissonance Heights</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
+      margin-top: 100px; 
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      margin: 10px;
+    }
+  </style>
+  <!-- Firebase SDKs for Auth -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
+  <script>
+    // Your Firebase configuration (same as in your main app)
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5avvNbSB5L_YtpyxbBYYnvUpjMa0WglE",
+      authDomain: "thephantasyreport.firebaseapp.com",
+      projectId: "thephantasyreport",
+      storageBucket: "thephantasyreport.firebasestorage.app",
+      messagingSenderId: "887983841070",
+      appId: "1:887983841070:web:252290aa7b51d7d8f7a4bf",
+      measurementId: "G-9MS36H0YV4"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    function signInWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithPopup(provider)
+        .then((result) => {
+          const user = result.user;
+          // You can store user data in localStorage if needed
+          localStorage.setItem('playerName', user.displayName);
+          // Redirect to the main app page
+          window.location.href = 'dissonanceheights.html';
+        })
+        .catch((error) => {
+          console.error("Error signing in: ", error);
+        });
+    }
+
+    // Optionally, check auth state on load and redirect if already signed in
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        localStorage.setItem('playerName', user.displayName);
+        window.location.href = 'dissonanceheights.html';
+      }
+    });
+  </script>
 </head>
 <body>
-  <p>Redirecting to DissonanceHeights... If you are not redirected automatically, <a href="DissonanceHeights.html">click here</a>.</p>
+  <h1>Welcome to Dissonance Heights</h1>
+  <p>Enter the world of The Phantasy Report</p>
+  <!-- Sign In with Google Button -->
+  <button onclick="signInWithGoogle()">Sign In with Google</button>
+  <!-- Optional: a manual entry button if user wants to proceed without signing in -->
+  <button onclick="window.location.href='dissonanceheights.html'">Enter Dissonance Heights</button>
 </body>
 </html>
