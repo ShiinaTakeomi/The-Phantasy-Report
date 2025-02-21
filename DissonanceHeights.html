@@ -60,6 +60,7 @@
       margin-top: 30px;
       display: flex;
       justify-content: space-around;
+      flex-wrap: wrap;
     }
     .facilities button {
       padding: 10px 20px;
@@ -67,6 +68,7 @@
       border: 1px solid #999;
       cursor: pointer;
       font-size: 16px;
+      margin: 5px;
     }
     .panel {
       display: none;
@@ -105,17 +107,14 @@
       margin: 20px auto;
       background: #fff;
     }
-    /* Character Status Box */
+    /* Character Status Box now in normal flow */
     #playerStatus {
-      position: fixed;
-      left: 10px;
-      bottom: 10px;
-      width: 250px;
+      margin: 20px auto;
+      max-width: 300px;
       background: #fff;
       border: 2px solid #444;
       padding: 10px;
       font-size: 14px;
-      z-index: 1000;
     }
   </style>
   <!-- Firebase SDKs and Socket.IO client library -->
@@ -165,6 +164,11 @@
     <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
     <!-- Toggle Status Button -->
     <button onclick="togglePlayerStatus()">Toggle Status</button>
+  </div>
+  <!-- Character Status Box placed below the facilities -->
+  <div id="playerStatus">
+    <h3>Character Status</h3>
+    <p>Please join the game to view your status.</p>
   </div>
 </div>
 
@@ -231,12 +235,6 @@
   <button onclick="closeChat()">Close Chat</button>
 </div>
 
-<!-- Character Status Box -->
-<div id="playerStatus">
-  <h3>Character Status</h3>
-  <p>Please join the game to view your status.</p>
-</div>
-
 <script>
   // Initialize Firebase
   const firebaseConfig = {
@@ -254,7 +252,7 @@
   // Toggle Status Visibility
   function togglePlayerStatus() {
     const statusBox = document.getElementById('playerStatus');
-    if (statusBox.style.display === "none") {
+    if (statusBox.style.display === "none" || statusBox.style.display === "") {
       statusBox.style.display = "block";
     } else {
       statusBox.style.display = "none";
