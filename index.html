@@ -37,9 +37,9 @@
       firebase.auth().signInWithPopup(provider)
         .then((result) => {
           const user = result.user;
-          // You can store user data in localStorage if needed
+          // Store the player's display name in localStorage
           localStorage.setItem('playerName', user.displayName);
-          // Redirect to the main app page
+          // Redirect to the main application page
           window.location.href = 'dissonanceheights.html';
         })
         .catch((error) => {
@@ -47,7 +47,7 @@
         });
     }
 
-    // Optionally, check auth state on load and redirect if already signed in
+    // Automatically check auth state on load and redirect if already signed in
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         localStorage.setItem('playerName', user.displayName);
@@ -59,9 +59,7 @@
 <body>
   <h1>Welcome to Dissonance Heights</h1>
   <p>Enter the world of The Phantasy Report</p>
-  <!-- Sign In with Google Button -->
+  <!-- Sign In with Google Button Only -->
   <button onclick="signInWithGoogle()">Sign In with Google</button>
-  <!-- Optional: a manual entry button if user wants to proceed without signing in -->
-  <button onclick="window.location.href='dissonanceheights.html'">Enter Dissonance Heights</button>
 </body>
 </html>
