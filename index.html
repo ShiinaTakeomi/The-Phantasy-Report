@@ -40,7 +40,7 @@
           // Store the player's display name in localStorage
           localStorage.setItem('playerName', user.displayName);
           // Redirect to the main application page
-          window.location.href = 'dissonanceheights.html';
+          window.location.href = 'DissonanceHeights.html';
         })
         .catch((error) => {
           console.error("Error signing in: ", error);
@@ -51,7 +51,7 @@
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         localStorage.setItem('playerName', user.displayName);
-        window.location.href = 'dissonanceheights.html';
+        window.location.href = 'DissonanceHeights.html';
       }
     });
   </script>
