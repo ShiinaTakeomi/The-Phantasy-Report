@@ -148,7 +148,6 @@
   <h3>Create Your Character</h3>
   <p>Welcome, <span id="displayName"></span>!</p>
   <form id="createCharacterForm" onsubmit="event.preventDefault(); createCharacter();">
-    <!-- You can pre-fill the name field using localStorage if desired -->
     <input type="text" id="charName" placeholder="Name" required>
     <input type="number" id="charAge" placeholder="Age" required>
     <select id="charGender" required>
@@ -352,15 +351,19 @@
   function sendChatMessage() {
     const msg = document.getElementById('chatInput').value;
     if (msg.trim() !== "") {
+      const playerName = localStorage.getItem('playerName') || "Unknown";
+      // Append message locally with the player's registered name
       const chatLog = document.getElementById('chatLog');
       const p = document.createElement('p');
-      p.textContent = `[${new Date().toLocaleTimeString()}] You: ${msg}`;
+      p.textContent = `[${new Date().toLocaleTimeString()}] ${playerName}: ${msg}`;
       chatLog.appendChild(p);
       chatLog.scrollTop = chatLog.scrollHeight;
-      socket.emit('chatMessage', { room: currentRoom, message: msg });
+      // Send message with sender info to the server
+      socket.emit('chatMessage', { room: currentRoom, message: msg, sender: playerName });
       document.getElementById('chatInput').value = "";
     }
   }
+  // Listen for chat messages from server
   socket.on('chatMessage', data => {
     if (data.room === currentRoom) {
       const chatLog = document.getElementById('chatLog');
@@ -368,6 +371,18 @@
       p.textContent = `[${new Date().toLocaleTimeString()}] ${data.sender}: ${data.message}`;
       chatLog.appendChild(p);
       chatLog.scrollTop = chatLog.scrollHeight;
+    }
+  });
+  // Add event listener to send message on Enter key
+  document.addEventListener('DOMContentLoaded', function() {
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+      chatInput.addEventListener('keydown', function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          sendChatMessage();
+        }
+      });
     }
   });
 
@@ -420,6 +435,7 @@
   function logPowerMessage(message) {
     const logDiv = document.getElementById('minigameLog');
     const timestamp = new Date().toLocaleTimeString();
+    // Use template literals for proper string formatting
     logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
     logDiv.scrollTop = logDiv.scrollHeight;
   }
@@ -562,12 +578,10 @@
     document.getElementById('powerOutputConfirm').textContent = powerOutputConfirmed ? "Output Confirmed" : "Confirm Output";
     updateVoltage();
     updateGarbageDisplay();
-
     // Check if a player is signed in and then check for their character document
     if (localStorage.getItem('playerName')) {
       checkCharacterExistence();
     }
-
     setInterval(updateVoltage, 5000);
     setInterval(simulateRandomEvent, 3600000);
     setInterval(updateGarbageDisplay, 3600000);
