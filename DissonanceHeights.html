@@ -105,6 +105,18 @@
       margin: 20px auto;
       background: #fff;
     }
+    /* Character Status Box */
+    #playerStatus {
+      position: fixed;
+      left: 10px;
+      bottom: 10px;
+      width: 250px;
+      background: #fff;
+      border: 2px solid #444;
+      padding: 10px;
+      font-size: 14px;
+      z-index: 1000;
+    }
   </style>
   <!-- Firebase SDKs and Socket.IO client library -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
@@ -217,6 +229,12 @@
   <input type="text" id="chatInput" placeholder="Type your message...">
   <button onclick="sendChatMessage()">Send</button>
   <button onclick="closeChat()">Close Chat</button>
+</div>
+
+<!-- Character Status Box -->
+<div id="playerStatus">
+  <h3>Character Status</h3>
+  <p>Please join the game to view your status.</p>
 </div>
 
 <script>
@@ -411,13 +429,13 @@
   }
 
   // ----------------------------
-  // Firebase: Player Join & Status Update
+  // Firebase: Player Join, Status Update & Display
   // ----------------------------
   function joinGame() {
     const playerName = prompt("Enter your player name:");
     if (playerName) {
+      localStorage.setItem('playerName', playerName);
       // Default conditions for survival in the harsh flathouse:
-      // Physical: Healthy, Mental: Content, Activity: Idle
       const playerData = {
         name: playerName,
         health: 100,
@@ -433,7 +451,33 @@
       };
       db.collection('players').doc(playerName).set(playerData);
       socket.emit('playerJoin', playerData);
+      updatePlayerStatus(); // Start listening for status updates
     }
+  }
+
+  function updatePlayerStatus() {
+    const playerName = localStorage.getItem('playerName');
+    if (!playerName) return;
+    // Listen for real-time updates to the player's document
+    db.collection('players').doc(playerName)
+      .onSnapshot((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          let statusHTML = `<h3>Character Status</h3>`;
+          statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
+          statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+          statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+          statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+          statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+          statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
+          statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
+          statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
+          statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
+          document.getElementById('playerStatus').innerHTML = statusHTML;
+        }
+      }, (error) => {
+        console.error("Error getting player status:", error);
+      });
   }
 
   // Listen for global game state updates from the server
@@ -454,6 +498,11 @@
     updateVoltage();
     updateGarbageDisplay();
     joinGame();
+
+    // If a player name already exists (e.g. on page refresh), start listening for status updates
+    if (localStorage.getItem('playerName')) {
+      updatePlayerStatus();
+    }
 
     // Start simulation intervals:
     setInterval(updateVoltage, 5000);            // Update power data every 5 sec
