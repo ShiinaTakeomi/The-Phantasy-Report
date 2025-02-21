@@ -117,8 +117,9 @@
       font-size: 14px;
     }
   </style>
-  <!-- Firebase SDKs and Socket.IO client library -->
+  <!-- Firebase SDKs: Auth must be loaded before Firestore -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
   <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
 </head>
@@ -162,13 +163,15 @@
     <button onclick="handleClick('Community Kitchen')">Community Kitchen</button>
     <button onclick="handleClick('Groceries Stand')">Groceries Stand</button>
     <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
+    <!-- Sign In with Google Button -->
+    <button onclick="signInWithGoogle()">Sign In with Google</button>
     <!-- Toggle Status Button -->
     <button onclick="togglePlayerStatus()">Toggle Status</button>
   </div>
   <!-- Character Status Box placed below the facilities -->
   <div id="playerStatus">
     <h3>Character Status</h3>
-    <p>Please join the game to view your status.</p>
+    <p>Please sign in to view your status.</p>
   </div>
 </div>
 
@@ -258,6 +261,44 @@
       statusBox.style.display = "none";
     }
   }
+
+  // Sign In with Google
+  function signInWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider)
+      .then((result) => {
+        const user = result.user;
+        localStorage.setItem('playerName', user.displayName);
+        // Set up default player data (you might want to merge with existing data)
+        const playerData = {
+          name: user.displayName,
+          health: 100,
+          hunger: 0,
+          injury: 0,
+          mood: 100,
+          conditions: {
+            physical: "Healthy",
+            mental: "Content",
+            activity: "Idle"
+          },
+          lastUpdated: Date.now()
+        };
+        db.collection('players').doc(user.displayName).set(playerData, { merge: true });
+        socket.emit('playerJoin', playerData);
+        updatePlayerStatus();
+      })
+      .catch((error) => {
+        console.error("Error signing in: ", error);
+      });
+  }
+
+  // Automatically check auth state and update status if already signed in
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      localStorage.setItem('playerName', user.displayName);
+      updatePlayerStatus();
+    }
+  });
 
   // Initialize Socket.IO
   const socket = io();
@@ -424,30 +465,6 @@
   // ----------------------------
   // Firebase: Player Join, Status Update & Display
   // ----------------------------
-  function joinGame() {
-    const playerName = prompt("Enter your player name:");
-    if (playerName) {
-      localStorage.setItem('playerName', playerName);
-      // Default conditions for survival in the harsh flathouse:
-      const playerData = {
-        name: playerName,
-        health: 100,
-        hunger: 0,
-        injury: 0,
-        mood: 100,
-        conditions: {
-          physical: "Healthy",
-          mental: "Content",
-          activity: "Idle"
-        },
-        lastUpdated: Date.now()
-      };
-      db.collection('players').doc(playerName).set(playerData);
-      socket.emit('playerJoin', playerData);
-      updatePlayerStatus(); // Start listening for status updates
-    }
-  }
-
   function updatePlayerStatus() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
@@ -489,9 +506,8 @@
     document.getElementById('powerOutputConfirm').textContent = powerOutputConfirmed ? "Output Confirmed" : "Confirm Output";
     updateVoltage();
     updateGarbageDisplay();
-    joinGame();
 
-    // If a player name already exists (e.g. on page refresh), start listening for status updates
+    // If a player is already signed in, update the status; otherwise, prompt to sign in via the button
     if (localStorage.getItem('playerName')) {
       updatePlayerStatus();
     }
