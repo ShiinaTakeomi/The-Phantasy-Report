@@ -351,19 +351,17 @@
   function sendChatMessage() {
     const msg = document.getElementById('chatInput').value;
     if (msg.trim() !== "") {
-      const playerName = localStorage.getItem('playerName') || "Unknown";
-      // Append message locally with the player's registered name
+      // Use "characterName" if set, otherwise fallback to the sign-in name ("playerName")
+      const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
       const chatLog = document.getElementById('chatLog');
       const p = document.createElement('p');
-      p.textContent = `[${new Date().toLocaleTimeString()}] ${playerName}: ${msg}`;
+      p.textContent = `[${new Date().toLocaleTimeString()}] ${characterName}: ${msg}`;
       chatLog.appendChild(p);
       chatLog.scrollTop = chatLog.scrollHeight;
-      // Send message with sender info to the server
-      socket.emit('chatMessage', { room: currentRoom, message: msg, sender: playerName });
+      socket.emit('chatMessage', { room: currentRoom, message: msg, sender: characterName });
       document.getElementById('chatInput').value = "";
     }
   }
-  // Listen for chat messages from server
   socket.on('chatMessage', data => {
     if (data.room === currentRoom) {
       const chatLog = document.getElementById('chatLog');
@@ -373,7 +371,6 @@
       chatLog.scrollTop = chatLog.scrollHeight;
     }
   });
-  // Add event listener to send message on Enter key
   document.addEventListener('DOMContentLoaded', function() {
     const chatInput = document.getElementById('chatInput');
     if (chatInput) {
@@ -435,7 +432,6 @@
   function logPowerMessage(message) {
     const logDiv = document.getElementById('minigameLog');
     const timestamp = new Date().toLocaleTimeString();
-    // Use template literals for proper string formatting
     logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
     logDiv.scrollTop = logDiv.scrollHeight;
   }
@@ -484,6 +480,8 @@
       .onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
+          // Optionally, update localStorage with the chosen character name:
+          localStorage.setItem('characterName', data.name);
           let statusHTML = `<h3>Character Status</h3>`;
           statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
           statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
@@ -554,6 +552,8 @@
 
     db.collection('players').doc(playerName).set(playerData, { merge: true })
       .then(() => {
+        // Store the chosen character name in localStorage
+        localStorage.setItem('characterName', charName);
         document.getElementById('characterCreation').style.display = 'none';
         document.getElementById('mainGame').style.display = 'block';
         updatePlayerStatus();
