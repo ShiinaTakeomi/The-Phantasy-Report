@@ -422,7 +422,7 @@
   // Listen for global game state updates from the server
   socket.on('gameStateUpdate', gameState => {
     logPowerMessage(`Global update: Electricity: ${gameState.resources.electricity}, Heat: ${gameState.resources.heat}, Water: ${gameState.resources.water}`);
-    // You can update UI for players' conditions using gameState.players here.
+    // UI updates for players' conditions using gameState.players can be added here.
   });
 
   // ----------------------------
