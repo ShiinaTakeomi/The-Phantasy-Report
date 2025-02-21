@@ -151,6 +151,8 @@
     <button onclick="handleClick('Community Kitchen')">Community Kitchen</button>
     <button onclick="handleClick('Groceries Stand')">Groceries Stand</button>
     <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
+    <!-- New Test Firestore Button -->
+    <button onclick="testFirestoreWrite()">Test Firestore Write</button>
   </div>
 </div>
 
@@ -230,6 +232,21 @@
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
+
+  // New Firestore Test Function
+  function testFirestoreWrite() {
+    db.collection('chats').add({
+      sender: 'Alice',
+      message: 'Hello, world!',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+      console.log("Document successfully written and collection created!");
+    })
+    .catch((error) => {
+      console.error("Error writing document: ", error);
+    });
+  }
 
   // Initialize Socket.IO
   const socket = io();
