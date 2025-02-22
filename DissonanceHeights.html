@@ -351,7 +351,7 @@
   function sendChatMessage() {
     const msg = document.getElementById('chatInput').value;
     if (msg.trim() !== "") {
-      // Use "characterName" if set, otherwise fallback to the sign-in name ("playerName")
+      // Use "characterName" if set; otherwise, fall back to "playerName"
       const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
       const chatLog = document.getElementById('chatLog');
       const p = document.createElement('p');
@@ -480,7 +480,7 @@
       .onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
-          // Optionally, update localStorage with the chosen character name:
+          // Update localStorage with the chosen character name
           localStorage.setItem('characterName', data.name);
           let statusHTML = `<h3>Character Status</h3>`;
           statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
