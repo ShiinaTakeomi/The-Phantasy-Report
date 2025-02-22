@@ -309,11 +309,7 @@
   // ----------------------------
   // Chat Functions using Firestore
   // ----------------------------
-
-  // Global variable for current room
   let currentRoom = "";
-
-  // Function to open a room's chat and listen to messages
   function openRoomChat(roomName) {
     currentRoom = roomName;
     document.getElementById('chatRoomTitle').textContent = roomName + " Chat";
@@ -322,12 +318,9 @@
     document.getElementById('main-screen').style.display = 'none';
     listenForMessages(roomName);
   }
-
-  // Function to listen for messages in a specific room
   function listenForMessages(roomName) {
     const chatLog = document.getElementById('chatLog');
     const messagesRef = db.collection("messages");
-    // Query messages by room, ordered by timestamp
     const q = messagesRef.where("room", "==", roomName).orderBy("timestamp");
     q.onSnapshot((querySnapshot) => {
       chatLog.innerHTML = "";
@@ -340,17 +333,14 @@
       chatLog.scrollTop = chatLog.scrollHeight;
     });
   }
-
   function closeChat() {
     document.getElementById('chatPanel').style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
     currentRoom = "";
   }
-
   async function sendChatMessage() {
     const msg = document.getElementById('chatInput').value;
     if (msg.trim() !== "") {
-      // Use characterName if available; otherwise, fallback to playerName
       const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
       try {
         await db.collection("messages").add({
@@ -365,7 +355,6 @@
       }
     }
   }
-
   document.addEventListener('DOMContentLoaded', function() {
     const chatInput = document.getElementById('chatInput');
     if (chatInput) {
@@ -387,7 +376,6 @@
   let lastInteractionTime = localStorage.getItem('lastInteractionTime') || Date.now();
   let garbageLevel = localStorage.getItem('garbageLevel') || 0;
   let lastGarbageUpdate = localStorage.getItem('lastGarbageUpdate') || Date.now();
-
   function updateWindSpeed() {
     windSpeed = document.getElementById('windSpeedSlider').value;
     document.getElementById('windSpeedValue').textContent = windSpeed;
@@ -463,8 +451,7 @@
     localStorage.setItem('garbageLevel', garbageLevel);
     document.getElementById('garbageDisplay').textContent = garbageLevel;
     logGarbageMessage("Garbage cleared by player.");
-    // If you want persistence for garbage disposal, you can save this event too.
-    // For now, we just emit a signal (if you have server-side handling).
+    socket.emit('disposeGarbage');
   }
   function logGarbageMessage(message) {
     const logDiv = document.getElementById('garbageLog');
@@ -483,7 +470,6 @@
       .onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
-          // Update localStorage with the chosen character name
           localStorage.setItem('characterName', data.name);
           let statusHTML = `<h3>Character Status</h3>`;
           statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
@@ -505,22 +491,18 @@
       });
   }
 
-  // Check if character exists and show appropriate section
   function checkCharacterExistence() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
     db.collection('players').doc(playerName).get().then((doc) => {
       if (doc.exists) {
-        // Character exists: show main game
         document.getElementById('characterCreation').style.display = 'none';
         document.getElementById('mainGame').style.display = 'block';
         updatePlayerStatus();
       } else {
-        // Character doesn't exist: show character creation section
         document.getElementById('characterCreation').style.display = 'block';
         document.getElementById('mainGame').style.display = 'none';
         document.getElementById('displayName').innerText = playerName;
-        // Pre-fill the name field
         document.getElementById('charName').value = playerName;
       }
     }).catch((error) => {
@@ -555,7 +537,6 @@
 
     db.collection('players').doc(playerName).set(playerData, { merge: true })
       .then(() => {
-        // Store the chosen character name in localStorage
         localStorage.setItem('characterName', charName);
         document.getElementById('characterCreation').style.display = 'none';
         document.getElementById('mainGame').style.display = 'block';
@@ -566,18 +547,10 @@
       });
   }
 
-  // Listen for global game state updates from the server (if applicable)
-  // For example, if you store global game state in Firestore or receive it via another method,
-  // you can update the system log accordingly.
-  // This demo uses a dummy example:
-  function dummyGlobalUpdate() {
-    logPowerMessage("Global update: Electricity: 120, Heat: 80, Water: 95");
-  }
-  setInterval(dummyGlobalUpdate, 30000);
+  socket.on('gameStateUpdate', gameState => {
+    logPowerMessage(`Global update: Electricity: ${gameState.resources.electricity}, Heat: ${gameState.resources.heat}, Water: ${gameState.resources.water}`);
+  });
 
-  // ----------------------------
-  // Initialization
-  // ----------------------------
   window.onload = function() {
     document.getElementById('windSpeedSlider').value = windSpeed;
     document.getElementById('windSpeedValue').textContent = windSpeed;
@@ -585,7 +558,6 @@
     document.getElementById('powerOutputConfirm').textContent = powerOutputConfirmed ? "Output Confirmed" : "Confirm Output";
     updateVoltage();
     updateGarbageDisplay();
-    // Check if a player is signed in and then check for their character document
     if (localStorage.getItem('playerName')) {
       checkCharacterExistence();
     }
