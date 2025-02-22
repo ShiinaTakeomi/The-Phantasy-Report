@@ -91,7 +91,7 @@
     .control input[type="range"] {
       width: 200px;
     }
-    #minigameLog, #garbageLog, #chatLog {
+    #minigameLog, #garbageLog {
       border: 1px solid #ccc;
       padding: 10px;
       height: 100px;
@@ -106,6 +106,14 @@
       width: 400px;
       margin: 20px auto;
       background: #fff;
+    }
+    #chatLog {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 100px;
+      overflow-y: auto;
+      background: #f9f9f9;
+      margin-bottom: 10px;
     }
     /* Character Status Box */
     #playerStatus {
@@ -135,11 +143,10 @@
       font-size: 14px;
     }
   </style>
-  <!-- Firebase SDKs: Auth, Firestore, and Socket.IO -->
+  <!-- Firebase SDKs: Auth, Firestore -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
-  <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
 </head>
 <body>
 
@@ -299,78 +306,66 @@
     }
   }
 
-  // Initialize Socket.IO
-  const socket = io();
+  // ----------------------------
+  // Chat Functions using Firestore
+  // ----------------------------
 
-  // Persistent state from localStorage
-  let windSpeed = localStorage.getItem('windSpeed') || 50;
-  let brakeEngaged = JSON.parse(localStorage.getItem('brakeEngaged')) || false;
-  let powerOutputConfirmed = JSON.parse(localStorage.getItem('powerOutputConfirmed')) || false;
-  let lastInteractionTime = localStorage.getItem('lastInteractionTime') || Date.now();
-  let garbageLevel = localStorage.getItem('garbageLevel') || 0;
-  let lastGarbageUpdate = localStorage.getItem('lastGarbageUpdate') || Date.now();
-
-  // ----------------------------
-  // Main Screen & Panel Functions
-  // ----------------------------
-  function showPowerPanel() {
-    document.getElementById('minigame-panel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-  }
-  function showGarbagePanel() {
-    updateGarbageDisplay();
-    document.getElementById('garbage-panel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-  }
-  function hidePanel(panelId) {
-    document.getElementById(panelId).style.display = 'none';
-    document.getElementById('main-screen').style.display = 'block';
-  }
-  function handleClick(label) {
-    openRoomChat(label);
-  }
-
-  // ----------------------------
-  // Room Chat Functions
-  // ----------------------------
+  // Global variable for current room
   let currentRoom = "";
+
+  // Function to open a room's chat and listen to messages
   function openRoomChat(roomName) {
     currentRoom = roomName;
     document.getElementById('chatRoomTitle').textContent = roomName + " Chat";
     document.getElementById('chatLog').innerHTML = "";
     document.getElementById('chatPanel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
-    socket.emit('joinRoom', roomName);
+    listenForMessages(roomName);
   }
+
+  // Function to listen for messages in a specific room
+  function listenForMessages(roomName) {
+    const chatLog = document.getElementById('chatLog');
+    const messagesRef = db.collection("messages");
+    // Query messages by room, ordered by timestamp
+    const q = messagesRef.where("room", "==", roomName).orderBy("timestamp");
+    q.onSnapshot((querySnapshot) => {
+      chatLog.innerHTML = "";
+      querySnapshot.forEach((doc) => {
+        const message = doc.data();
+        const p = document.createElement('p');
+        p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+        chatLog.appendChild(p);
+      });
+      chatLog.scrollTop = chatLog.scrollHeight;
+    });
+  }
+
   function closeChat() {
     document.getElementById('chatPanel').style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
-    socket.emit('leaveRoom', currentRoom);
     currentRoom = "";
   }
-  function sendChatMessage() {
+
+  async function sendChatMessage() {
     const msg = document.getElementById('chatInput').value;
     if (msg.trim() !== "") {
-      // Use "characterName" if set; otherwise, fall back to "playerName"
+      // Use characterName if available; otherwise, fallback to playerName
       const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
-      const chatLog = document.getElementById('chatLog');
-      const p = document.createElement('p');
-      p.textContent = `[${new Date().toLocaleTimeString()}] ${characterName}: ${msg}`;
-      chatLog.appendChild(p);
-      chatLog.scrollTop = chatLog.scrollHeight;
-      socket.emit('chatMessage', { room: currentRoom, message: msg, sender: characterName });
-      document.getElementById('chatInput').value = "";
+      try {
+        await db.collection("messages").add({
+          room: currentRoom,
+          sender: characterName,
+          content: msg,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('chatInput').value = "";
+      } catch (error) {
+        console.error("Error sending message:", error);
+      }
     }
   }
-  socket.on('chatMessage', data => {
-    if (data.room === currentRoom) {
-      const chatLog = document.getElementById('chatLog');
-      const p = document.createElement('p');
-      p.textContent = `[${new Date().toLocaleTimeString()}] ${data.sender}: ${data.message}`;
-      chatLog.appendChild(p);
-      chatLog.scrollTop = chatLog.scrollHeight;
-    }
-  });
+
   document.addEventListener('DOMContentLoaded', function() {
     const chatInput = document.getElementById('chatInput');
     if (chatInput) {
@@ -386,6 +381,13 @@
   // ----------------------------
   // Power Source Simulation Functions
   // ----------------------------
+  let windSpeed = localStorage.getItem('windSpeed') || 50;
+  let brakeEngaged = JSON.parse(localStorage.getItem('brakeEngaged')) || false;
+  let powerOutputConfirmed = JSON.parse(localStorage.getItem('powerOutputConfirmed')) || false;
+  let lastInteractionTime = localStorage.getItem('lastInteractionTime') || Date.now();
+  let garbageLevel = localStorage.getItem('garbageLevel') || 0;
+  let lastGarbageUpdate = localStorage.getItem('lastGarbageUpdate') || Date.now();
+
   function updateWindSpeed() {
     windSpeed = document.getElementById('windSpeedSlider').value;
     document.getElementById('windSpeedValue').textContent = windSpeed;
@@ -461,7 +463,8 @@
     localStorage.setItem('garbageLevel', garbageLevel);
     document.getElementById('garbageDisplay').textContent = garbageLevel;
     logGarbageMessage("Garbage cleared by player.");
-    socket.emit('disposeGarbage');
+    // If you want persistence for garbage disposal, you can save this event too.
+    // For now, we just emit a signal (if you have server-side handling).
   }
   function logGarbageMessage(message) {
     const logDiv = document.getElementById('garbageLog');
@@ -563,10 +566,14 @@
       });
   }
 
-  // Listen for global game state updates from the server
-  socket.on('gameStateUpdate', gameState => {
-    logPowerMessage(`Global update: Electricity: ${gameState.resources.electricity}, Heat: ${gameState.resources.heat}, Water: ${gameState.resources.water}`);
-  });
+  // Listen for global game state updates from the server (if applicable)
+  // For example, if you store global game state in Firestore or receive it via another method,
+  // you can update the system log accordingly.
+  // This demo uses a dummy example:
+  function dummyGlobalUpdate() {
+    logPowerMessage("Global update: Electricity: 120, Heat: 80, Water: 95");
+  }
+  setInterval(dummyGlobalUpdate, 30000);
 
   // ----------------------------
   // Initialization
