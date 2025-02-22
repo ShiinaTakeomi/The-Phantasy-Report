@@ -143,7 +143,7 @@
       font-size: 14px;
     }
   </style>
-  <!-- Firebase SDKs: Auth, Firestore -->
+  <!-- Firebase SDKs: Auth and Firestore -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
@@ -296,16 +296,6 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  // Toggle Status Visibility
-  function togglePlayerStatus() {
-    const statusBox = document.getElementById('playerStatus');
-    if (statusBox.style.display === "none" || statusBox.style.display === "") {
-      statusBox.style.display = "block";
-    } else {
-      statusBox.style.display = "none";
-    }
-  }
-
   // ----------------------------
   // Chat Functions using Firestore
   // ----------------------------
@@ -321,17 +311,20 @@
   function listenForMessages(roomName) {
     const chatLog = document.getElementById('chatLog');
     const messagesRef = db.collection("messages");
-    const q = messagesRef.where("room", "==", roomName).orderBy("timestamp");
-    q.onSnapshot((querySnapshot) => {
-      chatLog.innerHTML = "";
-      querySnapshot.forEach((doc) => {
-        const message = doc.data();
-        const p = document.createElement('p');
-        p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
-        chatLog.appendChild(p);
+    // Query messages by room ordered by timestamp
+    messagesRef
+      .where("room", "==", roomName)
+      .orderBy("timestamp")
+      .onSnapshot((querySnapshot) => {
+        chatLog.innerHTML = "";
+        querySnapshot.forEach((doc) => {
+          const message = doc.data();
+          const p = document.createElement('p');
+          p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+          chatLog.appendChild(p);
+        });
+        chatLog.scrollTop = chatLog.scrollHeight;
       });
-      chatLog.scrollTop = chatLog.scrollHeight;
-    });
   }
   function closeChat() {
     document.getElementById('chatPanel').style.display = 'none';
@@ -341,6 +334,7 @@
   async function sendChatMessage() {
     const msg = document.getElementById('chatInput').value;
     if (msg.trim() !== "") {
+      // Use the stored characterName if set; otherwise fallback to playerName
       const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
       try {
         await db.collection("messages").add({
@@ -451,7 +445,6 @@
     localStorage.setItem('garbageLevel', garbageLevel);
     document.getElementById('garbageDisplay').textContent = garbageLevel;
     logGarbageMessage("Garbage cleared by player.");
-    socket.emit('disposeGarbage');
   }
   function logGarbageMessage(message) {
     const logDiv = document.getElementById('garbageLog');
@@ -470,6 +463,7 @@
       .onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
+          // Update localStorage with the chosen character name
           localStorage.setItem('characterName', data.name);
           let statusHTML = `<h3>Character Status</h3>`;
           statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
@@ -547,10 +541,9 @@
       });
   }
 
-  socket.on('gameStateUpdate', gameState => {
-    logPowerMessage(`Global update: Electricity: ${gameState.resources.electricity}, Heat: ${gameState.resources.heat}, Water: ${gameState.resources.water}`);
-  });
-
+  // ----------------------------
+  // Initialization
+  // ----------------------------
   window.onload = function() {
     document.getElementById('windSpeedSlider').value = windSpeed;
     document.getElementById('windSpeedValue').textContent = windSpeed;
