@@ -46,8 +46,8 @@
     .grid button {
       width: 100%;
       height: 100%;
-      background-color: rgba(120, 120, 120, 0.3); /* muted gray */
-      border: 1px solid #555;
+      background-color: rgba(255, 255, 255, 0.2);
+      border: 1px solid #777;
       cursor: pointer;
       font-size: 14px;
       color: #eee;
@@ -90,8 +90,7 @@
     }
     .facilities button {
       padding: 10px 20px;
-      /* Using a rusty red/muted tone */
-      background-color: rgba(150, 60, 60, 0.7);
+      background-color: rgba(200, 150, 130, 0.7); /* muted, aged color hint */
       border: 1px solid #999;
       cursor: pointer;
       font-size: 16px;
@@ -327,6 +326,14 @@
 
 <script>
   // ----------------------------
+  // Helper: Sanitize Player Name
+  // ----------------------------
+  function sanitizePlayerName(name) {
+    // Replace slashes (both / and \) with underscores
+    return name.replace(/[\/\\]/g, '_');
+  }
+
+  // ----------------------------
   // Firebase Initialization
   // ----------------------------
   const firebaseConfig = {
@@ -527,7 +534,8 @@
   function updatePlayerStatus() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
-    db.collection('players').doc(playerName)
+    const safePlayerName = sanitizePlayerName(playerName);
+    db.collection('players').doc(safePlayerName)
       .onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
@@ -554,7 +562,8 @@
   function checkCharacterExistence() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
-    db.collection('players').doc(playerName).get().then((doc) => {
+    const safePlayerName = sanitizePlayerName(playerName);
+    db.collection('players').doc(safePlayerName).get().then((doc) => {
       if (doc.exists) {
         document.getElementById('characterCreation').style.display = 'none';
         document.getElementById('mainGame').style.display = 'block';
@@ -572,6 +581,7 @@
   function createCharacter() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
+    const safePlayerName = sanitizePlayerName(playerName);
     const charName = document.getElementById('charName').value;
     const charAge = document.getElementById('charAge').value;
     const charGender = document.getElementById('charGender').value;
@@ -592,7 +602,7 @@
       },
       lastUpdated: Date.now()
     };
-    db.collection('players').doc(playerName).set(playerData, { merge: true })
+    db.collection('players').doc(safePlayerName).set(playerData, { merge: true })
       .then(() => {
         localStorage.setItem('characterName', charName);
         document.getElementById('characterCreation').style.display = 'none';
@@ -602,6 +612,14 @@
       .catch((error) => {
         console.error("Error creating character:", error);
       });
+  }
+
+  // ----------------------------
+  // Helper: Sanitize Player Name
+  // ----------------------------
+  function sanitizePlayerName(name) {
+    // Replace forward slashes and backslashes with underscores.
+    return name.replace(/[\/\\]/g, '_');
   }
 
   // ----------------------------
