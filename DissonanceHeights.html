@@ -35,6 +35,19 @@
       padding: 10px;
       border-radius: 8px;
     }
+    /* New Community Garden Button Positioned Above Room 23 */
+    .garden-button {
+      position: absolute;
+      left: 210px; /* aligns roughly with column 3 */
+      top: -50px;  /* places it above the grid */
+      padding: 10px;
+      background-color: #5DADE2; /* a contrasting blue */
+      border: 2px solid #fff;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
     .grid {
       display: grid;
       grid-template-columns: repeat(5, 100px);
@@ -273,6 +286,8 @@
       <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
       <!-- Exit Button -->
       <button class="exit-button" onclick="signOutUser()">Exit</button>
+      <!-- New Community Garden Button positioned above Room 23 -->
+      <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
       <div class="grid">
         <!-- 25 Room Buttons -->
         <button onclick="openRoomChat('Room 21')">Room 21</button>
@@ -308,7 +323,7 @@
       <button onclick="openGroceryPanel()">Groceries Stand</button>
       <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
       <button onclick="togglePlayerStatus()">Biodata</button>
-      <button onclick="openGardenPanel()">Community Garden</button>
+      <!-- Removed Community Garden button from here -->
     </div>
     <!-- Biodata Panel -->
     <div id="playerStatus">
@@ -407,7 +422,6 @@
     <p>Manage your rooftop garden. Plants need water every 5 minutes and mature in 1 hour. Seeds can be obtained from the grocery store or by chance.</p>
     <div id="plantSlots">
       <!-- 10 Plant Slots -->
-      <!-- Each slot shows status and, if empty, a "Plant Seed" button -->
       <div class="slot" id="slot1">Slot 1: <span class="status">Empty</span> <button onclick="plantSeed(1)">Plant Seed</button></div>
       <div class="slot" id="slot2">Slot 2: <span class="status">Empty</span> <button onclick="plantSeed(2)">Plant Seed</button></div>
       <div class="slot" id="slot3">Slot 3: <span class="status">Empty</span> <button onclick="plantSeed(3)">Plant Seed</button></div>
@@ -443,16 +457,12 @@
   // ----------------------------
   // Garden State (Local Simulation)
   // ----------------------------
-  // Each plant slot is an object with properties: plantedTime and wateredTime.
-  // For simplicity, store in an array (index 1-10 for regular plants, index 11 for the mushroom tree).
   let garden = {};
   for (let i = 1; i <= 10; i++) {
     garden[i] = { plantedTime: null, wateredTime: null, mature: false };
   }
-  // Mushroom tree slot is index 11
   garden[11] = { plantedTime: null, wateredTime: null, mature: false, mushrooms: 0 };
   
-  // Function to update garden UI
   function updateGardenUI() {
     for (let i = 1; i <= 10; i++) {
       let slot = document.getElementById('slot' + i);
@@ -460,7 +470,6 @@
       if (garden[i].plantedTime === null) {
         statusSpan.textContent = "Empty";
       } else {
-        // Calculate elapsed time in minutes
         let elapsed = (Date.now() - garden[i].plantedTime) / 60000;
         if (elapsed >= 60 && !garden[i].mature) {
           garden[i].mature = true;
@@ -471,7 +480,6 @@
         }
       }
     }
-    // Mushroom tree slot
     let treeSlot = document.getElementById('mushroomTree');
     let treeStatus = treeSlot.querySelector('.status');
     if (garden[11].plantedTime === null) {
@@ -489,7 +497,6 @@
     }
   }
   
-  // Function to plant a seed in a regular slot
   function plantSeed(slotNumber) {
     if (garden[slotNumber].plantedTime === null) {
       garden[slotNumber].plantedTime = Date.now();
@@ -500,7 +507,6 @@
     }
   }
   
-  // Function to plant the mushroom tree
   function plantMushroomTree() {
     if (garden[11].plantedTime === null) {
       garden[11].plantedTime = Date.now();
@@ -511,7 +517,6 @@
     }
   }
   
-  // Every 5 minutes, simulate watering the plants (for demo, you could reduce the time)
   setInterval(function() {
     for (let i = 1; i <= 11; i++) {
       if (garden[i].plantedTime !== null) {
@@ -519,8 +524,8 @@
       }
     }
     updateGardenUI();
-  }, 300000); // 300000ms = 5 minutes
-
+  }, 300000);
+  
   // ----------------------------
   // Helper: Sanitize Player Name
   // ----------------------------
@@ -566,7 +571,7 @@
     const statusBox = document.getElementById('playerStatus');
     statusBox.style.display = (statusBox.style.display === "none" || statusBox.style.display === "") ? "block" : "none";
   }
-  
+
   // ----------------------------
   // Chat Functions using Firestore
   // ----------------------------
@@ -873,7 +878,6 @@
     document.getElementById('main-screen').style.display = 'block';
   }
   function buyItem(item) {
-    // Here you would normally process the purchase and update game state accordingly.
     alert("You purchased " + item + ".");
   }
 
@@ -919,7 +923,6 @@
     setInterval(updateVoltage, 5000);
     setInterval(simulateRandomEvent, 3600000);
     setInterval(updateGarbageDisplay, 3600000);
-    // For garden simulation, update UI periodically (every minute for example)
     setInterval(updateGardenUI, 60000);
   };
 </script>
