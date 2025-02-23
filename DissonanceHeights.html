@@ -250,8 +250,9 @@
       <button onclick="handleClick('Community Kitchen')">Community Kitchen</button>
       <button onclick="handleClick('Groceries Stand')">Groceries Stand</button>
       <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
-      <!-- Renamed Toggle Status button to Biodata -->
+      <!-- Biodata and Exit buttons -->
       <button onclick="togglePlayerStatus()">Biodata</button>
+      <button onclick="signOutUser()">Exit</button>
     </div>
     <!-- Biodata Panel -->
     <div id="playerStatus">
@@ -669,6 +670,21 @@
     })
     .catch((error) => {
        console.error("Error updating biodata:", error);
+    });
+  }
+
+  // ----------------------------
+  // New: Exit / Sign Out Function
+  // ----------------------------
+  function signOutUser() {
+    firebase.auth().signOut().then(() => {
+      // Optionally clear local storage or any other user data
+      localStorage.removeItem('playerName');
+      localStorage.removeItem('characterName');
+      // Reload the page (or redirect to a sign-in page)
+      window.location.reload();
+    }).catch((error) => {
+      console.error("Error signing out:", error);
     });
   }
 
