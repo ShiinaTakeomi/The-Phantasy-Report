@@ -11,9 +11,10 @@
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      /* Background with dark overlay for a gloomy, wintery feel */
-      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-                  url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
+      /* Background with dark overlay for a gloomy, wintery feel with a concrete/frost texture */
+      background: 
+        linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+        url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
       background-size: cover;
       color: #eee;
     }
@@ -28,6 +29,8 @@
       background: rgba(0, 0, 0, 0.6);
       padding: 10px;
       border-radius: 8px;
+      /* Optional: add a subtle concrete texture overlay */
+      background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');
     }
     .grid {
       display: grid;
@@ -46,6 +49,10 @@
       font-size: 14px;
       color: #eee;
       border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    .grid button:hover {
+      background-color: rgba(255, 255, 255, 0.3);
     }
     .garbage-chute {
       position: absolute;
@@ -91,6 +98,10 @@
       margin: 5px;
       border-radius: 4px;
       color: #222;
+      transition: background-color 0.3s;
+    }
+    .facilities button:hover {
+      background-color: rgba(200, 150, 130, 0.9);
     }
     .panel {
       display: none;
@@ -100,6 +111,7 @@
       margin: 20px auto;
       background: rgba(0, 0, 0, 0.7);
       border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.8);
     }
     .panel h2 {
       text-align: center;
@@ -179,14 +191,10 @@
       border-radius: 4px;
     }
   </style>
-  <!-- Firebase SDKs: Auth and Firestore (loaded so that firebase is defined globally) -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-<!-- Character Creation Section (shown if no character exists) -->
+<!-- Character Creation Section -->
 <div id="characterCreation">
   <h3>Create Your Character</h3>
   <p>Welcome, <span id="displayName"></span>!</p>
@@ -395,6 +403,7 @@
   async function sendChatMessage() {
     const msg = document.getElementById('chatInput').value;
     if (msg.trim() !== "") {
+      // Use the stored characterName if set; otherwise fallback to playerName
       const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
       try {
         await db.collection("messages").add({
