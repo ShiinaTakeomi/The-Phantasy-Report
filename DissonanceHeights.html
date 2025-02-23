@@ -172,7 +172,7 @@
       border-radius: 4px;
     }
   </style>
-  <!-- Firebase SDKs: Auth and Firestore -->
+  <!-- Firebase SDKs: Auth and Firestore (Loaded first so that firebase is defined globally) -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
@@ -580,7 +580,7 @@
     document.getElementById('powerOutputConfirm').textContent = powerOutputConfirmed ? "Output Confirmed" : "Confirm Output";
     updateVoltage();
     updateGarbageDisplay();
-    // Check if player is signed in and then check for character existence
+    // Check if a player is signed in and then check for their character document
     if (localStorage.getItem('playerName')) {
       checkCharacterExistence();
     }
