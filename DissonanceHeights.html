@@ -3,31 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <title>Dissonance Heights</title>
-  <!-- Google Font for Soviet-era signage look -->
+  <!-- Google Font for Soviet-style signage -->
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
   <style>
-    /* Global Styles & Eastern European Snowy Minimal Theme */
+    /* Global Styles & Eastern European Snowy Theme */
     body {
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
-      /* Background with dark overlay for a gloomy, wintery feel */
-      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-                  url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
+      font-family: 'Russo One', Arial, sans-serif;
+      /* Background image evokes a snowy urban block flat house with a concrete/frost overlay */
+      background: 
+        linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+        url('https://images.unsplash.com/photo-1601758123927-8b973eb4c74f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80') no-repeat center center fixed;
       background-size: cover;
       color: #eee;
-    }
-    /* Use Russo One for headings to evoke Soviet-era signage */
-    h1, h2, h3 {
-      font-family: 'Russo One', sans-serif;
     }
     .container {
       position: relative;
       width: 600px;
       margin: 20px auto;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(20, 20, 20, 0.7);
       padding: 10px;
       border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
     }
     .grid {
       display: grid;
@@ -40,12 +38,16 @@
     .grid button {
       width: 100%;
       height: 100%;
-      background-color: rgba(255, 255, 255, 0.2);
-      border: 1px solid #777;
+      background-color: rgba(180, 180, 180, 0.2);
+      border: 1px solid #555;
       cursor: pointer;
       font-size: 14px;
       color: #eee;
       border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    .grid button:hover {
+      background-color: rgba(180, 180, 180, 0.4);
     }
     .garbage-chute {
       position: absolute;
@@ -54,7 +56,7 @@
       width: 50px;
       height: 520px;
       background-color: rgba(211, 211, 211, 0.3);
-      border: 2px solid #999;
+      border: 2px solid #888;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -70,7 +72,7 @@
       left: calc(60px + 520px + 10px);
       width: 100px;
       height: 100px;
-      background-color: rgba(192, 192, 255, 0.5);
+      background-color: rgba(150, 150, 200, 0.5);
       border: 2px solid #666;
       cursor: pointer;
       font-size: 14px;
@@ -84,13 +86,17 @@
     }
     .facilities button {
       padding: 10px 20px;
-      background-color: rgba(200, 150, 130, 0.7); /* muted, aged color hint */
+      background-color: rgba(178, 34, 34, 0.7); /* rusty red tone */
       border: 1px solid #999;
       cursor: pointer;
       font-size: 16px;
       margin: 5px;
       border-radius: 4px;
       color: #222;
+      transition: background-color 0.3s;
+    }
+    .facilities button:hover {
+      background-color: rgba(178, 34, 34, 0.9);
     }
     .panel {
       display: none;
@@ -100,6 +106,7 @@
       margin: 20px auto;
       background: rgba(0, 0, 0, 0.7);
       border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
     }
     .panel h2 {
       text-align: center;
@@ -179,10 +186,6 @@
       border-radius: 4px;
     }
   </style>
-  <!-- Firebase SDKs: Auth and Firestore (loaded so that firebase is defined globally) -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -395,6 +398,7 @@
   async function sendChatMessage() {
     const msg = document.getElementById('chatInput').value;
     if (msg.trim() !== "") {
+      // Use the stored characterName if set; otherwise fallback to playerName
       const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
       try {
         await db.collection("messages").add({
@@ -544,6 +548,7 @@
         console.error("Error getting player status:", error);
       });
   }
+
   function checkCharacterExistence() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
@@ -562,6 +567,7 @@
       console.error("Error checking character existence:", error);
     });
   }
+
   function createCharacter() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
@@ -608,7 +614,7 @@
     document.getElementById('powerOutputConfirm').textContent = powerOutputConfirmed ? "Output Confirmed" : "Confirm Output";
     updateVoltage();
     updateGarbageDisplay();
-    // Check if a player is signed in and then check for character existence
+    // Check if a player is signed in and then check for their character document
     if (localStorage.getItem('playerName')) {
       checkCharacterExistence();
     }
