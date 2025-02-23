@@ -172,6 +172,10 @@
       border-radius: 4px;
     }
   </style>
+  <!-- Firebase SDKs: Auth and Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -394,6 +398,7 @@
   let lastInteractionTime = localStorage.getItem('lastInteractionTime') || Date.now();
   let garbageLevel = localStorage.getItem('garbageLevel') || 0;
   let lastGarbageUpdate = localStorage.getItem('lastGarbageUpdate') || Date.now();
+  
   function updateWindSpeed() {
     windSpeed = document.getElementById('windSpeedSlider').value;
     document.getElementById('windSpeedValue').textContent = windSpeed;
@@ -469,7 +474,6 @@
     localStorage.setItem('garbageLevel', garbageLevel);
     document.getElementById('garbageDisplay').textContent = garbageLevel;
     logGarbageMessage("Garbage cleared by player.");
-    // Removed socket emission for Firestore-only implementation.
   }
   function logGarbageMessage(message) {
     const logDiv = document.getElementById('garbageLog');
@@ -569,12 +573,14 @@
   // Initialization
   // ----------------------------
   window.onload = function() {
+    // Set initial values for power simulation
     document.getElementById('windSpeedSlider').value = windSpeed;
     document.getElementById('windSpeedValue').textContent = windSpeed;
     document.getElementById('brakeButton').textContent = brakeEngaged ? "Release Brake" : "Engage Brake";
     document.getElementById('powerOutputConfirm').textContent = powerOutputConfirmed ? "Output Confirmed" : "Confirm Output";
     updateVoltage();
     updateGarbageDisplay();
+    // Check if player is signed in and then check for character existence
     if (localStorage.getItem('playerName')) {
       checkCharacterExistence();
     }
