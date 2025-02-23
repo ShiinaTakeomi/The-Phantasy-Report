@@ -172,7 +172,7 @@
       border-radius: 4px;
     }
   </style>
-  <!-- Firebase SDKs: Auth and Firestore (Loaded first so that firebase is defined globally) -->
+  <!-- Firebase SDKs: Auth and Firestore (Loaded so that firebase is defined globally) -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
@@ -312,7 +312,9 @@
 </div>
 
 <script>
-  // Initialize Firebase
+  // ----------------------------
+  // Firebase Initialization
+  // ----------------------------
   const firebaseConfig = {
     apiKey: "AIzaSyD5avvNbSB5L_YtpyxbBYYnvUpjMa0WglE",
     authDomain: "thephantasyreport.firebaseapp.com",
@@ -324,6 +326,32 @@
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
+
+  // ----------------------------
+  // Navigation Functions
+  // ----------------------------
+  function showPowerPanel() {
+    document.getElementById('minigame-panel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+  }
+  function showGarbagePanel() {
+    updateGarbageDisplay();
+    document.getElementById('garbage-panel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+  }
+  function hidePanel(panelId) {
+    document.getElementById(panelId).style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+  }
+  // A stub for facilities buttons (if needed)
+  function handleClick(label) {
+    // For now, simply alert the label; you can extend this functionality as needed.
+    alert("Facility: " + label);
+  }
+  function togglePlayerStatus() {
+    const statusBox = document.getElementById('playerStatus');
+    statusBox.style.display = (statusBox.style.display === "none" || statusBox.style.display === "") ? "block" : "none";
+  }
 
   // ----------------------------
   // Chat Functions using Firestore
@@ -398,7 +426,7 @@
   let lastInteractionTime = localStorage.getItem('lastInteractionTime') || Date.now();
   let garbageLevel = localStorage.getItem('garbageLevel') || 0;
   let lastGarbageUpdate = localStorage.getItem('lastGarbageUpdate') || Date.now();
-  
+
   function updateWindSpeed() {
     windSpeed = document.getElementById('windSpeedSlider').value;
     document.getElementById('windSpeedValue').textContent = windSpeed;
@@ -483,7 +511,7 @@
   }
 
   // ----------------------------
-  // Firebase: Player Join, Status Update & Display
+  // Firebase: Player Status & Character Management
   // ----------------------------
   function updatePlayerStatus() {
     const playerName = localStorage.getItem('playerName');
@@ -492,6 +520,7 @@
       .onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
+          // Update localStorage with the chosen character name
           localStorage.setItem('characterName', data.name);
           let statusHTML = `<h3>Character Status</h3>`;
           statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
