@@ -151,7 +151,7 @@
       color: #fff;
       border-radius: 4px;
     }
-    /* Character Status Box */
+    /* Character Status Box (now Biodata) */
     #playerStatus {
       margin: 20px auto;
       max-width: 300px;
@@ -250,13 +250,12 @@
       <button onclick="handleClick('Community Kitchen')">Community Kitchen</button>
       <button onclick="handleClick('Groceries Stand')">Groceries Stand</button>
       <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
-      <!-- Toggle Status Button -->
-      <button onclick="togglePlayerStatus()">Toggle Status</button>
+      <!-- Renamed Toggle Status button to Biodata -->
+      <button onclick="togglePlayerStatus()">Biodata</button>
     </div>
-    <!-- Character Status Box -->
+    <!-- Biodata Panel (formerly Character Status) -->
     <div id="playerStatus">
-      <h3>Character Status</h3>
-      <p>Your character data will appear here.</p>
+      <!-- This content is populated by updatePlayerStatus() -->
     </div>
   </div>
 
@@ -540,19 +539,20 @@
         if (doc.exists) {
           const data = doc.data();
           localStorage.setItem('characterName', data.name);
-          let statusHTML = `<h3>Character Status</h3>`;
-          statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
+          let statusHTML = `<h3>Biodata</h3>`;
+          statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" /></p>`;
           statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
           statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
           statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
           statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
           statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
-          statusHTML += `<p><strong>Age:</strong> ${data.age || "N/A"}</p>`;
-          statusHTML += `<p><strong>Reason:</strong> ${data.reason || "N/A"}</p>`;
+          statusHTML += `<p><strong>Age:</strong> <input type="number" id="editAge" value="${data.age}" /></p>`;
+          statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason}</textarea></p>`;
           statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
           statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
           statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
           statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
+          statusHTML += `<button onclick="saveBiodata()">Save Changes</button>`;
           document.getElementById('playerStatus').innerHTML = statusHTML;
         }
       }, (error) => {
@@ -615,6 +615,31 @@
   }
 
   // ----------------------------
+  // New: Save Biodata Function
+  // ----------------------------
+  function saveBiodata() {
+    const playerName = localStorage.getItem('playerName');
+    if (!playerName) return;
+    const safePlayerName = sanitizePlayerName(playerName);
+    const newName = document.getElementById('editName').value;
+    const newAge = document.getElementById('editAge').value;
+    const newReason = document.getElementById('editReason').value;
+    db.collection('players').doc(safePlayerName).set({
+       name: newName,
+       age: newAge,
+       reason: newReason,
+       lastUpdated: Date.now()
+    }, { merge: true })
+    .then(() => {
+       localStorage.setItem('characterName', newName);
+       alert('Biodata updated successfully.');
+    })
+    .catch((error) => {
+       console.error("Error updating biodata:", error);
+    });
+  }
+
+  // ----------------------------
   // Initialization
   // ----------------------------
   window.onload = function() {
@@ -635,4 +660,4 @@
   };
 </script>
 </body>
-</html> 
+</html>
