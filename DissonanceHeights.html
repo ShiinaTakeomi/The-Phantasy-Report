@@ -151,7 +151,7 @@
       color: #fff;
       border-radius: 4px;
     }
-    /* Character Status Box (now Biodata) */
+    /* Biodata Panel (formerly Character Status) */
     #playerStatus {
       margin: 20px auto;
       max-width: 300px;
@@ -253,7 +253,7 @@
       <!-- Renamed Toggle Status button to Biodata -->
       <button onclick="togglePlayerStatus()">Biodata</button>
     </div>
-    <!-- Biodata Panel (formerly Character Status) -->
+    <!-- Biodata Panel -->
     <div id="playerStatus">
       <!-- This content is populated by updatePlayerStatus() -->
     </div>
@@ -324,6 +324,11 @@
 </div>
 
 <script>
+  // ----------------------------
+  // Global Editing State
+  // ----------------------------
+  let isEditing = false;
+
   // ----------------------------
   // Helper: Sanitize Player Name
   // ----------------------------
@@ -540,19 +545,38 @@
           const data = doc.data();
           localStorage.setItem('characterName', data.name);
           let statusHTML = `<h3>Biodata</h3>`;
-          statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" /></p>`;
-          statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
-          statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
-          statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
-          statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
-          statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
-          statusHTML += `<p><strong>Age:</strong> <input type="number" id="editAge" value="${data.age}" /></p>`;
-          statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason}</textarea></p>`;
-          statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
-          statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
-          statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
-          statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
-          statusHTML += `<button onclick="saveBiodata()">Save Changes</button>`;
+          if (!isEditing) {
+            // View mode: show biodata as static text
+            statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
+            statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+            statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+            statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+            statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+            statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
+            statusHTML += `<p><strong>Age:</strong> ${data.age}</p>`;
+            statusHTML += `<p><strong>Reason:</strong> ${data.reason}</p>`;
+            statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
+            statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
+            statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
+            statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
+            statusHTML += `<button onclick="enableEdit()">Edit</button>`;
+          } else {
+            // Edit mode: show input fields for Name, Age and Reason along with Save and Cancel buttons
+            statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" /></p>`;
+            statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+            statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+            statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+            statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+            statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
+            statusHTML += `<p><strong>Age:</strong> <input type="number" id="editAge" value="${data.age}" /></p>`;
+            statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason}</textarea></p>`;
+            statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
+            statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
+            statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
+            statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
+            statusHTML += `<button onclick="saveBiodata()">Save Changes</button> `;
+            statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
+          }
           document.getElementById('playerStatus').innerHTML = statusHTML;
         }
       }, (error) => {
@@ -615,8 +639,16 @@
   }
 
   // ----------------------------
-  // New: Save Biodata Function
+  // New: Editing Functions
   // ----------------------------
+  function enableEdit() {
+    isEditing = true;
+    updatePlayerStatus();
+  }
+  function cancelEdit() {
+    isEditing = false;
+    updatePlayerStatus();
+  }
   function saveBiodata() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
@@ -632,6 +664,7 @@
     }, { merge: true })
     .then(() => {
        localStorage.setItem('characterName', newName);
+       isEditing = false;
        alert('Biodata updated successfully.');
     })
     .catch((error) => {
