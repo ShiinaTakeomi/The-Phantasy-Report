@@ -3,24 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <title>Welcome to Dissonance Heights</title>
+  <!-- Google Font for Soviet-era aesthetic -->
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      text-align: center; 
-      margin-top: 100px; 
+    /* Global Styles - Dark, Gloomy, Eastern European Winter Vibe */
+    body {
+      font-family: 'Russo One', sans-serif;
+      text-align: center;
+      margin-top: 100px;
+      background:
+        linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)),
+        url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
+      background-size: cover;
+      color: #c0c7d3;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
     }
-    button {
-      padding: 10px 20px;
+    
+    h1 {
+      font-size: 40px;
+      letter-spacing: 2px;
+      color: #ffffff;
+      text-transform: uppercase;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+    }
+    
+    p {
       font-size: 18px;
+      margin-bottom: 30px;
+      color: #d1d6e0;
+    }
+    
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      font-weight: bold;
       cursor: pointer;
-      margin: 10px;
+      background: #9b1c1c; /* Deep Soviet red */
+      border: 2px solid #772020;
+      color: #f4f4f4;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 3px 3px 10px rgba(0,0,0,0.6);
+      transition: all 0.3s ease-in-out;
+    }
+    
+    button:hover {
+      background: #b92727;
+      border: 2px solid #a42424;
+      transform: scale(1.05);
+    }
+    
+    /* Snowfall overlay for a wintry feel */
+    @keyframes snowfall {
+      from {background-position: 0 0;}
+      to {background-position: 1000px 1000px;}
+    }
+    
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: url('https://www.transparenttextures.com/patterns/foggy-birds.png');
+      opacity: 0.2;
+      animation: snowfall 20s linear infinite;
     }
   </style>
   <!-- Firebase SDKs for Auth -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script>
-    // Your Firebase configuration (same as in your main app)
+    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyD5avvNbSB5L_YtpyxbBYYnvUpjMa0WglE",
       authDomain: "thephantasyreport.firebaseapp.com",
@@ -37,9 +93,7 @@
       firebase.auth().signInWithPopup(provider)
         .then((result) => {
           const user = result.user;
-          // Store the player's display name in localStorage
           localStorage.setItem('playerName', user.displayName);
-          // Redirect to the main application page
           window.location.href = 'DissonanceHeights.html';
         })
         .catch((error) => {
@@ -47,7 +101,6 @@
         });
     }
 
-    // Automatically check auth state on load and redirect if already signed in
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         localStorage.setItem('playerName', user.displayName);
@@ -59,7 +112,6 @@
 <body>
   <h1>Welcome to Dissonance Heights</h1>
   <p>Enter the world of The Phantasy Report</p>
-  <!-- Sign In with Google Button Only -->
   <button onclick="signInWithGoogle()">Sign In with Google</button>
 </body>
 </html>
