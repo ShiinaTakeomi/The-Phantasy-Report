@@ -343,9 +343,7 @@
     document.getElementById(panelId).style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
   }
-  // A stub for facilities buttons (if needed)
   function handleClick(label) {
-    // For now, simply alert the label; you can extend this functionality as needed.
     alert("Facility: " + label);
   }
   function togglePlayerStatus() {
@@ -520,7 +518,6 @@
       .onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
-          // Update localStorage with the chosen character name
           localStorage.setItem('characterName', data.name);
           let statusHTML = `<h3>Character Status</h3>`;
           statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
@@ -541,7 +538,6 @@
         console.error("Error getting player status:", error);
       });
   }
-
   function checkCharacterExistence() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
@@ -560,7 +556,6 @@
       console.error("Error checking character existence:", error);
     });
   }
-
   function createCharacter() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
@@ -568,7 +563,6 @@
     const charAge = document.getElementById('charAge').value;
     const charGender = document.getElementById('charGender').value;
     const charReason = document.getElementById('charReason').value;
-
     const playerData = {
       name: charName,
       age: charAge,
@@ -585,7 +579,6 @@
       },
       lastUpdated: Date.now()
     };
-
     db.collection('players').doc(playerName).set(playerData, { merge: true })
       .then(() => {
         localStorage.setItem('characterName', charName);
