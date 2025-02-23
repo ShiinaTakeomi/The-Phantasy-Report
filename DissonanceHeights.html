@@ -138,14 +138,33 @@
     .control input[type="range"] {
       width: 200px;
     }
-    #minigameLog, #garbageLog {
-      border: 1px solid #ccc;
-      padding: 10px;
-      height: 100px;
-      overflow-y: auto;
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      border-radius: 4px;
+    /* Additional styles for the Resource Allocation Panel */
+    #resource-panel {
+      display: none;
+      border: 2px solid #444;
+      padding: 20px;
+      width: 600px;
+      margin: 20px auto;
+      border-radius: 8px;
+      background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #eee;
+    }
+    #resource-panel h2 {
+      margin-bottom: 20px;
+    }
+    #resource-panel .allocation {
+      margin: 10px 0;
+    }
+    #resource-panel input[type="number"] {
+      width: 60px;
+      padding: 5px;
+      font-size: 16px;
+      margin-left: 10px;
+    }
+    #resource-panel p {
+      font-size: 16px;
+      margin-bottom: 10px;
     }
     /* Chat Panel */
     #chatPanel {
@@ -232,7 +251,7 @@
   <div id="main-screen">
     <div class="container">
       <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
-      <!-- New Exit Button placed below the garbage chute -->
+      <!-- Exit Button -->
       <button class="exit-button" onclick="signOutUser()">Exit</button>
       <div class="grid">
         <!-- 25 Room Buttons -->
@@ -268,8 +287,9 @@
       <button onclick="handleClick('Community Kitchen')">Community Kitchen</button>
       <button onclick="handleClick('Groceries Stand')">Groceries Stand</button>
       <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
-      <!-- Only Biodata button remains in facilities -->
       <button onclick="togglePlayerStatus()">Biodata</button>
+      <!-- New button to open the Resource Allocation Meeting -->
+      <button onclick="openResourcePanel()">Resource Meeting</button>
     </div>
     <!-- Biodata Panel -->
     <div id="playerStatus">
@@ -331,6 +351,27 @@
     <div id="garbageLog"></div>
   </div>
 
+  <!-- Resource Allocation Meeting Panel -->
+  <div id="resource-panel" class="panel">
+    <h2>Resource Allocation Meeting</h2>
+    <p>Distribute exactly <strong>100 resource points</strong> among your survivors.</p>
+    <div class="allocation">
+      <label for="allocA">Survivor A:</label>
+      <input type="number" id="allocA" value="0" min="0" oninput="updateAllocationTotal()">
+    </div>
+    <div class="allocation">
+      <label for="allocB">Survivor B:</label>
+      <input type="number" id="allocB" value="0" min="0" oninput="updateAllocationTotal()">
+    </div>
+    <div class="allocation">
+      <label for="allocC">Survivor C:</label>
+      <input type="number" id="allocC" value="0" min="0" oninput="updateAllocationTotal()">
+    </div>
+    <p>Total Allocated: <span id="allocTotal">0</span> / 100</p>
+    <button onclick="submitAllocation()">Submit Allocation</button>
+    <button onclick="closeResourcePanel()">Cancel</button>
+  </div>
+
   <!-- Chat Panel -->
   <div id="chatPanel" class="panel">
     <h2 id="chatRoomTitle"></h2>
@@ -351,7 +392,6 @@
   // Helper: Sanitize Player Name
   // ----------------------------
   function sanitizePlayerName(name) {
-    // Replace forward slashes and backslashes with underscores.
     return name.replace(/[\/\\]/g, '_');
   }
 
@@ -564,7 +604,6 @@
           localStorage.setItem('characterName', data.name);
           let statusHTML = `<h3>Biodata</h3>`;
           if (!isEditing) {
-            // View mode: show biodata as static text
             statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
             statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
             statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
@@ -579,7 +618,6 @@
             statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
             statusHTML += `<button onclick="enableEdit()">Edit</button>`;
           } else {
-            // Edit mode: show input fields for Name, Age and Reason along with Save and Cancel buttons
             statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" /></p>`;
             statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
             statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
@@ -691,14 +729,46 @@
   }
 
   // ----------------------------
+  // New: Resource Allocation Meeting Minigame Functions
+  // ----------------------------
+  function openResourcePanel() {
+    document.getElementById('resource-panel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+    // Reset allocation inputs
+    document.getElementById('allocA').value = 0;
+    document.getElementById('allocB').value = 0;
+    document.getElementById('allocC').value = 0;
+    updateAllocationTotal();
+  }
+  function closeResourcePanel() {
+    document.getElementById('resource-panel').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+  }
+  function updateAllocationTotal() {
+    const a = parseInt(document.getElementById('allocA').value) || 0;
+    const b = parseInt(document.getElementById('allocB').value) || 0;
+    const c = parseInt(document.getElementById('allocC').value) || 0;
+    const total = a + b + c;
+    document.getElementById('allocTotal').textContent = total;
+  }
+  function submitAllocation() {
+    const total = parseInt(document.getElementById('allocTotal').textContent) || 0;
+    if (total === 100) {
+      // Process allocation result – here we simply alert success.
+      alert("Allocation successful! Survivors are satisfied with the distribution.");
+      closeResourcePanel();
+    } else {
+      alert("Please allocate exactly 100 resource points. Your current total is " + total + ".");
+    }
+  }
+
+  // ----------------------------
   // New: Exit / Sign Out Function
   // ----------------------------
   function signOutUser() {
     firebase.auth().signOut().then(() => {
-      // Optionally clear local storage or any other user data
       localStorage.removeItem('playerName');
       localStorage.removeItem('characterName');
-      // Redirect to index.html upon sign out
       window.location.href = "index.html";
     }).catch((error) => {
       console.error("Error signing out:", error);
@@ -709,14 +779,12 @@
   // Initialization
   // ----------------------------
   window.onload = function() {
-    // Set initial values for power simulation
     document.getElementById('windSpeedSlider').value = windSpeed;
     document.getElementById('windSpeedValue').textContent = windSpeed;
     document.getElementById('brakeButton').textContent = brakeEngaged ? "Release Brake" : "Engage Brake";
     document.getElementById('powerOutputConfirm').textContent = powerOutputConfirmed ? "Output Confirmed" : "Confirm Output";
     updateVoltage();
     updateGarbageDisplay();
-    // Check if a player is signed in and then check for character existence
     if (localStorage.getItem('playerName')) {
       checkCharacterExistence();
     }
