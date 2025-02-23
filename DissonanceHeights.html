@@ -35,20 +35,9 @@
       padding: 10px;
       border-radius: 8px;
     }
-    /* New Community Garden Button Positioned Above Room 23 */
-    .garden-button {
-      position: absolute;
-      left: 210px; /* aligns roughly with column 3 */
-      top: 10px;  /* moved down from -50px for better visibility */
-      padding: 10px;
-      background-color: #5DADE2; /* a contrasting blue */
-      border: 2px solid #fff;
-      border-radius: 4px;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-    }
+    /* The grid container for room buttons */
     .grid {
+      position: relative; /* So that absolute children are relative to this container */
       display: grid;
       grid-template-columns: repeat(5, 100px);
       grid-template-rows: repeat(5, 100px);
@@ -286,8 +275,7 @@
       <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
       <!-- Exit Button -->
       <button class="exit-button" onclick="signOutUser()">Exit</button>
-      <!-- New Community Garden Button positioned above Room 23 -->
-      <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
+      <!-- The grid container now holds the room buttons -->
       <div class="grid">
         <!-- 25 Room Buttons -->
         <button onclick="openRoomChat('Room 21')">Room 21</button>
@@ -315,6 +303,9 @@
         <button onclick="openRoomChat('Room 3')">Room 3</button>
         <button onclick="openRoomChat('Room 4')">Room 4</button>
         <button onclick="openRoomChat('Room 5')">Room 5</button>
+        <!-- The Community Garden button is not part of the normal flow;
+             it is absolutely positioned within the grid container so that it appears above Room 23 -->
+        <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
       </div>
       <button class="power-room" onclick="showPowerPanel()">Power Room</button>
     </div>
@@ -323,7 +314,6 @@
       <button onclick="openGroceryPanel()">Groceries Stand</button>
       <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
       <button onclick="togglePlayerStatus()">Biodata</button>
-      <!-- Removed Community Garden button from here -->
     </div>
     <!-- Biodata Panel -->
     <div id="playerStatus">
@@ -461,6 +451,7 @@
   for (let i = 1; i <= 10; i++) {
     garden[i] = { plantedTime: null, wateredTime: null, mature: false };
   }
+  // Mushroom tree slot is index 11
   garden[11] = { plantedTime: null, wateredTime: null, mature: false, mushrooms: 0 };
   
   function updateGardenUI() {
@@ -524,7 +515,7 @@
       }
     }
     updateGardenUI();
-  }, 300000);
+  }, 300000); // Every 5 minutes
   
   // ----------------------------
   // Helper: Sanitize Player Name
