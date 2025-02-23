@@ -329,7 +329,7 @@
   // Helper: Sanitize Player Name
   // ----------------------------
   function sanitizePlayerName(name) {
-    // Replace slashes (both / and \) with underscores
+    // Replace forward slashes and backslashes with underscores.
     return name.replace(/[\/\\]/g, '_');
   }
 
@@ -612,14 +612,6 @@
       .catch((error) => {
         console.error("Error creating character:", error);
       });
-  }
-
-  // ----------------------------
-  // Helper: Sanitize Player Name
-  // ----------------------------
-  function sanitizePlayerName(name) {
-    // Replace forward slashes and backslashes with underscores.
-    return name.replace(/[\/\\]/g, '_');
   }
 
   // ----------------------------
