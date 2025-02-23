@@ -138,8 +138,8 @@
     .control input[type="range"] {
       width: 200px;
     }
-    /* Resource Allocation Panel */
-    #resource-panel {
+    /* Grocery Store Panel */
+    #grocery-panel {
       display: none;
       border: 2px solid #444;
       padding: 20px;
@@ -150,21 +150,15 @@
       background-color: rgba(0, 0, 0, 0.7);
       color: #eee;
     }
-    #resource-panel h2 {
+    #grocery-panel h2 {
       margin-bottom: 20px;
     }
-    #resource-panel .allocation {
+    #grocery-panel .grocery-item {
       margin: 10px 0;
     }
-    #resource-panel input[type="number"] {
-      width: 60px;
-      padding: 5px;
+    #grocery-panel .grocery-item p {
       font-size: 16px;
-      margin-left: 10px;
-    }
-    #resource-panel p {
-      font-size: 16px;
-      margin-bottom: 10px;
+      margin-bottom: 5px;
     }
     /* Chat Panel */
     #chatPanel {
@@ -220,14 +214,14 @@
       border-radius: 4px;
     }
   </style>
-  <!-- Firebase SDKs: Auth and Firestore (loaded so that firebase is defined globally) -->
+  <!-- Firebase SDKs: Auth and Firestore -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-<!-- Character Creation Section (shown if no character exists) -->
+<!-- Character Creation Section -->
 <div id="characterCreation">
   <h3>Create Your Character</h3>
   <p>Welcome, <span id="displayName"></span>!</p>
@@ -285,15 +279,14 @@
     </div>
     <div class="facilities">
       <button onclick="handleClick('Community Kitchen')">Community Kitchen</button>
-      <button onclick="handleClick('Groceries Stand')">Groceries Stand</button>
+      <!-- Changed Groceries Stand to open the new Grocery Store panel -->
+      <button onclick="openGroceryPanel()">Groceries Stand</button>
       <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
       <button onclick="togglePlayerStatus()">Biodata</button>
-      <!-- New button to open the Resource Allocation Meeting -->
-      <button onclick="openResourcePanel()">Resource Meeting</button>
     </div>
     <!-- Biodata Panel -->
     <div id="playerStatus">
-      <!-- This content is populated by updatePlayerStatus() -->
+      <!-- Populated by updatePlayerStatus() -->
     </div>
   </div>
 
@@ -351,33 +344,35 @@
     <div id="garbageLog"></div>
   </div>
 
-  <!-- Resource Allocation Meeting Panel -->
-  <div id="resource-panel" class="panel">
-    <h2>Resource Allocation Meeting</h2>
-    <p>Distribute exactly <strong>100 resource points</strong> among the building floors.</p>
-    <div class="allocation">
-      <label for="allocF1">Floor 1 (Rooms 1–5):</label>
-      <input type="number" id="allocF1" value="0" min="0" oninput="updateAllocationTotal()">
+  <!-- Grocery Store Panel -->
+  <div id="grocery-panel" class="panel">
+    <h2>Grocery Store</h2>
+    <p>Purchase essential items to ensure survival. Note: Without proper electricity, prices may increase.</p>
+    <div class="grocery-item">
+      <p><strong>Food Staples</strong> (Bread, Meat, Vegetables, etc.)</p>
+      <button onclick="buyItem('Food Staples')">Buy Food</button>
     </div>
-    <div class="allocation">
-      <label for="allocF2">Floor 2 (Rooms 6–10):</label>
-      <input type="number" id="allocF2" value="0" min="0" oninput="updateAllocationTotal()">
+    <div class="grocery-item">
+      <p><strong>Seeds</strong> (For your community garden)</p>
+      <button onclick="buyItem('Seeds')">Buy Seeds</button>
     </div>
-    <div class="allocation">
-      <label for="allocF3">Floor 3 (Rooms 11–15):</label>
-      <input type="number" id="allocF3" value="0" min="0" oninput="updateAllocationTotal()">
+    <div class="grocery-item">
+      <p><strong>Maintenance Essentials</strong> (For wind turbine repairs)</p>
+      <button onclick="buyItem('Maintenance Essentials')">Buy Maintenance</button>
     </div>
-    <div class="allocation">
-      <label for="allocF4">Floor 4 (Rooms 16–20):</label>
-      <input type="number" id="allocF4" value="0" min="0" oninput="updateAllocationTotal()">
+    <div class="grocery-item">
+      <p><strong>Room Decorations</strong> (10 types available to boost mood)</p>
+      <button onclick="buyItem('Room Decoration')">Buy Decoration</button>
     </div>
-    <div class="allocation">
-      <label for="allocF5">Floor 5 (Rooms 21–25):</label>
-      <input type="number" id="allocF5" value="0" min="0" oninput="updateAllocationTotal()">
+    <div class="grocery-item">
+      <p><strong>Alcohol</strong> (Boosts mood temporarily but slows work)</p>
+      <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
     </div>
-    <p>Total Allocated: <span id="allocTotal">0</span> / 100</p>
-    <button onclick="submitAllocation()">Submit Allocation</button>
-    <button onclick="closeResourcePanel()">Cancel</button>
+    <div class="grocery-item">
+      <p><strong>Cigarettes</strong> (50/50 chance to boost mood but harm health over time)</p>
+      <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
+    </div>
+    <button onclick="closeGroceryPanel()">Return to Main Screen</button>
   </div>
 
   <!-- Chat Panel -->
@@ -737,41 +732,19 @@
   }
 
   // ----------------------------
-  // New: Resource Allocation Meeting Minigame Functions
+  // New: Grocery Store Functions
   // ----------------------------
-  function openResourcePanel() {
-    document.getElementById('resource-panel').style.display = 'block';
+  function openGroceryPanel() {
+    document.getElementById('grocery-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
-    // Reset allocation inputs
-    document.getElementById('allocF1').value = 0;
-    document.getElementById('allocF2').value = 0;
-    document.getElementById('allocF3').value = 0;
-    document.getElementById('allocF4').value = 0;
-    document.getElementById('allocF5').value = 0;
-    updateAllocationTotal();
   }
-  function closeResourcePanel() {
-    document.getElementById('resource-panel').style.display = 'none';
+  function closeGroceryPanel() {
+    document.getElementById('grocery-panel').style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
   }
-  function updateAllocationTotal() {
-    const f1 = parseInt(document.getElementById('allocF1').value) || 0;
-    const f2 = parseInt(document.getElementById('allocF2').value) || 0;
-    const f3 = parseInt(document.getElementById('allocF3').value) || 0;
-    const f4 = parseInt(document.getElementById('allocF4').value) || 0;
-    const f5 = parseInt(document.getElementById('allocF5').value) || 0;
-    const total = f1 + f2 + f3 + f4 + f5;
-    document.getElementById('allocTotal').textContent = total;
-  }
-  function submitAllocation() {
-    const total = parseInt(document.getElementById('allocTotal').textContent) || 0;
-    if (total === 100) {
-      // Process allocation result – here we simply alert success.
-      alert("Allocation successful! The floors are satisfied with the distribution.");
-      closeResourcePanel();
-    } else {
-      alert("Please allocate exactly 100 resource points. Your current total is " + total + ".");
-    }
+  function buyItem(item) {
+    // Here you would normally process the purchase and update game state accordingly.
+    alert("You purchased " + item + ".");
   }
 
   // ----------------------------
