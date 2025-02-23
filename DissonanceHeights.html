@@ -35,9 +35,8 @@
       padding: 10px;
       border-radius: 8px;
     }
-    /* The grid container for room buttons */
+    /* Grid container for room buttons */
     .grid {
-      position: relative; /* So that absolute children are relative to this container */
       display: grid;
       grid-template-columns: repeat(5, 100px);
       grid-template-rows: repeat(5, 100px);
@@ -53,23 +52,6 @@
       cursor: pointer;
       font-size: 14px;
       color: #eee;
-      border-radius: 4px;
-    }
-    .garbage-chute {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 50px;
-      height: 520px;
-      background-color: rgba(211, 211, 211, 0.3);
-      border: 2px solid #999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      writing-mode: vertical-rl;
-      cursor: pointer;
-      font-size: 12px;
-      padding: 5px;
       border-radius: 4px;
     }
     /* Updated Exit Button Style */
@@ -275,12 +257,13 @@
       <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
       <!-- Exit Button -->
       <button class="exit-button" onclick="signOutUser()">Exit</button>
-      <!-- The grid container now holds the room buttons -->
+      <!-- Grid Container -->
       <div class="grid">
-        <!-- 25 Room Buttons -->
+        <!-- 25 Room Buttons with Community Garden replacing Room 23 -->
         <button onclick="openRoomChat('Room 21')">Room 21</button>
         <button onclick="openRoomChat('Room 22')">Room 22</button>
-        <button onclick="openRoomChat('Room 23')">Room 23</button>
+        <!-- Community Garden button occupies the position of Room 23 -->
+        <button onclick="openGardenPanel()">Community Garden</button>
         <button onclick="openRoomChat('Room 24')">Room 24</button>
         <button onclick="openRoomChat('Room 25')">Room 25</button>
         <button onclick="openRoomChat('Room 16')">Room 16</button>
@@ -303,9 +286,6 @@
         <button onclick="openRoomChat('Room 3')">Room 3</button>
         <button onclick="openRoomChat('Room 4')">Room 4</button>
         <button onclick="openRoomChat('Room 5')">Room 5</button>
-        <!-- The Community Garden button is not part of the normal flow;
-             it is absolutely positioned within the grid container so that it appears above Room 23 -->
-        <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
       </div>
       <button class="power-room" onclick="showPowerPanel()">Power Room</button>
     </div>
@@ -523,7 +503,7 @@
   function sanitizePlayerName(name) {
     return name.replace(/[\/\\]/g, '_');
   }
-
+  
   // ----------------------------
   // Firebase Initialization
   // ----------------------------
@@ -538,7 +518,7 @@
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
-
+  
   // ----------------------------
   // Navigation Functions
   // ----------------------------
@@ -562,7 +542,7 @@
     const statusBox = document.getElementById('playerStatus');
     statusBox.style.display = (statusBox.style.display === "none" || statusBox.style.display === "") ? "block" : "none";
   }
-
+  
   // ----------------------------
   // Chat Functions using Firestore
   // ----------------------------
@@ -625,7 +605,7 @@
       });
     }
   });
-
+  
   // ----------------------------
   // Power Source Simulation Functions
   // ----------------------------
@@ -693,7 +673,7 @@
     lastInteractionTime = Date.now();
     localStorage.setItem('lastInteractionTime', lastInteractionTime);
   }
-
+  
   // ----------------------------
   // Garbage Chute Simulation Functions
   // ----------------------------
@@ -718,7 +698,7 @@
     logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
     logDiv.scrollTop = logDiv.scrollHeight;
   }
-
+  
   // ----------------------------
   // Firebase: Player Status & Character Management
   // ----------------------------
@@ -822,7 +802,7 @@
         console.error("Error creating character:", error);
       });
   }
-
+  
   // ----------------------------
   // New: Editing Functions
   // ----------------------------
@@ -856,7 +836,7 @@
        console.error("Error updating biodata:", error);
     });
   }
-
+  
   // ----------------------------
   // New: Grocery Store Functions
   // ----------------------------
@@ -871,7 +851,7 @@
   function buyItem(item) {
     alert("You purchased " + item + ".");
   }
-
+  
   // ----------------------------
   // New: Community Garden Functions
   // ----------------------------
@@ -897,7 +877,7 @@
       console.error("Error signing out:", error);
     });
   }
-
+  
   // ----------------------------
   // Initialization
   // ----------------------------
