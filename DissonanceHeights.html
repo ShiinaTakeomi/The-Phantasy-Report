@@ -39,9 +39,9 @@
     .garden-button {
       position: absolute;
       left: 210px; /* aligns roughly with column 3 */
-      top: 10px;  /* moved down from -50px for better visibility */
+      top: 10px;
       padding: 10px;
-      background-color: #5DADE2; /* a contrasting blue */
+      background-color: #5DADE2;
       border: 2px solid #fff;
       border-radius: 4px;
       color: #fff;
@@ -87,10 +87,10 @@
     .exit-button {
       position: absolute;
       left: 0;
-      top: 530px; /* Positioned just below the garbage chute */
+      top: 530px;
       width: 70px;
       height: 40px;
-      background-color: #FF4136; /* Bright red background */
+      background-color: #FF4136;
       border: 2px solid #fff;
       cursor: pointer;
       font-size: 16px;
@@ -119,7 +119,7 @@
     }
     .facilities button {
       padding: 10px 20px;
-      background-color: rgba(200, 150, 130, 0.7); /* muted, aged color hint */
+      background-color: rgba(200, 150, 130, 0.7);
       border: 1px solid #999;
       cursor: pointer;
       font-size: 16px;
@@ -134,7 +134,6 @@
       width: 600px;
       margin: 20px auto;
       border-radius: 8px;
-      /* Background image inherited from container style */
     }
     .panel h2 {
       text-align: center;
@@ -323,7 +322,6 @@
       <button onclick="openGroceryPanel()">Groceries Stand</button>
       <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
       <button onclick="togglePlayerStatus()">Biodata</button>
-      <!-- Removed Community Garden button from here -->
     </div>
     <!-- Biodata Panel -->
     <div id="playerStatus">
@@ -390,27 +388,27 @@
     <h2>Grocery Store</h2>
     <p>Purchase essential items to ensure survival. Note: Without proper electricity, prices may increase.</p>
     <div class="grocery-item">
-      <p><strong>Food Staples</strong> (Bread, Meat, Vegetables, etc.)</p>
+      <p><strong>Food Staples</strong> (Bread, Meat, Vegetables, etc.) - $10</p>
       <button onclick="buyItem('Food Staples')">Buy Food</button>
     </div>
     <div class="grocery-item">
-      <p><strong>Seeds</strong> (For your community garden)</p>
+      <p><strong>Seeds</strong> (For your community garden) - $2 each</p>
       <button onclick="buyItem('Seeds')">Buy Seeds</button>
     </div>
     <div class="grocery-item">
-      <p><strong>Maintenance Essentials</strong> (For wind turbine repairs)</p>
+      <p><strong>Maintenance Essentials</strong> (For wind turbine repairs) - $5</p>
       <button onclick="buyItem('Maintenance Essentials')">Buy Maintenance</button>
     </div>
     <div class="grocery-item">
-      <p><strong>Room Decorations</strong> (10 types available to boost mood)</p>
+      <p><strong>Room Decorations</strong> (Boost mood) - $7</p>
       <button onclick="buyItem('Room Decoration')">Buy Decoration</button>
     </div>
     <div class="grocery-item">
-      <p><strong>Alcohol</strong> (Boosts mood temporarily but slows work)</p>
+      <p><strong>Alcohol</strong> (Boost mood temporarily) - $3</p>
       <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
     </div>
     <div class="grocery-item">
-      <p><strong>Cigarettes</strong> (50/50 chance to boost mood but harm health over time)</p>
+      <p><strong>Cigarettes</strong> (50/50 mood boost, health risk) - $4</p>
       <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
     </div>
     <button onclick="closeGroceryPanel()">Return to Main Screen</button>
@@ -419,7 +417,7 @@
   <!-- Community Garden Panel -->
   <div id="garden-panel" class="panel">
     <h2>Community Garden</h2>
-    <p>Manage your rooftop garden. Plants need water every 5 minutes and mature in 1 hour. Seeds can be obtained from the grocery store or by chance.</p>
+    <p>Manage your rooftop garden. Plants need water every 5 minutes and mature in 1 hour. Seeds can be purchased from the Grocery Store.</p>
     <div id="plantSlots">
       <!-- 10 Plant Slots -->
       <div class="slot" id="slot1">Slot 1: <span class="status">Empty</span> <button onclick="plantSeed(1)">Plant Seed</button></div>
@@ -435,6 +433,7 @@
       <!-- Special Mushroom Tree Slot -->
       <div class="slot" id="mushroomTree">Mushroom Tree: <span class="status">Empty</span> <button onclick="plantMushroomTree()">Plant Tree</button></div>
     </div>
+    <button onclick="sellProduce()">Sell Produce</button>
     <button onclick="closeGardenPanel()">Return to Main Screen</button>
   </div>
 
@@ -450,19 +449,45 @@
 
 <script>
   // ----------------------------
-  // Global Editing State
+  // Global Economy & Produce Data
   // ----------------------------
-  let isEditing = false;
-  
+  // Initialize money and seed inventory if not already set
+  if (!localStorage.getItem('money')) { localStorage.setItem('money', 50); }
+  if (!localStorage.getItem('seeds')) { localStorage.setItem('seeds', 0); }
+  if (!localStorage.getItem('mushroomSeeds')) { localStorage.setItem('mushroomSeeds', 0); }
+
+  // Define plant and mushroom types
+  const plantTypes = [
+    { name: "Tomato", description: "Juicy, tangy, and sweet tomatoes perfect for salads and sauces; robust nutrition but needs ample sunlight and regular watering.", price: 5 },
+    { name: "Lettuce", description: "Crisp, mildly sweet leaves ideal for fresh salads; fast-maturing with modest mood boost but wilts in heat.", price: 3 },
+    { name: "Carrot", description: "Crunchy, sweet, and earthy roots great for snacking or stews; reliably grown but sensitive to poor soil.", price: 4 },
+    { name: "Potato", description: "Starchy, savory tubers serving as a hearty meal base; high yield yet pest‐prone and moisture–dependent.", price: 6 },
+    { name: "Cucumber", description: "Crisp, refreshing, and mildly sweet cucumbers great for salads and pickling; hydrating but water–demanding.", price: 4 },
+    { name: "Bell Pepper", description: "Sweet, crunchy peppers available in vibrant colors to enhance dishes; improves meal variety but sensitive to temperature.", price: 5 },
+    { name: "Eggplant", description: "Rich, slightly bitter fruit with a creamy texture that absorbs flavors well; consistent but needs extra fertilizer.", price: 5 },
+    { name: "Spinach", description: "Tender, slightly earthy leaves ideal for salads or smoothies; nutrient–dense and quick-growing yet may bolt in heat.", price: 3 },
+    { name: "Zucchini", description: "Mild and slightly sweet zucchinis versatile for sautés and baking; prolific but may dominate the garden if unmanaged.", price: 4 },
+    { name: "Herb Plant", description: "A mix of aromatic herbs from minty to savory that enhances meals and offers minor health benefits; low–cost but requires regular trimming.", price: 2 }
+  ];
+
+  const mushroomTypes = [
+    { name: "Shiitake", description: "Rich umami flavor with meaty texture ideal for soups and stir-fries; moderately growing, balanced mood boost.", price: 10 },
+    { name: "Portobello", description: "Deep, earthy taste with robust texture perfect for grilling; fast-growing with a modest mood boost.", price: 7 },
+    { name: "Enoki", description: "Delicate with a mild, slightly fruity flavor ideal for salads and garnishes; rare and unpredictable yet offers significant mood boost.", price: 15 },
+    { name: "Oyster", description: "Sweet, slightly woody flavor ideal for a variety of dishes; steady growth, provides decent mood boost, requires precise temperature control.", price: 12 },
+    { name: "Morel", description: "Nutty and earthy with a unique texture perfect for gourmet recipes; high-risk but excellent profit potential.", price: 20 }
+  ];
+
   // ----------------------------
   // Garden State (Local Simulation)
   // ----------------------------
   let garden = {};
   for (let i = 1; i <= 10; i++) {
-    garden[i] = { plantedTime: null, wateredTime: null, mature: false };
+    garden[i] = { plantedTime: null, wateredTime: null, mature: false, produceType: null };
   }
-  garden[11] = { plantedTime: null, wateredTime: null, mature: false, mushrooms: 0 };
-  
+  // Use key 11 for the Mushroom Tree slot
+  garden[11] = { plantedTime: null, wateredTime: null, mature: false, mushrooms: 0, produceType: null };
+
   function updateGardenUI() {
     for (let i = 1; i <= 10; i++) {
       let slot = document.getElementById('slot' + i);
@@ -471,12 +496,13 @@
         statusSpan.textContent = "Empty";
       } else {
         let elapsed = (Date.now() - garden[i].plantedTime) / 60000;
+        let produceName = garden[i].produceType ? garden[i].produceType.name : "";
         if (elapsed >= 60 && !garden[i].mature) {
           garden[i].mature = true;
-          statusSpan.textContent = "Mature";
+          statusSpan.textContent = "Mature: " + produceName;
           slot.querySelector('button').style.display = 'none';
         } else if (!garden[i].mature) {
-          statusSpan.textContent = "Growing (" + Math.floor(elapsed) + " min)";
+          statusSpan.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
         }
       }
     }
@@ -486,56 +512,95 @@
       treeStatus.textContent = "Empty";
     } else {
       let elapsed = (Date.now() - garden[11].plantedTime) / 60000;
+      let produceName = garden[11].produceType ? garden[11].produceType.name : "";
       if (elapsed >= 60 && !garden[11].mature) {
         garden[11].mature = true;
-        garden[11].mushrooms = 5;
-        treeStatus.textContent = "Mature (" + garden[11].mushrooms + " mushrooms)";
+        garden[11].mushrooms = 5; // Fixed yield for simplicity
+        treeStatus.textContent = "Mature: " + produceName + " (" + garden[11].mushrooms + " mushrooms)";
         treeSlot.querySelector('button').style.display = 'none';
       } else if (!garden[11].mature) {
-        treeStatus.textContent = "Growing (" + Math.floor(elapsed) + " min)";
+        treeStatus.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
       }
     }
   }
-  
+
   function plantSeed(slotNumber) {
+    let seeds = parseInt(localStorage.getItem('seeds')) || 0;
+    if (seeds <= 0) {
+      alert("No seeds available. Purchase seeds from the Grocery Store.");
+      return;
+    }
     if (garden[slotNumber].plantedTime === null) {
+      // Deduct one seed and update inventory
+      seeds -= 1;
+      localStorage.setItem('seeds', seeds);
       garden[slotNumber].plantedTime = Date.now();
       garden[slotNumber].wateredTime = Date.now();
+      // Assign a random plant type
+      let randomIndex = Math.floor(Math.random() * plantTypes.length);
+      garden[slotNumber].produceType = plantTypes[randomIndex];
       updateGardenUI();
+      updatePlayerStatus();
     } else {
       alert("A seed is already planted in Slot " + slotNumber + ".");
     }
   }
-  
+
   function plantMushroomTree() {
+    let mSeeds = parseInt(localStorage.getItem('mushroomSeeds')) || 0;
+    if (mSeeds <= 0) {
+      alert("No mushroom seeds available. Purchase from the Grocery Store.");
+      return;
+    }
     if (garden[11].plantedTime === null) {
+      mSeeds -= 1;
+      localStorage.setItem('mushroomSeeds', mSeeds);
       garden[11].plantedTime = Date.now();
       garden[11].wateredTime = Date.now();
+      let randomIndex = Math.floor(Math.random() * mushroomTypes.length);
+      garden[11].produceType = mushroomTypes[randomIndex];
       updateGardenUI();
+      updatePlayerStatus();
     } else {
       alert("The mushroom tree is already planted.");
     }
   }
-  
-  setInterval(function() {
-    for (let i = 1; i <= 11; i++) {
-      if (garden[i].plantedTime !== null) {
-        garden[i].wateredTime = Date.now();
+
+  function sellProduce() {
+    let totalEarnings = 0;
+    // Process regular plant slots
+    for (let i = 1; i <= 10; i++) {
+      if (garden[i].mature && garden[i].produceType) {
+        totalEarnings += garden[i].produceType.price;
+        // Reset slot
+        garden[i] = { plantedTime: null, wateredTime: null, mature: false, produceType: null };
+        let slot = document.getElementById('slot' + i);
+        let btn = slot.querySelector('button');
+        if (btn) btn.style.display = 'inline';
       }
     }
+    // Process mushroom tree slot
+    if (garden[11].mature && garden[11].produceType) {
+      totalEarnings += (garden[11].mushrooms * garden[11].produceType.price);
+      garden[11] = { plantedTime: null, wateredTime: null, mature: false, mushrooms: 0, produceType: null };
+      let slot = document.getElementById('mushroomTree');
+      let btn = slot.querySelector('button');
+      if (btn) btn.style.display = 'inline';
+    }
+    let currentMoney = parseInt(localStorage.getItem('money')) || 50;
+    currentMoney += totalEarnings;
+    localStorage.setItem('money', currentMoney);
+    alert("You sold your produce for $" + totalEarnings + ". Current money: $" + currentMoney);
+    updatePlayerStatus();
     updateGardenUI();
-  }, 300000);
-  
+  }
+
   // ----------------------------
-  // Helper: Sanitize Player Name
+  // Firebase Initialization & Player Management
   // ----------------------------
   function sanitizePlayerName(name) {
     return name.replace(/[\/\\]/g, '_');
   }
-
-  // ----------------------------
-  // Firebase Initialization
-  // ----------------------------
   const firebaseConfig = {
     apiKey: "AIzaSyD5avvNbSB5L_YtpyxbBYYnvUpjMa0WglE",
     authDomain: "thephantasyreport.firebaseapp.com",
@@ -548,28 +613,247 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
+  function updatePlayerStatus() {
+    const playerName = localStorage.getItem('playerName');
+    if (!playerName) return;
+    const safePlayerName = sanitizePlayerName(playerName);
+    db.collection('players').doc(safePlayerName)
+      .onSnapshot((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          localStorage.setItem('characterName', data.name);
+          let statusHTML = `<h3>Biodata</h3>`;
+          if (!isEditing) {
+            statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
+            statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+            statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+            statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+            statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+            statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
+            statusHTML += `<p><strong>Age:</strong> ${data.age}</p>`;
+            statusHTML += `<p><strong>Reason:</strong> ${data.reason}</p>`;
+            statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
+            statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
+            statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
+            statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
+            statusHTML += `<button onclick="enableEdit()">Edit</button>`;
+          } else {
+            statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" /></p>`;
+            statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+            statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+            statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+            statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+            statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
+            statusHTML += `<p><strong>Age:</strong> <input type="number" id="editAge" value="${data.age}" /></p>`;
+            statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason}</textarea></p>`;
+            statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
+            statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
+            statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
+            statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
+            statusHTML += `<button onclick="saveBiodata()">Save Changes</button> `;
+            statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
+          }
+          // Display economy stats
+          statusHTML += `<p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>`;
+          statusHTML += `<p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>`;
+          statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
+          document.getElementById('playerStatus').innerHTML = statusHTML;
+        }
+      }, (error) => {
+        console.error("Error getting player status:", error);
+      });
+  }
+
+  function checkCharacterExistence() {
+    const playerName = localStorage.getItem('playerName');
+    if (!playerName) return;
+    const safePlayerName = sanitizePlayerName(playerName);
+    db.collection('players').doc(safePlayerName).get().then((doc) => {
+      if (doc.exists) {
+        document.getElementById('characterCreation').style.display = 'none';
+        document.getElementById('mainGame').style.display = 'block';
+        updatePlayerStatus();
+      } else {
+        document.getElementById('characterCreation').style.display = 'block';
+        document.getElementById('mainGame').style.display = 'none';
+        document.getElementById('displayName').innerText = playerName;
+        document.getElementById('charName').value = playerName;
+      }
+    }).catch((error) => {
+      console.error("Error checking character existence:", error);
+    });
+  }
+
+  function createCharacter() {
+    const playerName = localStorage.getItem('playerName');
+    if (!playerName) return;
+    const safePlayerName = sanitizePlayerName(playerName);
+    const charName = document.getElementById('charName').value;
+    const charAge = document.getElementById('charAge').value;
+    const charGender = document.getElementById('charGender').value;
+    const charReason = document.getElementById('charReason').value;
+    const playerData = {
+      name: charName,
+      age: charAge,
+      gender: charGender,
+      reason: charReason,
+      health: 100,
+      hunger: 0,
+      injury: 0,
+      mood: 100,
+      conditions: {
+        physical: "Healthy",
+        mental: "Content",
+        activity: "Idle"
+      },
+      lastUpdated: Date.now()
+    };
+    db.collection('players').doc(safePlayerName).set(playerData, { merge: true })
+      .then(() => {
+        localStorage.setItem('characterName', charName);
+        document.getElementById('characterCreation').style.display = 'none';
+        document.getElementById('mainGame').style.display = 'block';
+        updatePlayerStatus();
+      })
+      .catch((error) => {
+        console.error("Error creating character:", error);
+      });
+  }
+
   // ----------------------------
-  // Navigation Functions
+  // Editing Functions
   // ----------------------------
-  function showPowerPanel() {
-    document.getElementById('minigame-panel').style.display = 'block';
+  let isEditing = false;
+  function enableEdit() {
+    isEditing = true;
+    updatePlayerStatus();
+  }
+  function cancelEdit() {
+    isEditing = false;
+    updatePlayerStatus();
+  }
+  function saveBiodata() {
+    const playerName = localStorage.getItem('playerName');
+    if (!playerName) return;
+    const safePlayerName = sanitizePlayerName(playerName);
+    const newName = document.getElementById('editName').value;
+    const newAge = document.getElementById('editAge').value;
+    const newReason = document.getElementById('editReason').value;
+    db.collection('players').doc(safePlayerName).set({
+       name: newName,
+       age: newAge,
+       reason: newReason,
+       lastUpdated: Date.now()
+    }, { merge: true })
+    .then(() => {
+       localStorage.setItem('characterName', newName);
+       isEditing = false;
+       alert('Biodata updated successfully.');
+    })
+    .catch((error) => {
+       console.error("Error updating biodata:", error);
+    });
+  }
+
+  // ----------------------------
+  // Grocery Store Functions
+  // ----------------------------
+  function openGroceryPanel() {
+    document.getElementById('grocery-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
   }
-  function showGarbagePanel() {
-    updateGarbageDisplay();
-    document.getElementById('garbage-panel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-  }
-  function hidePanel(panelId) {
-    document.getElementById(panelId).style.display = 'none';
+  function closeGroceryPanel() {
+    document.getElementById('grocery-panel').style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
   }
-  function handleClick(label) {
-    alert("Facility: " + label);
+  function buyItem(item) {
+    let currentMoney = parseInt(localStorage.getItem('money')) || 50;
+    if (item === "Seeds") {
+      if (currentMoney >= 2) {
+        currentMoney -= 2;
+        localStorage.setItem('money', currentMoney);
+        let seeds = parseInt(localStorage.getItem('seeds')) || 0;
+        seeds += 1;
+        localStorage.setItem('seeds', seeds);
+        alert("You purchased 1 seed. Seeds available: " + seeds + ". Money left: $" + currentMoney);
+        updatePlayerStatus();
+      } else {
+        alert("Not enough money to purchase a seed.");
+      }
+    } else if (item === "Food Staples") {
+      if (currentMoney >= 10) {
+        currentMoney -= 10;
+        localStorage.setItem('money', currentMoney);
+        alert("You purchased Food Staples. Money left: $" + currentMoney);
+        updatePlayerStatus();
+      } else {
+        alert("Not enough money to purchase Food Staples.");
+      }
+    } else if (item === "Maintenance Essentials") {
+      if (currentMoney >= 5) {
+        currentMoney -= 5;
+        localStorage.setItem('money', currentMoney);
+        alert("You purchased Maintenance Essentials. Money left: $" + currentMoney);
+        updatePlayerStatus();
+      } else {
+        alert("Not enough money for Maintenance Essentials.");
+      }
+    } else if (item === "Room Decoration") {
+      if (currentMoney >= 7) {
+        currentMoney -= 7;
+        localStorage.setItem('money', currentMoney);
+        alert("You purchased a Room Decoration. Money left: $" + currentMoney);
+        updatePlayerStatus();
+      } else {
+        alert("Not enough money for Room Decoration.");
+      }
+    } else if (item === "Alcohol") {
+      if (currentMoney >= 3) {
+        currentMoney -= 3;
+        localStorage.setItem('money', currentMoney);
+        alert("You purchased Alcohol. Money left: $" + currentMoney);
+        updatePlayerStatus();
+      } else {
+        alert("Not enough money for Alcohol.");
+      }
+    } else if (item === "Cigarettes") {
+      if (currentMoney >= 4) {
+        currentMoney -= 4;
+        localStorage.setItem('money', currentMoney);
+        alert("You purchased Cigarettes. Money left: $" + currentMoney);
+        updatePlayerStatus();
+      } else {
+        alert("Not enough money for Cigarettes.");
+      }
+    } else {
+      alert("Item not recognized.");
+    }
   }
-  function togglePlayerStatus() {
-    const statusBox = document.getElementById('playerStatus');
-    statusBox.style.display = (statusBox.style.display === "none" || statusBox.style.display === "") ? "block" : "none";
+
+  // ----------------------------
+  // Community Garden Functions
+  // ----------------------------
+  function openGardenPanel() {
+    document.getElementById('garden-panel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+    updateGardenUI();
+  }
+  function closeGardenPanel() {
+    document.getElementById('garden-panel').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+  }
+
+  // ----------------------------
+  // Exit / Sign Out Function
+  // ----------------------------
+  function signOutUser() {
+    firebase.auth().signOut().then(() => {
+      localStorage.removeItem('playerName');
+      localStorage.removeItem('characterName');
+      window.location.href = "index.html";
+    }).catch((error) => {
+      console.error("Error signing out:", error);
+    });
   }
 
   // ----------------------------
@@ -726,185 +1010,6 @@
     const timestamp = new Date().toLocaleTimeString();
     logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
     logDiv.scrollTop = logDiv.scrollHeight;
-  }
-
-  // ----------------------------
-  // Firebase: Player Status & Character Management
-  // ----------------------------
-  function updatePlayerStatus() {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    db.collection('players').doc(safePlayerName)
-      .onSnapshot((doc) => {
-        if (doc.exists) {
-          const data = doc.data();
-          localStorage.setItem('characterName', data.name);
-          let statusHTML = `<h3>Biodata</h3>`;
-          if (!isEditing) {
-            statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
-            statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
-            statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
-            statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
-            statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
-            statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
-            statusHTML += `<p><strong>Age:</strong> ${data.age}</p>`;
-            statusHTML += `<p><strong>Reason:</strong> ${data.reason}</p>`;
-            statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
-            statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
-            statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
-            statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
-            statusHTML += `<button onclick="enableEdit()">Edit</button>`;
-          } else {
-            statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" /></p>`;
-            statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
-            statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
-            statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
-            statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
-            statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
-            statusHTML += `<p><strong>Age:</strong> <input type="number" id="editAge" value="${data.age}" /></p>`;
-            statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason}</textarea></p>`;
-            statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
-            statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
-            statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
-            statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
-            statusHTML += `<button onclick="saveBiodata()">Save Changes</button> `;
-            statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
-          }
-          document.getElementById('playerStatus').innerHTML = statusHTML;
-        }
-      }, (error) => {
-        console.error("Error getting player status:", error);
-      });
-  }
-  function checkCharacterExistence() {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    db.collection('players').doc(safePlayerName).get().then((doc) => {
-      if (doc.exists) {
-        document.getElementById('characterCreation').style.display = 'none';
-        document.getElementById('mainGame').style.display = 'block';
-        updatePlayerStatus();
-      } else {
-        document.getElementById('characterCreation').style.display = 'block';
-        document.getElementById('mainGame').style.display = 'none';
-        document.getElementById('displayName').innerText = playerName;
-        document.getElementById('charName').value = playerName;
-      }
-    }).catch((error) => {
-      console.error("Error checking character existence:", error);
-    });
-  }
-  function createCharacter() {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    const charName = document.getElementById('charName').value;
-    const charAge = document.getElementById('charAge').value;
-    const charGender = document.getElementById('charGender').value;
-    const charReason = document.getElementById('charReason').value;
-    const playerData = {
-      name: charName,
-      age: charAge,
-      gender: charGender,
-      reason: charReason,
-      health: 100,
-      hunger: 0,
-      injury: 0,
-      mood: 100,
-      conditions: {
-        physical: "Healthy",
-        mental: "Content",
-        activity: "Idle"
-      },
-      lastUpdated: Date.now()
-    };
-    db.collection('players').doc(safePlayerName).set(playerData, { merge: true })
-      .then(() => {
-        localStorage.setItem('characterName', charName);
-        document.getElementById('characterCreation').style.display = 'none';
-        document.getElementById('mainGame').style.display = 'block';
-        updatePlayerStatus();
-      })
-      .catch((error) => {
-        console.error("Error creating character:", error);
-      });
-  }
-
-  // ----------------------------
-  // New: Editing Functions
-  // ----------------------------
-  function enableEdit() {
-    isEditing = true;
-    updatePlayerStatus();
-  }
-  function cancelEdit() {
-    isEditing = false;
-    updatePlayerStatus();
-  }
-  function saveBiodata() {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    const newName = document.getElementById('editName').value;
-    const newAge = document.getElementById('editAge').value;
-    const newReason = document.getElementById('editReason').value;
-    db.collection('players').doc(safePlayerName).set({
-       name: newName,
-       age: newAge,
-       reason: newReason,
-       lastUpdated: Date.now()
-    }, { merge: true })
-    .then(() => {
-       localStorage.setItem('characterName', newName);
-       isEditing = false;
-       alert('Biodata updated successfully.');
-    })
-    .catch((error) => {
-       console.error("Error updating biodata:", error);
-    });
-  }
-
-  // ----------------------------
-  // New: Grocery Store Functions
-  // ----------------------------
-  function openGroceryPanel() {
-    document.getElementById('grocery-panel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-  }
-  function closeGroceryPanel() {
-    document.getElementById('grocery-panel').style.display = 'none';
-    document.getElementById('main-screen').style.display = 'block';
-  }
-  function buyItem(item) {
-    alert("You purchased " + item + ".");
-  }
-
-  // ----------------------------
-  // New: Community Garden Functions
-  // ----------------------------
-  function openGardenPanel() {
-    document.getElementById('garden-panel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-    updateGardenUI();
-  }
-  function closeGardenPanel() {
-    document.getElementById('garden-panel').style.display = 'none';
-    document.getElementById('main-screen').style.display = 'block';
-  }
-  
-  // ----------------------------
-  // New: Exit / Sign Out Function
-  // ----------------------------
-  function signOutUser() {
-    firebase.auth().signOut().then(() => {
-      localStorage.removeItem('playerName');
-      localStorage.removeItem('characterName');
-      window.location.href = "index.html";
-    }).catch((error) => {
-      console.error("Error signing out:", error);
-    });
   }
 
   // ----------------------------
