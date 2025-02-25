@@ -251,7 +251,8 @@
     /* New Modals for Room Interaction */
     #roomInteractionModal,
     #knockModal,
-    #pinModal {
+    #pinModal,
+    #blacksmithModal {
       display: none;
       position: fixed;
       top: 50%;
@@ -266,7 +267,8 @@
     }
     #roomInteractionModal button,
     #knockModal button,
-    #pinModal button {
+    #pinModal button,
+    #blacksmithModal button {
       margin-top: 10px;
       padding: 5px 10px;
       font-size: 14px;
@@ -275,7 +277,8 @@
       cursor: pointer;
     }
     #knockModal input,
-    #pinModal input {
+    #pinModal input,
+    #blacksmithModal input {
       width: 100%;
       padding: 5px;
       margin-top: 10px;
@@ -534,17 +537,33 @@
     <button onclick="submitPin()">Submit</button>
     <button onclick="closePinModal()">Cancel</button>
   </div>
+
+  <!-- New Modal: Blacksmith Shop (for Room 5) -->
+  <div id="blacksmithModal" class="panel">
+    <h2>Blacksmith Shop</h2>
+    <p><em>"I am the blacksmith of these forsaken halls. My hammer and anvil have forged countless fates. I offer my craft freely to secure your sanctuary. Tell me the password you wish to have inscribed on your door."</em></p>
+    <input type="text" id="roomPasswordInput" placeholder="Enter room password">
+    <button onclick="setRoomPassword()">Set Password</button>
+    <button onclick="closeBlacksmithModal()">Cancel</button>
+  </div>
 </div>
 
 <script>
+  // ----------------------------
   // Global Variables for Room Interaction
+  // ----------------------------
   let currentRoomInteraction = "";
   
   // Room Interaction Modal Functions
   function openRoomInteraction(roomName) {
-    currentRoomInteraction = roomName;
-    document.getElementById('interactionRoomName').textContent = roomName;
-    document.getElementById('roomInteractionModal').style.display = 'block';
+    // If the room is Room 5, open the Blacksmith modal instead.
+    if (roomName === "Room 5") {
+      openBlacksmithModal();
+    } else {
+      currentRoomInteraction = roomName;
+      document.getElementById('interactionRoomName').textContent = roomName;
+      document.getElementById('roomInteractionModal').style.display = 'block';
+    }
   }
   
   function closeRoomInteractionModal() {
@@ -566,8 +585,7 @@
       alert("Please type a message before knocking.");
       return;
     }
-    // Simulate sending a knock request and owner approval
-    // (Replace this with your own Firebase logic as needed)
+    // Simulate sending a knock request and owner approval.
     closeKnockModal();
     if(confirm("Room owner, do you approve this knock request from " + currentRoomInteraction + "?")) {
       openRoomChat(currentRoomInteraction);
@@ -595,15 +613,48 @@
       alert("Incorrect pin code. Please try again.");
     }
   }
-
-  // (The rest of your code remains unchanged below this point)
+  
+  // Blacksmith Modal Functions (for Room 5)
+  function openBlacksmithModal() {
+    document.getElementById('blacksmithModal').style.display = 'block';
+  }
+  
+  function closeBlacksmithModal() {
+    document.getElementById('blacksmithModal').style.display = 'none';
+  }
+  
+  function setRoomPassword() {
+    let password = document.getElementById('roomPasswordInput').value;
+    if(password.trim() === "") {
+      alert("Please enter a valid password.");
+      return;
+    }
+    // Update the player's room password in Firebase
+    const playerName = localStorage.getItem('playerName');
+    if(!playerName) return;
+    const safePlayerName = sanitizePlayerName(playerName);
+    db.collection('players').doc(safePlayerName).set({
+      roomPassword: password,
+      lastUpdated: Date.now()
+    }, { merge: true })
+    .then(() => {
+      alert("Your room password has been set/updated.");
+      closeBlacksmithModal();
+      // Optionally, you can open a dialogue/chat with the blacksmith NPC here.
+      openRoomChat("Room 5");
+    })
+    .catch((error) => {
+      console.error("Error setting room password:", error);
+    });
+  }
+  
   // ----------------------------
   // Global Economy & Produce Data
   // ----------------------------
   if (!localStorage.getItem('money')) { localStorage.setItem('money', 50); }
   if (!localStorage.getItem('seeds')) { localStorage.setItem('seeds', 0); }
   if (!localStorage.getItem('mushroomSeeds')) { localStorage.setItem('mushroomSeeds', 0); }
-
+  
   const plantTypes = [
     { name: "Tomato", description: "Juicy, tangy, and sweet tomatoes perfect for salads and sauces; robust nutrition but needs ample sunlight and regular watering.", price: 5 },
     { name: "Lettuce", description: "Crisp, mildly sweet leaves ideal for fresh salads; fast-maturing with modest mood boost but wilts in heat.", price: 3 },
@@ -616,7 +667,7 @@
     { name: "Zucchini", description: "Mild and slightly sweet zucchinis versatile for sautés and baking; prolific but may dominate the garden if unmanaged.", price: 4 },
     { name: "Herb Plant", description: "A mix of aromatic herbs from minty to savory that enhances meals and offers minor health benefits; low–cost but requires regular trimming.", price: 2 }
   ];
-
+  
   const mushroomTypes = [
     { name: "Shiitake", description: "Rich umami flavor with meaty texture ideal for soups and stir-fries; moderately growing, balanced mood boost.", price: 10 },
     { name: "Portobello", description: "Deep, earthy taste with robust texture perfect for grilling; fast-growing with a modest mood boost.", price: 7 },
@@ -624,13 +675,13 @@
     { name: "Oyster", description: "Sweet, slightly woody flavor ideal for a variety of dishes; steady growth, provides decent mood boost, requires precise temperature control.", price: 12 },
     { name: "Morel", description: "Nutty and earthy with a unique texture perfect for gourmet recipes; high-risk but excellent profit potential.", price: 20 }
   ];
-
+  
   let garden = {};
   for (let i = 1; i <= 10; i++) {
     garden[i] = { plantedTime: null, wateredTime: null, mature: false, produceType: null };
   }
   garden[11] = { plantedTime: null, wateredTime: null, mature: false, mushrooms: 0, produceType: null };
-
+  
   function updateGardenUI() {
     for (let i = 1; i <= 10; i++) {
       let slot = document.getElementById('slot' + i);
@@ -666,7 +717,7 @@
       }
     }
   }
-
+  
   function plantSeed(slotNumber) {
     let seeds = parseInt(localStorage.getItem('seeds')) || 0;
     if (seeds <= 0) {
@@ -686,7 +737,7 @@
       alert("A seed is already planted in Slot " + slotNumber + ".");
     }
   }
-
+  
   function plantMushroomTree() {
     let mSeeds = parseInt(localStorage.getItem('mushroomSeeds')) || 0;
     if (mSeeds <= 0) {
@@ -706,7 +757,7 @@
       alert("The mushroom tree is already planted.");
     }
   }
-
+  
   function sellProduce() {
     let totalEarnings = 0;
     for (let i = 1; i <= 10; i++) {
@@ -732,7 +783,7 @@
     updatePlayerStatus();
     updateGardenUI();
   }
-
+  
   // Firebase Initialization & Player Management
   function sanitizePlayerName(name) {
     return name.replace(/[\/\\]/g, '_');
@@ -748,7 +799,7 @@
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
-
+  
   function updatePlayerStatus() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
@@ -800,7 +851,7 @@
         console.error("Error getting player status:", error);
       });
   }
-
+  
   function checkCharacterExistence() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
@@ -820,7 +871,7 @@
       console.error("Error checking character existence:", error);
     });
   }
-
+  
   function createCharacter() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
@@ -858,7 +909,7 @@
         console.error("Error creating character:", error);
       });
   }
-
+  
   // Editing Functions (with 4-edits-per-month limit)
   let isEditing = false;
   function enableEdit() {
@@ -916,7 +967,7 @@
       }
     });
   }
-
+  
   // Toggle Biodata Panel Function
   function togglePlayerStatus() {
     const statusBox = document.getElementById('playerStatus');
@@ -926,7 +977,7 @@
       statusBox.style.display = 'none';
     }
   }
-
+  
   // Grocery Store Functions
   function openGroceryPanel() {
     document.getElementById('grocery-panel').style.display = 'block';
@@ -999,7 +1050,7 @@
       alert("Item not recognized.");
     }
   }
-
+  
   // Community Garden Functions
   function openGardenPanel() {
     document.getElementById('garden-panel').style.display = 'block';
@@ -1010,7 +1061,7 @@
     document.getElementById('garden-panel').style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
   }
-
+  
   // Exit / Sign Out Function
   function signOutUser() {
     firebase.auth().signOut().then(() => {
@@ -1021,7 +1072,7 @@
       console.error("Error signing out:", error);
     });
   }
-
+  
   // Chat Functions using Firestore
   let currentRoom = "";
   function openRoomChat(roomName) {
@@ -1082,7 +1133,7 @@
       });
     }
   });
-
+  
   // Power Source Simulation Functions
   let windSpeed = localStorage.getItem('windSpeed') || 50;
   let brakeEngaged = JSON.parse(localStorage.getItem('brakeEngaged')) || false;
@@ -1148,7 +1199,7 @@
     lastInteractionTime = Date.now();
     localStorage.setItem('lastInteractionTime', lastInteractionTime);
   }
-
+  
   // Garbage Chute Simulation Functions
   function updateGarbageDisplay() {
     const now = Date.now();
@@ -1171,7 +1222,7 @@
     logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
     logDiv.scrollTop = logDiv.scrollHeight;
   }
-
+  
   // Initialization
   window.onload = function() {
     document.getElementById('windSpeedSlider').value = windSpeed;
