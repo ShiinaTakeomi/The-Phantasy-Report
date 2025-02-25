@@ -263,18 +263,27 @@
 <div id="characterCreation">
   <h3>Create Your Character</h3>
   <p>Welcome, <span id="displayName"></span>!</p>
-  <form id="createCharacterForm" onsubmit="event.preventDefault(); createCharacter();">
-    <input type="text" id="charName" placeholder="Name" required>
-    <input type="number" id="charAge" placeholder="Age" required>
-    <select id="charGender" required>
-      <option value="">Select Gender</option>
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
-      <option value="Other">Other</option>
-    </select>
-    <textarea id="charReason" placeholder="Reason for staying at Dissonance Heights" required></textarea>
-    <button type="submit">Create Character</button>
-  </form>
+<form id="createCharacterForm" onsubmit="event.preventDefault(); createCharacter();">
+  <input type="text" id="charName" placeholder="Name" required>
+  <input type="number" id="charAge" placeholder="Age" required>
+  <select id="charGender" required>
+    <option value="">Select Gender</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+    <option value="Other">Other</option>
+  </select>
+  <textarea id="charReason" placeholder="Reason for staying at Dissonance Heights" required></textarea>
+  <!-- New Room Selection Dropdown -->
+  <select id="roomNumber" required>
+    <option value="">Select Room Number</option>
+    <!-- Options 1 to 25 -->
+    <option value="1">Room 1</option>
+    <option value="2">Room 2</option>
+    <!-- … add options 3-24 … -->
+    <option value="25">Room 25</option>
+  </select>
+  <button type="submit">Create Character</button>
+</form>
 </div>
 
 <!-- Main Game Section -->
@@ -686,41 +695,45 @@
     });
   }
 
-  function createCharacter() {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    const charName = document.getElementById('charName').value;
-    const charAge = document.getElementById('charAge').value;
-    const charGender = document.getElementById('charGender').value;
-    const charReason = document.getElementById('charReason').value;
-    const playerData = {
-      name: charName,
-      age: charAge,
-      gender: charGender,
-      reason: charReason,
-      health: 100,
-      hunger: 0,
-      injury: 0,
-      mood: 100,
-      conditions: {
-        physical: "Healthy",
-        mental: "Content",
-        activity: "Idle"
-      },
-      lastUpdated: Date.now()
-    };
-    db.collection('players').doc(safePlayerName).set(playerData, { merge: true })
-      .then(() => {
-        localStorage.setItem('characterName', charName);
-        document.getElementById('characterCreation').style.display = 'none';
-        document.getElementById('mainGame').style.display = 'block';
-        updatePlayerStatus();
-      })
-      .catch((error) => {
-        console.error("Error creating character:", error);
-      });
-  }
+function createCharacter() {
+  const playerName = localStorage.getItem('playerName');
+  if (!playerName) return;
+  const safePlayerName = sanitizePlayerName(playerName);
+  const charName = document.getElementById('charName').value;
+  const charAge = document.getElementById('charAge').value;
+  const charGender = document.getElementById('charGender').value;
+  const charReason = document.getElementById('charReason').value;
+  const roomNumber = document.getElementById('roomNumber').value; // New field
+  
+  const playerData = {
+    name: charName,
+    age: charAge,
+    gender: charGender,
+    reason: charReason,
+    roomNumber: roomNumber, // Save room number
+    health: 100,
+    hunger: 0,
+    injury: 0,
+    mood: 100,
+    conditions: {
+      physical: "Healthy",
+      mental: "Content",
+      activity: "Idle"
+    },
+    lastUpdated: Date.now()
+  };
+  db.collection('players').doc(safePlayerName).set(playerData, { merge: true })
+    .then(() => {
+      localStorage.setItem('characterName', charName);
+      document.getElementById('characterCreation').style.display = 'none';
+      document.getElementById('mainGame').style.display = 'block';
+      updatePlayerStatus();
+    })
+    .catch((error) => {
+      console.error("Error creating character:", error);
+    });
+}
+
 
   // ----------------------------
   // Editing Functions
