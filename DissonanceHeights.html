@@ -812,6 +812,19 @@
   }
 
   // ----------------------------
+  // Toggle Biodata Panel Function
+  // ----------------------------
+  function togglePlayerStatus() {
+    const statusBox = document.getElementById('playerStatus');
+    // If the biodata panel is hidden or has no display style set, show it; otherwise, hide it.
+    if (!statusBox.style.display || statusBox.style.display === 'none') {
+      statusBox.style.display = 'block';
+    } else {
+      statusBox.style.display = 'none';
+    }
+  }
+
+  // ----------------------------
   // Grocery Store Functions
   // ----------------------------
   function openGroceryPanel() {
