@@ -248,11 +248,8 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    /* New Modals for Room Interaction */
-    #roomInteractionModal,
-    #knockModal,
-    #pinModal,
-    #blacksmithModal {
+    /* New Modal: Room Interaction Options (only knock option remains) */
+    #roomInteractionModal {
       display: none;
       position: fixed;
       top: 50%;
@@ -265,10 +262,7 @@
       border-radius: 8px;
       z-index: 1000;
     }
-    #roomInteractionModal button,
-    #knockModal button,
-    #pinModal button,
-    #blacksmithModal button {
+    #roomInteractionModal button {
       margin-top: 10px;
       padding: 5px 10px;
       font-size: 14px;
@@ -276,9 +270,29 @@
       border: none;
       cursor: pointer;
     }
-    #knockModal input,
-    #pinModal input,
-    #blacksmithModal input {
+    /* New Modal: Knock Chat (Limited Chatbox) */
+    #knockModal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.9);
+      padding: 20px;
+      border: 2px solid #444;
+      border-radius: 8px;
+      z-index: 1000;
+    }
+    #knockModal button {
+      margin-top: 10px;
+      padding: 5px 10px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+    }
+    #knockModal input {
       width: 100%;
       padding: 5px;
       margin-top: 10px;
@@ -350,7 +364,7 @@
       <!-- New Community Garden Button positioned above Room 23 -->
       <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
       <div class="grid">
-        <!-- 25 Room Buttons (now call openRoomInteraction) -->
+        <!-- 25 Room Buttons (all use the openRoomInteraction which now only offers Knock option) -->
         <button onclick="openRoomInteraction('Room 21')">Room 21</button>
         <button onclick="openRoomInteraction('Room 22')">Room 22</button>
         <button onclick="openRoomInteraction('Room 23')">Room 23</button>
@@ -511,12 +525,11 @@
     <button onclick="closeChat()">Close Chat</button>
   </div>
 
-  <!-- New Modal: Room Interaction Options -->
+  <!-- New Modal: Room Interaction Options (only Knock option remains) -->
   <div id="roomInteractionModal" class="panel">
     <h2>Room Interaction</h2>
     <p>How do you want to interact with <span id="interactionRoomName"></span>?</p>
     <button onclick="chooseKnock()">Knock on Door</button>
-    <button onclick="choosePin()">Enter Pin Code</button>
     <button onclick="closeRoomInteractionModal()">Cancel</button>
   </div>
 
@@ -528,27 +541,6 @@
     <button onclick="sendKnock()">Send Knock</button>
     <button onclick="closeKnockModal()">Cancel</button>
   </div>
-
-  <!-- New Modal: Pin Code Entry -->
-  <div id="pinModal" class="panel">
-    <h2>Enter Pin Code</h2>
-    <p>Please enter the room's pin code:</p>
-    <input type="password" id="pinCodeInput" placeholder="Enter pin code">
-    <button onclick="submitPin()">Submit</button>
-    <button onclick="closePinModal()">Cancel</button>
-  </div>
-
-  <!-- New Modal: Blacksmith Shop (for Room 5) -->
-  <div id="blacksmithModal" class="panel">
-    <h2>Blacksmith Shop</h2>
-    <p><em>"I am the blacksmith of these forsaken halls. My hammer and anvil have forged countless fates. I offer my craft freely to secure your sanctuary."</em></p>
-    <p>Please confirm your room number:</p>
-    <input type="number" id="blacksmithRoomNumber" placeholder="Your room number">
-    <p>Enter a new room password (6-digit number):</p>
-    <input type="text" id="roomPasswordInput" pattern="\d{6}" maxlength="6" placeholder="e.g., 123456">
-    <button onclick="setRoomPassword()">Set Password</button>
-    <button onclick="closeBlacksmithModal()">Cancel</button>
-  </div>
 </div>
 
 <script>
@@ -559,14 +551,9 @@
   
   // Room Interaction Modal Functions
   function openRoomInteraction(roomName) {
-    // If the room is Room 5, open the Blacksmith modal instead.
-    if (roomName === "Room 5") {
-      openBlacksmithModal();
-    } else {
-      currentRoomInteraction = roomName;
-      document.getElementById('interactionRoomName').textContent = roomName;
-      document.getElementById('roomInteractionModal').style.display = 'block';
-    }
+    currentRoomInteraction = roomName;
+    document.getElementById('interactionRoomName').textContent = roomName;
+    document.getElementById('roomInteractionModal').style.display = 'block';
   }
   
   function closeRoomInteractionModal() {
@@ -595,78 +582,6 @@
     } else {
       alert("Your knock was rejected.");
     }
-  }
-  
-  function choosePin() {
-    closeRoomInteractionModal();
-    document.getElementById('pinModal').style.display = 'block';
-  }
-  
-  function closePinModal() {
-    document.getElementById('pinModal').style.display = 'none';
-  }
-  
-  function submitPin() {
-    let pin = document.getElementById('pinCodeInput').value;
-    // For demonstration, assume correct pin is "1234"
-    if(pin === "1234") {
-      closePinModal();
-      openRoomChat(currentRoomInteraction);
-    } else {
-      alert("Incorrect pin code. Please try again.");
-    }
-  }
-  
-  // Blacksmith Modal Functions (for Room 5)
-  function openBlacksmithModal() {
-    document.getElementById('blacksmithModal').style.display = 'block';
-  }
-  
-  function closeBlacksmithModal() {
-    document.getElementById('blacksmithModal').style.display = 'none';
-  }
-  
-  function setRoomPassword() {
-    // Get the entered room number from the modal and the desired password.
-    let inputRoom = document.getElementById('blacksmithRoomNumber').value;
-    let password = document.getElementById('roomPasswordInput').value;
-    
-    // Check that a 6-digit password was entered
-    let sixDigitRegex = /^\d{6}$/;
-    if (!sixDigitRegex.test(password)) {
-      alert("Please enter a valid 6-digit number for your room password.");
-      return;
-    }
-    
-    // Retrieve player's data from Firebase to verify room ownership.
-    const playerName = localStorage.getItem('playerName');
-    if(!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    
-    db.collection('players').doc(safePlayerName).get().then((doc) => {
-      if(doc.exists) {
-        let data = doc.data();
-        // Check if the entered room number matches the player's registered room
-        if(String(data.roomNumber) !== String(inputRoom)) {
-          alert("The room number you entered does not match your registered room (" + data.roomNumber + ").");
-          return;
-        }
-        // If the room number is correct, update the room password
-        db.collection('players').doc(safePlayerName).set({
-          roomPassword: password,
-          lastUpdated: Date.now()
-        }, { merge: true })
-        .then(() => {
-          alert("Your room password has been set/updated.");
-          closeBlacksmithModal();
-          // Optionally, open the chat for Room 5 after setting password.
-          openRoomChat("Room 5");
-        })
-        .catch((error) => {
-          console.error("Error setting room password:", error);
-        });
-      }
-    });
   }
   
   // ----------------------------
