@@ -23,8 +23,8 @@
       font-family: 'Russo One', sans-serif;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     }
-    /* A subtle concrete texture overlay for containers and panels */
-    .container, .panel, #characterCreation {
+    /* Common Panel and Container Styles */
+    .container, .panel, #characterCreation, .modal {
       background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');
       background-color: rgba(0, 0, 0, 0.6);
     }
@@ -35,19 +35,20 @@
       padding: 10px;
       border-radius: 8px;
     }
-    /* New Community Garden Button Positioned Above Room 23 */
-    .garden-button {
-      position: absolute;
-      left: 210px; /* aligns roughly with column 3 */
-      top: 10px;
-      padding: 10px;
-      background-color: #5DADE2;
-      border: 2px solid #fff;
-      border-radius: 4px;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
+    .panel {
+      display: none;
+      border: 2px solid #444;
+      padding: 20px;
+      width: 600px;
+      margin: 20px auto;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.7);
     }
+    .panel h2, .modal h2 {
+      text-align: center;
+      color: #fff;
+    }
+    /* Grid of Rooms */
     .grid {
       display: grid;
       grid-template-columns: repeat(5, 100px);
@@ -65,6 +66,23 @@
       font-size: 14px;
       color: #eee;
       border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    .grid button:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+    }
+    /* Buttons */
+    .garden-button {
+      position: absolute;
+      left: 210px; /* aligns roughly with column 3 */
+      top: 10px;
+      padding: 10px;
+      background-color: #5DADE2;
+      border: 2px solid #fff;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
     }
     .garbage-chute {
       position: absolute;
@@ -83,7 +101,6 @@
       padding: 5px;
       border-radius: 4px;
     }
-    /* Updated Exit Button Style */
     .exit-button {
       position: absolute;
       left: 0;
@@ -127,105 +144,6 @@
       border-radius: 4px;
       color: #222;
     }
-    .panel {
-      display: none;
-      border: 2px solid #444;
-      padding: 20px;
-      width: 600px;
-      margin: 20px auto;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    .panel h2 {
-      text-align: center;
-      color: #fff;
-    }
-    .control {
-      margin-bottom: 15px;
-    }
-    .control label {
-      display: inline-block;
-      width: 200px;
-      color: #fff;
-    }
-    .control input[type="range"] {
-      width: 200px;
-    }
-    /* Grocery Store Panel */
-    #grocery-panel {
-      display: none;
-      border: 2px solid #444;
-      padding: 20px;
-      width: 600px;
-      margin: 20px auto;
-      border-radius: 8px;
-      background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');
-    }
-    #grocery-panel h2 {
-      margin-bottom: 20px;
-    }
-    #grocery-panel .grocery-item {
-      margin: 10px 0;
-    }
-    #grocery-panel .grocery-item p {
-      font-size: 16px;
-      margin-bottom: 5px;
-    }
-    /* Community Garden Panel */
-    #garden-panel {
-      display: none;
-      border: 2px solid #444;
-      padding: 20px;
-      width: 600px;
-      margin: 20px auto;
-      border-radius: 8px;
-      background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');
-    }
-    #garden-panel h2 {
-      margin-bottom: 20px;
-    }
-    #garden-panel .slot {
-      margin: 10px 0;
-      padding: 5px;
-      border: 1px solid #777;
-      border-radius: 4px;
-    }
-    #garden-panel .slot button {
-      margin-left: 10px;
-      padding: 3px 6px;
-      font-size: 14px;
-    }
-    /* Chat Panel */
-    #chatPanel {
-      display: none;
-      border: 2px solid #444;
-      padding: 10px;
-      width: 400px;
-      margin: 20px auto;
-      background: rgba(0,0,0,0.8);
-      border-radius: 8px;
-    }
-    #chatLog {
-      border: 1px solid #ccc;
-      padding: 10px;
-      height: 100px;
-      overflow-y: auto;
-      background: rgba(255,255,255,0.1);
-      margin-bottom: 10px;
-      color: #fff;
-      border-radius: 4px;
-    }
-    /* Biodata Panel (formerly Character Status) */
-    #playerStatus {
-      margin: 20px auto;
-      max-width: 300px;
-      border: 2px solid #444;
-      padding: 10px;
-      font-size: 14px;
-      color: #fff;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
     /* Character Creation Section */
     #characterCreation {
       margin: 20px auto;
@@ -248,8 +166,8 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    /* New Modal: Room Interaction Options (only knock option remains) */
-    #roomInteractionModal {
+    /* Modal Styles (for knock, plant selection, DM, trade, login, kitchen, water, admin) */
+    .modal {
       display: none;
       position: fixed;
       top: 50%;
@@ -262,41 +180,69 @@
       border-radius: 8px;
       z-index: 1000;
     }
-    #roomInteractionModal button {
+    .modal button, .modal input, .modal select, .modal textarea {
       margin-top: 10px;
       padding: 5px 10px;
       font-size: 14px;
       border-radius: 4px;
       border: none;
       cursor: pointer;
-    }
-    /* New Modal: Knock Chat (Limited Chatbox) */
-    #knockModal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      width: 300px;
-      transform: translate(-50%, -50%);
-      background: rgba(0,0,0,0.9);
-      padding: 20px;
-      border: 2px solid #444;
-      border-radius: 8px;
-      z-index: 1000;
-    }
-    #knockModal button {
-      margin-top: 10px;
-      padding: 5px 10px;
-      font-size: 14px;
-      border-radius: 4px;
-      border: none;
-      cursor: pointer;
-    }
-    #knockModal input {
       width: 100%;
-      padding: 5px;
-      margin-top: 10px;
+    }
+    /* Chat Panel */
+    #chatPanel {
+      display: none;
+      border: 2px solid #444;
+      padding: 10px;
+      width: 400px;
+      margin: 20px auto;
+      background: rgba(0,0,0,0.8);
+      border-radius: 8px;
+    }
+    #chatLog {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 100px;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.1);
+      margin-bottom: 10px;
+      color: #fff;
+      border-radius: 4px;
+    }
+    /* Biodata Panel */
+    #playerStatus {
+      margin: 20px auto;
+      max-width: 300px;
+      border: 2px solid #444;
+      padding: 10px;
       font-size: 14px;
+      color: #fff;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.7);
+    }
+    /* Garden Slots */
+    #garden-panel .slot {
+      margin: 10px 0;
+      padding: 5px;
+      border: 1px solid #777;
+      border-radius: 4px;
+    }
+    #garden-panel .slot button {
+      margin-left: 5px;
+      padding: 3px 6px;
+      font-size: 12px;
+    }
+    /* New panel for Login */
+    #loginPanel {
+      margin: 20px auto;
+      max-width: 300px;
+      border: 2px solid #444;
+      padding: 10px;
+      font-size: 14px;
+      color: #fff;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.7);
+      display: none;
     }
   </style>
   <!-- Firebase SDKs: Auth and Firestore -->
@@ -305,6 +251,15 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
 </head>
 <body>
+
+<!-- Login Panel -->
+<div id="loginPanel">
+  <h3>Login / Register</h3>
+  <input type="email" id="loginEmail" placeholder="Email" required>
+  <input type="password" id="loginPassword" placeholder="Password" required>
+  <button onclick="loginUser()">Login</button>
+  <button onclick="registerUser()">Register</button>
+</div>
 
 <!-- Character Creation Section -->
 <div id="characterCreation">
@@ -323,31 +278,12 @@
     <!-- New Room Selection Dropdown -->
     <select id="roomNumber" required>
       <option value="">Select Room Number</option>
-      <option value="1">Room 1</option>
-      <option value="2">Room 2</option>
-      <option value="3">Room 3</option>
-      <option value="4">Room 4</option>
-      <option value="5">Room 5</option>
-      <option value="6">Room 6</option>
-      <option value="7">Room 7</option>
-      <option value="8">Room 8</option>
-      <option value="9">Room 9</option>
-      <option value="10">Room 10</option>
-      <option value="11">Room 11</option>
-      <option value="12">Room 12</option>
-      <option value="13">Room 13</option>
-      <option value="14">Room 14</option>
-      <option value="15">Room 15</option>
-      <option value="16">Room 16</option>
-      <option value="17">Room 17</option>
-      <option value="18">Room 18</option>
-      <option value="19">Room 19</option>
-      <option value="20">Room 20</option>
-      <option value="21">Room 21</option>
-      <option value="22">Room 22</option>
-      <option value="23">Room 23</option>
-      <option value="24">Room 24</option>
-      <option value="25">Room 25</option>
+      <!-- Rooms 1 to 25 -->
+      <script>
+        for(let i=1; i<=25; i++){
+          document.write('<option value="'+i+'">Room '+i+'</option>');
+        }
+      </script>
     </select>
     <button type="submit">Create Character</button>
   </form>
@@ -361,35 +297,16 @@
       <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
       <!-- Exit Button -->
       <button class="exit-button" onclick="signOutUser()">Exit</button>
-      <!-- New Community Garden Button positioned above Room 23 -->
+      <!-- Community Garden Button -->
       <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
       <div class="grid">
-        <!-- 25 Room Buttons (all use the openRoomInteraction which now only offers Knock option) -->
-        <button onclick="openRoomInteraction('Room 21')">Room 21</button>
-        <button onclick="openRoomInteraction('Room 22')">Room 22</button>
-        <button onclick="openRoomInteraction('Room 23')">Room 23</button>
-        <button onclick="openRoomInteraction('Room 24')">Room 24</button>
-        <button onclick="openRoomInteraction('Room 25')">Room 25</button>
-        <button onclick="openRoomInteraction('Room 16')">Room 16</button>
-        <button onclick="openRoomInteraction('Room 17')">Room 17</button>
-        <button onclick="openRoomInteraction('Room 18')">Room 18</button>
-        <button onclick="openRoomInteraction('Room 19')">Room 19</button>
-        <button onclick="openRoomInteraction('Room 20')">Room 20</button>
-        <button onclick="openRoomInteraction('Room 11')">Room 11</button>
-        <button onclick="openRoomInteraction('Room 12')">Room 12</button>
-        <button onclick="openRoomInteraction('Room 13')">Room 13</button>
-        <button onclick="openRoomInteraction('Room 14')">Room 14</button>
-        <button onclick="openRoomInteraction('Room 15')">Room 15</button>
-        <button onclick="openRoomInteraction('Room 6')">Room 6</button>
-        <button onclick="openRoomInteraction('Room 7')">Room 7</button>
-        <button onclick="openRoomInteraction('Room 8')">Room 8</button>
-        <button onclick="openRoomInteraction('Room 9')">Room 9</button>
-        <button onclick="openRoomInteraction('Room 10')">Room 10</button>
-        <button onclick="openRoomInteraction('Room 1')">Room 1</button>
-        <button onclick="openRoomInteraction('Room 2')">Room 2</button>
-        <button onclick="openRoomInteraction('Room 3')">Room 3</button>
-        <button onclick="openRoomInteraction('Room 4')">Room 4</button>
-        <button onclick="openRoomInteraction('Room 5')">Room 5</button>
+        <!-- 25 Room Buttons -->
+        <script>
+          const rooms = [21,22,23,24,25,16,17,18,19,20,11,12,13,14,15,6,7,8,9,10,1,2,3,4,5];
+          rooms.forEach(room => {
+            document.write('<button onclick="openRoomInteraction(\'Room '+room+'\')">Room '+room+'</button>');
+          });
+        </script>
       </div>
       <button class="power-room" onclick="showPowerPanel()">Power Room</button>
     </div>
@@ -398,6 +315,9 @@
       <button onclick="openGroceryPanel()">Groceries Stand</button>
       <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
       <button onclick="togglePlayerStatus()">Biodata</button>
+      <button onclick="openDMPanel()">Direct Message</button>
+      <button onclick="openTradePanel()">Trade</button>
+      <button onclick="openAdminPanel()">Admin Dashboard</button>
     </div>
     <!-- Biodata Panel -->
     <div id="playerStatus">
@@ -408,10 +328,10 @@
   <!-- Power Source Panel -->
   <div id="minigame-panel" class="panel">
     <h2>Wind Turbine Control Panel</h2>
-    <p><strong>Objective:</strong> Ensure the turbine remains stable and provides electricity (affecting water and heating) to the flats.</p>
+    <p><strong>Objective:</strong> Ensure the turbine provides electricity, water heating, and lighting.</p>
     <button id="instructionsButton" onclick="toggleInstructions()">Instructions</button>
     <div id="instructions" style="display: none;">
-      <p>Adjust the wind speed, engage brakes when needed, lubricate the turbine, and confirm power output.</p>
+      <p>Adjust wind speed, engage brakes as needed, lubricate, and confirm power output.</p>
     </div>
     <div class="control">
       <label for="windSpeedSlider">Wind Speed Regulator:</label>
@@ -439,12 +359,16 @@
     </div>
     <h3>System Log:</h3>
     <div id="minigameLog"></div>
+    <div class="control">
+      <label>Power Status:</label>
+      <span id="powerStatusDisplay">Unknown</span>
+    </div>
   </div>
 
   <!-- Garbage Chute Panel -->
   <div id="garbage-panel" class="panel">
     <h2>Garbage Chute Control</h2>
-    <p><strong>Objective:</strong> Clear the accumulated garbage before it piles up too high.</p>
+    <p><strong>Objective:</strong> Clear accumulated garbage before it causes a community health crisis.</p>
     <div class="control">
       <label>Garbage Level:</label>
       <span id="garbageDisplay"></span> / 100
@@ -462,29 +386,29 @@
   <!-- Grocery Store Panel -->
   <div id="grocery-panel" class="panel">
     <h2>Grocery Store</h2>
-    <p>Purchase essential items to ensure survival. Note: Without proper electricity, prices may increase.</p>
+    <p>Purchase essential items. Prices may vary with electricity availability.</p>
     <div class="grocery-item">
-      <p><strong>Food Staples</strong> (Bread, Meat, Vegetables, etc.) - $10</p>
+      <p><strong>Food Staples</strong> - $10</p>
       <button onclick="buyItem('Food Staples')">Buy Food</button>
     </div>
     <div class="grocery-item">
-      <p><strong>Seeds</strong> (For your community garden) - $2 each</p>
+      <p><strong>Seeds</strong> (for Community Garden) - $2 each</p>
       <button onclick="buyItem('Seeds')">Buy Seeds</button>
     </div>
     <div class="grocery-item">
-      <p><strong>Maintenance Essentials</strong> (For wind turbine repairs) - $5</p>
+      <p><strong>Maintenance Essentials</strong> - $5</p>
       <button onclick="buyItem('Maintenance Essentials')">Buy Maintenance</button>
     </div>
     <div class="grocery-item">
-      <p><strong>Room Decorations</strong> (Boost mood) - $7</p>
+      <p><strong>Room Decorations</strong> - $7</p>
       <button onclick="buyItem('Room Decoration')">Buy Decoration</button>
     </div>
     <div class="grocery-item">
-      <p><strong>Alcohol</strong> (Boost mood temporarily) - $3</p>
+      <p><strong>Alcohol</strong> - $3</p>
       <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
     </div>
     <div class="grocery-item">
-      <p><strong>Cigarettes</strong> (50/50 mood boost, health risk) - $4</p>
+      <p><strong>Cigarettes</strong> - $4</p>
       <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
     </div>
     <button onclick="closeGroceryPanel()">Return to Main Screen</button>
@@ -493,19 +417,14 @@
   <!-- Community Garden Panel -->
   <div id="garden-panel" class="panel">
     <h2>Community Garden</h2>
-    <p>Manage your rooftop garden. Plants need water every 5 minutes and mature in 1 hour. Seeds can be purchased from the Grocery Store.</p>
+    <p>Manage your rooftop garden. Plants need watering and fertilizing; seasonal changes affect growth.</p>
     <div id="plantSlots">
       <!-- 10 Plant Slots -->
-      <div class="slot" id="slot1">Slot 1: <span class="status">Empty</span> <button onclick="plantSeed(1)">Plant Seed</button></div>
-      <div class="slot" id="slot2">Slot 2: <span class="status">Empty</span> <button onclick="plantSeed(2)">Plant Seed</button></div>
-      <div class="slot" id="slot3">Slot 3: <span class="status">Empty</span> <button onclick="plantSeed(3)">Plant Seed</button></div>
-      <div class="slot" id="slot4">Slot 4: <span class="status">Empty</span> <button onclick="plantSeed(4)">Plant Seed</button></div>
-      <div class="slot" id="slot5">Slot 5: <span class="status">Empty</span> <button onclick="plantSeed(5)">Plant Seed</button></div>
-      <div class="slot" id="slot6">Slot 6: <span class="status">Empty</span> <button onclick="plantSeed(6)">Plant Seed</button></div>
-      <div class="slot" id="slot7">Slot 7: <span class="status">Empty</span> <button onclick="plantSeed(7)">Plant Seed</button></div>
-      <div class="slot" id="slot8">Slot 8: <span class="status">Empty</span> <button onclick="plantSeed(8)">Plant Seed</button></div>
-      <div class="slot" id="slot9">Slot 9: <span class="status">Empty</span> <button onclick="plantSeed(9)">Plant Seed</button></div>
-      <div class="slot" id="slot10">Slot 10: <span class="status">Empty</span> <button onclick="plantSeed(10)">Plant Seed</button></div>
+      <script>
+        for(let i=1;i<=10;i++){
+          document.write('<div class="slot" id="slot'+i+'">Slot '+i+': <span class="status">Empty</span> <button onclick="openPlantSelectionModal('+i+')">Plant Seed</button></div>');
+        }
+      </script>
       <!-- Tree for Mushrooms Slot -->
       <div class="slot" id="mushroomTree">
         Tree for Mushrooms: <span class="status">Empty</span>
@@ -516,7 +435,7 @@
     <button onclick="closeGardenPanel()">Return to Main Screen</button>
   </div>
 
-  <!-- Chat Panel -->
+  <!-- Chat Panel (Room Chat) -->
   <div id="chatPanel" class="panel">
     <h2 id="chatRoomTitle"></h2>
     <div id="chatLog"></div>
@@ -525,205 +444,90 @@
     <button onclick="closeChat()">Close Chat</button>
   </div>
 
-  <!-- New Modal: Room Interaction Options (only Knock option remains) -->
-  <div id="roomInteractionModal" class="panel">
+  <!-- Modal: Room Interaction Options -->
+  <div id="roomInteractionModal" class="modal">
     <h2>Room Interaction</h2>
     <p>How do you want to interact with <span id="interactionRoomName"></span>?</p>
     <button onclick="chooseKnock()">Knock on Door</button>
     <button onclick="closeRoomInteractionModal()">Cancel</button>
   </div>
 
-  <!-- New Modal: Knock Chat (Limited Chatbox) -->
-  <div id="knockModal" class="panel">
+  <!-- Modal: Knock Chat -->
+  <div id="knockModal" class="modal">
     <h2>Knock Request</h2>
-    <p>Type a brief message (max 50 characters) to request entry:</p>
+    <p>Type a brief message (max 50 characters):</p>
     <input type="text" id="knockMessage" maxlength="50" placeholder="Your knock message...">
     <button onclick="sendKnock()">Send Knock</button>
     <button onclick="closeKnockModal()">Cancel</button>
   </div>
+
+  <!-- Modal: Plant Selection -->
+  <div id="plantSelectionModal" class="modal">
+    <h2>Select Plant Type</h2>
+    <select id="plantTypeSelect">
+      <!-- Options populated from plantTypes array -->
+    </select>
+    <button onclick="confirmPlantSelection()">Plant</button>
+    <button onclick="closePlantSelectionModal()">Cancel</button>
+  </div>
+
+  <!-- Modal: Direct Messaging Panel -->
+  <div id="dmPanel" class="modal">
+    <h2>Direct Message</h2>
+    <input type="text" id="dmRecipient" placeholder="Recipient's Username">
+    <div id="dmChatLog" style="height:100px; overflow-y:auto; background:rgba(255,255,255,0.1); padding:5px;"></div>
+    <input type="text" id="dmMessage" placeholder="Your message">
+    <button onclick="sendDMMessage()">Send DM</button>
+    <button onclick="closeDMPanel()">Close</button>
+  </div>
+
+  <!-- Modal: Trade Panel -->
+  <div id="tradePanel" class="modal">
+    <h2>Trade Request</h2>
+    <input type="text" id="tradeRecipient" placeholder="Recipient's Username">
+    <select id="tradeItemSelect">
+      <option value="Food Staples">Food Staples</option>
+      <option value="Seeds">Seeds</option>
+      <option value="Maintenance Essentials">Maintenance Essentials</option>
+      <option value="Room Decoration">Room Decoration</option>
+      <option value="Alcohol">Alcohol</option>
+      <option value="Cigarettes">Cigarettes</option>
+    </select>
+    <input type="number" id="tradeQuantity" placeholder="Quantity" min="1">
+    <button onclick="sendTradeRequest()">Send Trade</button>
+    <button onclick="closeTradePanel()">Cancel</button>
+  </div>
+
+  <!-- Modal: Community Kitchen Panel -->
+  <div id="kitchenPanel" class="modal">
+    <h2>Community Kitchen</h2>
+    <p>Process food ingredients for safer, more efficient consumption.</p>
+    <button onclick="processFood()">Process Food</button>
+    <button onclick="closeKitchenPanel()">Close</button>
+  </div>
+
+  <!-- Modal: Water Supplies Panel -->
+  <div id="waterPanel" class="modal">
+    <h2>Water Supplies</h2>
+    <p>Distribute water for gardening, cooking, personal consumption, and laundry.</p>
+    <button onclick="useWater()">Use Water</button>
+    <button onclick="closeWaterPanel()">Close</button>
+  </div>
+
+  <!-- Modal: Admin Dashboard -->
+  <div id="adminPanel" class="modal">
+    <h2>Admin Dashboard</h2>
+    <p>Monitoring game activity:</p>
+    <div id="adminStats"></div>
+    <button onclick="closeAdminPanel()">Close</button>
+  </div>
+
 </div>
 
 <script>
   // ----------------------------
-  // Global Variables for Room Interaction
+  // Firebase Initialization & Config
   // ----------------------------
-  let currentRoomInteraction = "";
-  
-  // Room Interaction Modal Functions
-  function openRoomInteraction(roomName) {
-    currentRoomInteraction = roomName;
-    document.getElementById('interactionRoomName').textContent = roomName;
-    document.getElementById('roomInteractionModal').style.display = 'block';
-  }
-  
-  function closeRoomInteractionModal() {
-    document.getElementById('roomInteractionModal').style.display = 'none';
-  }
-  
-  function chooseKnock() {
-    closeRoomInteractionModal();
-    document.getElementById('knockModal').style.display = 'block';
-  }
-  
-  function closeKnockModal() {
-    document.getElementById('knockModal').style.display = 'none';
-  }
-  
-  function sendKnock() {
-    let message = document.getElementById('knockMessage').value;
-    if(message.trim() === "") {
-      alert("Please type a message before knocking.");
-      return;
-    }
-    // Simulate sending a knock request and owner approval.
-    closeKnockModal();
-    if(confirm("Room owner, do you approve this knock request from " + currentRoomInteraction + "?")) {
-      openRoomChat(currentRoomInteraction);
-    } else {
-      alert("Your knock was rejected.");
-    }
-  }
-  
-  // ----------------------------
-  // Global Economy & Produce Data
-  // ----------------------------
-  if (!localStorage.getItem('money')) { localStorage.setItem('money', 50); }
-  if (!localStorage.getItem('seeds')) { localStorage.setItem('seeds', 0); }
-  if (!localStorage.getItem('mushroomSeeds')) { localStorage.setItem('mushroomSeeds', 0); }
-  
-  const plantTypes = [
-    { name: "Tomato", description: "Juicy, tangy, and sweet tomatoes perfect for salads and sauces; robust nutrition but needs ample sunlight and regular watering.", price: 5 },
-    { name: "Lettuce", description: "Crisp, mildly sweet leaves ideal for fresh salads; fast-maturing with modest mood boost but wilts in heat.", price: 3 },
-    { name: "Carrot", description: "Crunchy, sweet, and earthy roots great for snacking or stews; reliably grown but sensitive to poor soil.", price: 4 },
-    { name: "Potato", description: "Starchy, savory tubers serving as a hearty meal base; high yield yet pest‐prone and moisture–dependent.", price: 6 },
-    { name: "Cucumber", description: "Crisp, refreshing, and mildly sweet cucumbers great for salads and pickling; hydrating but water–demanding.", price: 4 },
-    { name: "Bell Pepper", description: "Sweet, crunchy peppers available in vibrant colors to enhance dishes; improves meal variety but sensitive to temperature.", price: 5 },
-    { name: "Eggplant", description: "Rich, slightly bitter fruit with a creamy texture that absorbs flavors well; consistent but needs extra fertilizer.", price: 5 },
-    { name: "Spinach", description: "Tender, slightly earthy leaves ideal for salads or smoothies; nutrient–dense and quick-growing yet may bolt in heat.", price: 3 },
-    { name: "Zucchini", description: "Mild and slightly sweet zucchinis versatile for sautés and baking; prolific but may dominate the garden if unmanaged.", price: 4 },
-    { name: "Herb Plant", description: "A mix of aromatic herbs from minty to savory that enhances meals and offers minor health benefits; low–cost but requires regular trimming.", price: 2 }
-  ];
-  
-  const mushroomTypes = [
-    { name: "Shiitake", description: "Rich umami flavor with meaty texture ideal for soups and stir-fries; moderately growing, balanced mood boost.", price: 10 },
-    { name: "Portobello", description: "Deep, earthy taste with robust texture perfect for grilling; fast-growing with a modest mood boost.", price: 7 },
-    { name: "Enoki", description: "Delicate with a mild, slightly fruity flavor ideal for salads and garnishes; rare and unpredictable yet offers significant mood boost.", price: 15 },
-    { name: "Oyster", description: "Sweet, slightly woody flavor ideal for a variety of dishes; steady growth, provides decent mood boost, requires precise temperature control.", price: 12 },
-    { name: "Morel", description: "Nutty and earthy with a unique texture perfect for gourmet recipes; high-risk but excellent profit potential.", price: 20 }
-  ];
-  
-  let garden = {};
-  for (let i = 1; i <= 10; i++) {
-    garden[i] = { plantedTime: null, wateredTime: null, mature: false, produceType: null };
-  }
-  garden[11] = { plantedTime: null, wateredTime: null, mature: false, mushrooms: 0, produceType: null };
-  
-  function updateGardenUI() {
-    for (let i = 1; i <= 10; i++) {
-      let slot = document.getElementById('slot' + i);
-      let statusSpan = slot.querySelector('.status');
-      if (garden[i].plantedTime === null) {
-        statusSpan.textContent = "Empty";
-      } else {
-        let elapsed = (Date.now() - garden[i].plantedTime) / 60000;
-        let produceName = garden[i].produceType ? garden[i].produceType.name : "";
-        if (elapsed >= 60 && !garden[i].mature) {
-          garden[i].mature = true;
-          statusSpan.textContent = "Mature: " + produceName;
-          slot.querySelector('button').style.display = 'none';
-        } else if (!garden[i].mature) {
-          statusSpan.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
-        }
-      }
-    }
-    let treeSlot = document.getElementById('mushroomTree');
-    let treeStatus = treeSlot.querySelector('.status');
-    if (garden[11].plantedTime === null) {
-      treeStatus.textContent = "Empty";
-    } else {
-      let elapsed = (Date.now() - garden[11].plantedTime) / 60000;
-      let produceName = garden[11].produceType ? garden[11].produceType.name : "";
-      if (elapsed >= 60 && !garden[11].mature) {
-        garden[11].mature = true;
-        garden[11].mushrooms = 5;
-        treeStatus.textContent = "Mature: " + produceName + " (" + garden[11].mushrooms + " mushrooms)";
-        treeSlot.querySelector('button').style.display = 'none';
-      } else if (!garden[11].mature) {
-        treeStatus.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
-      }
-    }
-  }
-  
-  function plantSeed(slotNumber) {
-    let seeds = parseInt(localStorage.getItem('seeds')) || 0;
-    if (seeds <= 0) {
-      alert("No seeds available. Purchase seeds from the Grocery Store.");
-      return;
-    }
-    if (garden[slotNumber].plantedTime === null) {
-      seeds -= 1;
-      localStorage.setItem('seeds', seeds);
-      garden[slotNumber].plantedTime = Date.now();
-      garden[slotNumber].wateredTime = Date.now();
-      let randomIndex = Math.floor(Math.random() * plantTypes.length);
-      garden[slotNumber].produceType = plantTypes[randomIndex];
-      updateGardenUI();
-      updatePlayerStatus();
-    } else {
-      alert("A seed is already planted in Slot " + slotNumber + ".");
-    }
-  }
-  
-  function plantMushroomTree() {
-    let mSeeds = parseInt(localStorage.getItem('mushroomSeeds')) || 0;
-    if (mSeeds <= 0) {
-      alert("No mushroom seeds available. Purchase from the Grocery Store.");
-      return;
-    }
-    if (garden[11].plantedTime === null) {
-      mSeeds -= 1;
-      localStorage.setItem('mushroomSeeds', mSeeds);
-      garden[11].plantedTime = Date.now();
-      garden[11].wateredTime = Date.now();
-      let randomIndex = Math.floor(Math.random() * mushroomTypes.length);
-      garden[11].produceType = mushroomTypes[randomIndex];
-      updateGardenUI();
-      updatePlayerStatus();
-    } else {
-      alert("The mushroom tree is already planted.");
-    }
-  }
-  
-  function sellProduce() {
-    let totalEarnings = 0;
-    for (let i = 1; i <= 10; i++) {
-      if (garden[i].mature && garden[i].produceType) {
-        totalEarnings += garden[i].produceType.price;
-        garden[i] = { plantedTime: null, wateredTime: null, mature: false, produceType: null };
-        let slot = document.getElementById('slot' + i);
-        let btn = slot.querySelector('button');
-        if (btn) btn.style.display = 'inline';
-      }
-    }
-    if (garden[11].mature && garden[11].produceType) {
-      totalEarnings += (garden[11].mushrooms * garden[11].produceType.price);
-      garden[11] = { plantedTime: null, wateredTime: null, mature: false, mushrooms: 0, produceType: null };
-      let slot = document.getElementById('mushroomTree');
-      let btn = slot.querySelector('button');
-      if (btn) btn.style.display = 'inline';
-    }
-    let currentMoney = parseInt(localStorage.getItem('money')) || 50;
-    currentMoney += totalEarnings;
-    localStorage.setItem('money', currentMoney);
-    alert("You sold your produce for $" + totalEarnings + ". Current money: $" + currentMoney);
-    updatePlayerStatus();
-    updateGardenUI();
-  }
-  
-  // Firebase Initialization & Player Management
-  function sanitizePlayerName(name) {
-    return name.replace(/[\/\\]/g, '_');
-  }
   const firebaseConfig = {
     apiKey: "AIzaSyD5avvNbSB5L_YtpyxbBYYnvUpjMa0WglE",
     authDomain: "thephantasyreport.firebaseapp.com",
@@ -734,8 +538,146 @@
     measurementId: "G-9MS36H0YV4"
   };
   firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
   const db = firebase.firestore();
-  
+
+  // ----------------------------
+  // Authentication Functions
+  // ----------------------------
+  function loginUser() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => {
+        document.getElementById('loginPanel').style.display = 'none';
+        checkCharacterExistence();
+      })
+      .catch(error => {
+        alert("Login error: " + error.message);
+      });
+  }
+  function registerUser() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(() => {
+        document.getElementById('loginPanel').style.display = 'none';
+        checkCharacterExistence();
+      })
+      .catch(error => {
+        alert("Registration error: " + error.message);
+      });
+  }
+  auth.onAuthStateChanged(user => {
+    if(user){
+      // If logged in, show main game or character creation
+      if(!localStorage.getItem('playerName')){
+        localStorage.setItem('playerName', user.email);
+      }
+      checkCharacterExistence();
+    } else {
+      // Show login panel if not logged in
+      document.getElementById('loginPanel').style.display = 'block';
+      document.getElementById('mainGame').style.display = 'none';
+      document.getElementById('characterCreation').style.display = 'none';
+    }
+  });
+
+  // ----------------------------
+  // Character Creation & Management
+  // ----------------------------
+  function sanitizePlayerName(name) {
+    return name.replace(/[\/\\]/g, '_');
+  }
+  function checkCharacterExistence() {
+    const playerName = localStorage.getItem('playerName');
+    if (!playerName) return;
+    const safePlayerName = sanitizePlayerName(playerName);
+    db.collection('players').doc(safePlayerName).get().then((doc) => {
+      if (doc.exists) {
+        document.getElementById('characterCreation').style.display = 'none';
+        document.getElementById('mainGame').style.display = 'block';
+        updatePlayerStatus();
+      } else {
+        document.getElementById('characterCreation').style.display = 'block';
+        document.getElementById('mainGame').style.display = 'none';
+        document.getElementById('displayName').innerText = playerName;
+        document.getElementById('charName').value = playerName;
+      }
+    }).catch((error) => {
+      console.error("Error checking character existence:", error);
+    });
+  }
+  function createCharacter() {
+    const playerName = localStorage.getItem('playerName');
+    if (!playerName) return;
+    const safePlayerName = sanitizePlayerName(playerName);
+    const charName = document.getElementById('charName').value;
+    const charAge = document.getElementById('charAge').value;
+    const charGender = document.getElementById('charGender').value;
+    const charReason = document.getElementById('charReason').value;
+    const roomNumber = document.getElementById('roomNumber').value;
+    const playerData = {
+      name: charName,
+      age: charAge,
+      gender: charGender,
+      reason: charReason,
+      roomNumber: roomNumber,
+      health: 100,
+      hunger: 0,
+      injury: 0,
+      mood: 100,
+      conditions: {
+        physical: "Healthy",
+        mental: "Content",
+        activity: "Idle"
+      },
+      lastUpdated: Date.now()
+    };
+    db.collection('players').doc(safePlayerName).set(playerData, { merge: true })
+      .then(() => {
+        localStorage.setItem('characterName', charName);
+        document.getElementById('characterCreation').style.display = 'none';
+        document.getElementById('mainGame').style.display = 'block';
+        updatePlayerStatus();
+      })
+      .catch((error) => {
+        console.error("Error creating character:", error);
+      });
+  }
+  let isEditing = false;
+  function enableEdit() {
+    isEditing = true;
+    updatePlayerStatus();
+  }
+  function cancelEdit() {
+    isEditing = false;
+    updatePlayerStatus();
+  }
+  function saveBiodata() {
+    const playerName = localStorage.getItem('playerName');
+    if (!playerName) return;
+    const safePlayerName = sanitizePlayerName(playerName);
+    const newName = document.getElementById('editName').value;
+    const newAge = document.getElementById('editAge').value;
+    const newReason = document.getElementById('editReason').value;
+    const newRoomNumber = document.getElementById('editRoomNumber').value;
+    db.collection('players').doc(safePlayerName).set({
+      name: newName,
+      age: newAge,
+      reason: newReason,
+      roomNumber: newRoomNumber,
+      lastUpdated: Date.now()
+    }, { merge: true })
+    .then(() => {
+      localStorage.setItem('characterName', newName);
+      isEditing = false;
+      alert('Biodata updated successfully.');
+    })
+    .catch((error) => {
+      console.error("Error updating biodata:", error);
+    });
+  }
   function updatePlayerStatus() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
@@ -787,229 +729,48 @@
         console.error("Error getting player status:", error);
       });
   }
-  
-  function checkCharacterExistence() {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    db.collection('players').doc(safePlayerName).get().then((doc) => {
-      if (doc.exists) {
-        document.getElementById('characterCreation').style.display = 'none';
-        document.getElementById('mainGame').style.display = 'block';
-        updatePlayerStatus();
-      } else {
-        document.getElementById('characterCreation').style.display = 'block';
-        document.getElementById('mainGame').style.display = 'none';
-        document.getElementById('displayName').innerText = playerName;
-        document.getElementById('charName').value = playerName;
-      }
-    }).catch((error) => {
-      console.error("Error checking character existence:", error);
-    });
-  }
-  
-  function createCharacter() {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    const charName = document.getElementById('charName').value;
-    const charAge = document.getElementById('charAge').value;
-    const charGender = document.getElementById('charGender').value;
-    const charReason = document.getElementById('charReason').value;
-    const roomNumber = document.getElementById('roomNumber').value;
-    const playerData = {
-      name: charName,
-      age: charAge,
-      gender: charGender,
-      reason: charReason,
-      roomNumber: roomNumber,
-      health: 100,
-      hunger: 0,
-      injury: 0,
-      mood: 100,
-      conditions: {
-        physical: "Healthy",
-        mental: "Content",
-        activity: "Idle"
-      },
-      lastUpdated: Date.now()
-    };
-    db.collection('players').doc(safePlayerName).set(playerData, { merge: true })
-      .then(() => {
-        localStorage.setItem('characterName', charName);
-        document.getElementById('characterCreation').style.display = 'none';
-        document.getElementById('mainGame').style.display = 'block';
-        updatePlayerStatus();
-      })
-      .catch((error) => {
-        console.error("Error creating character:", error);
-      });
-  }
-  
-  // Editing Functions (with 4-edits-per-month limit)
-  let isEditing = false;
-  function enableEdit() {
-    isEditing = true;
-    updatePlayerStatus();
-  }
-  function cancelEdit() {
-    isEditing = false;
-    updatePlayerStatus();
-  }
-  function saveBiodata() {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    const newName = document.getElementById('editName').value;
-    const newAge = document.getElementById('editAge').value;
-    const newReason = document.getElementById('editReason').value;
-    const newRoomNumber = document.getElementById('editRoomNumber').value;
-    db.collection('players').doc(safePlayerName).get().then((doc) => {
-      if (doc.exists) {
-        let data = doc.data();
-        let now = new Date();
-        let currentMonth = now.getMonth();
-        let lastEditMonth = data.lastEditMonth;
-        let editCount = data.editCount || 0;
-        if (lastEditMonth === undefined || lastEditMonth === null) {
-          lastEditMonth = currentMonth;
-        }
-        if (currentMonth === lastEditMonth && editCount >= 4) {
-          alert("You have reached the maximum number of edits for this month.");
-          return;
-        }
-        if (currentMonth !== lastEditMonth) {
-          editCount = 0;
-          lastEditMonth = currentMonth;
-        }
-        editCount++;
-        db.collection('players').doc(safePlayerName).set({
-           name: newName,
-           age: newAge,
-           reason: newReason,
-           roomNumber: newRoomNumber,
-           lastUpdated: Date.now(),
-           editCount: editCount,
-           lastEditMonth: lastEditMonth
-        }, { merge: true })
-        .then(() => {
-           localStorage.setItem('characterName', newName);
-           isEditing = false;
-           alert('Biodata updated successfully.');
-        })
-        .catch((error) => {
-           console.error("Error updating biodata:", error);
-        });
-      }
-    });
-  }
-  
-  // Toggle Biodata Panel Function
-  function togglePlayerStatus() {
-    const statusBox = document.getElementById('playerStatus');
-    if (!statusBox.style.display || statusBox.style.display === 'none') {
-      statusBox.style.display = 'block';
-    } else {
-      statusBox.style.display = 'none';
-    }
-  }
-  
-  // Grocery Store Functions
-  function openGroceryPanel() {
-    document.getElementById('grocery-panel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-  }
-  function closeGroceryPanel() {
-    document.getElementById('grocery-panel').style.display = 'none';
-    document.getElementById('main-screen').style.display = 'block';
-  }
-  function buyItem(item) {
-    let currentMoney = parseInt(localStorage.getItem('money')) || 50;
-    if (item === "Seeds") {
-      if (currentMoney >= 2) {
-        currentMoney -= 2;
-        localStorage.setItem('money', currentMoney);
-        let seeds = parseInt(localStorage.getItem('seeds')) || 0;
-        seeds += 1;
-        localStorage.setItem('seeds', seeds);
-        alert("You purchased 1 seed. Seeds available: " + seeds + ". Money left: $" + currentMoney);
-        updatePlayerStatus();
-      } else {
-        alert("Not enough money to purchase a seed.");
-      }
-    } else if (item === "Food Staples") {
-      if (currentMoney >= 10) {
-        currentMoney -= 10;
-        localStorage.setItem('money', currentMoney);
-        alert("You purchased Food Staples. Money left: $" + currentMoney);
-        updatePlayerStatus();
-      } else {
-        alert("Not enough money to purchase Food Staples.");
-      }
-    } else if (item === "Maintenance Essentials") {
-      if (currentMoney >= 5) {
-        currentMoney -= 5;
-        localStorage.setItem('money', currentMoney);
-        alert("You purchased Maintenance Essentials. Money left: $" + currentMoney);
-        updatePlayerStatus();
-      } else {
-        alert("Not enough money for Maintenance Essentials.");
-      }
-    } else if (item === "Room Decoration") {
-      if (currentMoney >= 7) {
-        currentMoney -= 7;
-        localStorage.setItem('money', currentMoney);
-        alert("You purchased a Room Decoration. Money left: $" + currentMoney);
-        updatePlayerStatus();
-      } else {
-        alert("Not enough money for Room Decoration.");
-      }
-    } else if (item === "Alcohol") {
-      if (currentMoney >= 3) {
-        currentMoney -= 3;
-        localStorage.setItem('money', currentMoney);
-        alert("You purchased Alcohol. Money left: $" + currentMoney);
-        updatePlayerStatus();
-      } else {
-        alert("Not enough money for Alcohol.");
-      }
-    } else if (item === "Cigarettes") {
-      if (currentMoney >= 4) {
-        currentMoney -= 4;
-        localStorage.setItem('money', currentMoney);
-        alert("You purchased Cigarettes. Money left: $" + currentMoney);
-        updatePlayerStatus();
-      } else {
-        alert("Not enough money for Cigarettes.");
-      }
-    } else {
-      alert("Item not recognized.");
-    }
-  }
-  
-  // Community Garden Functions
-  function openGardenPanel() {
-    document.getElementById('garden-panel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-    updateGardenUI();
-  }
-  function closeGardenPanel() {
-    document.getElementById('garden-panel').style.display = 'none';
-    document.getElementById('main-screen').style.display = 'block';
-  }
-  
-  // Exit / Sign Out Function
   function signOutUser() {
-    firebase.auth().signOut().then(() => {
+    auth.signOut().then(() => {
       localStorage.removeItem('playerName');
       localStorage.removeItem('characterName');
-      window.location.href = "index.html";
+      window.location.reload();
     }).catch((error) => {
       console.error("Error signing out:", error);
     });
   }
-  
-  // Chat Functions using Firestore
+
+  // ----------------------------
+  // Room Interaction & Chat Functions
+  // ----------------------------
+  let currentRoomInteraction = "";
+  function openRoomInteraction(roomName) {
+    currentRoomInteraction = roomName;
+    document.getElementById('interactionRoomName').textContent = roomName;
+    document.getElementById('roomInteractionModal').style.display = 'block';
+  }
+  function closeRoomInteractionModal() {
+    document.getElementById('roomInteractionModal').style.display = 'none';
+  }
+  function chooseKnock() {
+    closeRoomInteractionModal();
+    document.getElementById('knockModal').style.display = 'block';
+  }
+  function closeKnockModal() {
+    document.getElementById('knockModal').style.display = 'none';
+  }
+  function sendKnock() {
+    let message = document.getElementById('knockMessage').value;
+    if(message.trim() === "") {
+      alert("Please type a message before knocking.");
+      return;
+    }
+    closeKnockModal();
+    if(confirm("Room owner, do you approve this knock request from " + currentRoomInteraction + "?")) {
+      openRoomChat(currentRoomInteraction);
+    } else {
+      alert("Your knock was rejected.");
+    }
+  }
   let currentRoom = "";
   function openRoomChat(roomName) {
     currentRoom = roomName;
@@ -1069,15 +830,301 @@
       });
     }
   });
-  
+
+  // ----------------------------
+  // Direct Messaging Functions
+  // ----------------------------
+  function openDMPanel() {
+    document.getElementById('dmPanel').style.display = 'block';
+  }
+  function closeDMPanel() {
+    document.getElementById('dmPanel').style.display = 'none';
+  }
+  async function sendDMMessage() {
+    const recipient = document.getElementById('dmRecipient').value.trim();
+    const msg = document.getElementById('dmMessage').value;
+    if(recipient === "" || msg.trim() === "") {
+      alert("Please enter a recipient and a message.");
+      return;
+    }
+    const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
+    try {
+      await db.collection("directMessages").add({
+        sender: characterName,
+        recipient: recipient,
+        content: msg,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      document.getElementById('dmMessage').value = "";
+      listenForDMMessages(recipient);
+    } catch (error) {
+      console.error("Error sending DM:", error);
+    }
+  }
+  function listenForDMMessages(recipient) {
+    const dmLog = document.getElementById('dmChatLog');
+    const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
+    db.collection("directMessages")
+      .where("sender", "in", [characterName, recipient])
+      .where("recipient", "in", [characterName, recipient])
+      .orderBy("timestamp")
+      .onSnapshot(snapshot => {
+        dmLog.innerHTML = "";
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const p = document.createElement('p');
+          p.innerHTML = `<strong>${data.sender}</strong>: ${data.content}`;
+          dmLog.appendChild(p);
+        });
+        dmLog.scrollTop = dmLog.scrollHeight;
+      });
+  }
+
+  // ----------------------------
+  // Trade Functions
+  // ----------------------------
+  function openTradePanel() {
+    document.getElementById('tradePanel').style.display = 'block';
+  }
+  function closeTradePanel() {
+    document.getElementById('tradePanel').style.display = 'none';
+  }
+  async function sendTradeRequest() {
+    const recipient = document.getElementById('tradeRecipient').value.trim();
+    const item = document.getElementById('tradeItemSelect').value;
+    const quantity = parseInt(document.getElementById('tradeQuantity').value);
+    if(recipient === "" || isNaN(quantity) || quantity <= 0) {
+      alert("Please enter a valid recipient and quantity.");
+      return;
+    }
+    const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
+    try {
+      await db.collection("trades").add({
+        sender: characterName,
+        recipient: recipient,
+        item: item,
+        quantity: quantity,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        status: "pending"
+      });
+      alert("Trade request sent.");
+      closeTradePanel();
+    } catch (error) {
+      console.error("Error sending trade request:", error);
+    }
+  }
+
+  // ----------------------------
+  // Community Kitchen & Water Supplies Functions
+  // ----------------------------
+  function handleClick(facility) {
+    if(facility === "Community Kitchen") {
+      openKitchenPanel();
+    } else if(facility === "Water Supplies (Laundry)") {
+      openWaterPanel();
+    }
+  }
+  function openKitchenPanel() {
+    document.getElementById('kitchenPanel').style.display = 'block';
+  }
+  function closeKitchenPanel() {
+    document.getElementById('kitchenPanel').style.display = 'none';
+  }
+  function processFood() {
+    alert("Food processed for improved safety and efficiency.");
+  }
+  function openWaterPanel() {
+    document.getElementById('waterPanel').style.display = 'block';
+  }
+  function closeWaterPanel() {
+    document.getElementById('waterPanel').style.display = 'none';
+  }
+  function useWater() {
+    alert("Water distributed for gardening, cooking, and personal use.");
+  }
+
+  // ----------------------------
+  // Garden & Planting Functions
+  // ----------------------------
+  let plantTypes = [
+    { name: "Tomato", description: "Juicy and tangy", price: 5 },
+    { name: "Lettuce", description: "Crisp leaves", price: 3 },
+    { name: "Carrot", description: "Crunchy roots", price: 4 },
+    { name: "Potato", description: "Starchy tubers", price: 6 },
+    { name: "Cucumber", description: "Refreshing", price: 4 },
+    { name: "Bell Pepper", description: "Vibrant and sweet", price: 5 },
+    { name: "Eggplant", description: "Creamy texture", price: 5 },
+    { name: "Spinach", description: "Tender leaves", price: 3 },
+    { name: "Zucchini", description: "Mild and versatile", price: 4 },
+    { name: "Herb Plant", description: "Aromatic", price: 2 }
+  ];
+  const mushroomTypes = [
+    { name: "Shiitake", description: "Rich umami", price: 10 },
+    { name: "Portobello", description: "Earthy taste", price: 7 },
+    { name: "Enoki", description: "Delicate flavor", price: 15 },
+    { name: "Oyster", description: "Sweet and woody", price: 12 },
+    { name: "Morel", description: "Nutty and earthy", price: 20 }
+  ];
+  let garden = {};
+  for (let i = 1; i <= 10; i++) {
+    garden[i] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, produceType: null };
+  }
+  garden[11] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, mushrooms: 0, produceType: null };
+  function updateGardenUI() {
+    for (let i = 1; i <= 10; i++) {
+      let slot = document.getElementById('slot' + i);
+      let statusSpan = slot.querySelector('.status');
+      if (garden[i].plantedTime === null) {
+        statusSpan.textContent = "Empty";
+      } else {
+        let elapsed = (Date.now() - garden[i].plantedTime) / 60000;
+        let produceName = garden[i].produceType ? garden[i].produceType.name : "";
+        if (elapsed >= 60 && !garden[i].mature) {
+          garden[i].mature = true;
+          statusSpan.textContent = "Mature: " + produceName;
+          // Remove plant action buttons when mature
+          let btn = slot.querySelector('button');
+          if(btn) btn.style.display = 'none';
+        } else if (!garden[i].mature) {
+          statusSpan.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
+          // Show watering button if not watered in last 5 min
+          if(Date.now() - garden[i].wateredTime > 5*60000) {
+            if(!slot.querySelector('.waterBtn')){
+              let waterBtn = document.createElement('button');
+              waterBtn.className = 'waterBtn';
+              waterBtn.textContent = "Water";
+              waterBtn.onclick = function(){ waterPlant(i); };
+              slot.appendChild(waterBtn);
+            }
+          }
+          // Show fertilize button if not fertilized
+          if(!garden[i].fertilized && !slot.querySelector('.fertilizeBtn')){
+            let fertBtn = document.createElement('button');
+            fertBtn.className = 'fertilizeBtn';
+            fertBtn.textContent = "Fertilize";
+            fertBtn.onclick = function(){ fertilizePlant(i); };
+            slot.appendChild(fertBtn);
+          }
+        }
+      }
+    }
+    let treeSlot = document.getElementById('mushroomTree');
+    let treeStatus = treeSlot.querySelector('.status');
+    if (garden[11].plantedTime === null) {
+      treeStatus.textContent = "Empty";
+    } else {
+      let elapsed = (Date.now() - garden[11].plantedTime) / 60000;
+      let produceName = garden[11].produceType ? garden[11].produceType.name : "";
+      if (elapsed >= 60 && !garden[11].mature) {
+        garden[11].mature = true;
+        garden[11].mushrooms = 5;
+        treeStatus.textContent = "Mature: " + produceName + " (" + garden[11].mushrooms + " mushrooms)";
+        let btn = treeSlot.querySelector('button');
+        if(btn) btn.style.display = 'none';
+      } else if (!garden[11].mature) {
+        treeStatus.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
+      }
+    }
+  }
+  function openPlantSelectionModal(slotNumber) {
+    document.getElementById('plantSelectionModal').style.display = 'block';
+    document.getElementById('plantSelectionModal').setAttribute('data-slot', slotNumber);
+    let select = document.getElementById('plantTypeSelect');
+    select.innerHTML = "";
+    plantTypes.forEach(pt => {
+      let option = document.createElement('option');
+      option.value = pt.name;
+      option.textContent = pt.name + " ($" + pt.price + ")";
+      select.appendChild(option);
+    });
+  }
+  function closePlantSelectionModal() {
+    document.getElementById('plantSelectionModal').style.display = 'none';
+  }
+  function confirmPlantSelection() {
+    let slotNumber = document.getElementById('plantSelectionModal').getAttribute('data-slot');
+    let selectedName = document.getElementById('plantTypeSelect').value;
+    let selectedPlant = plantTypes.find(pt => pt.name === selectedName);
+    let seeds = parseInt(localStorage.getItem('seeds')) || 0;
+    if(seeds <= 0) {
+      alert("No seeds available. Purchase from the Grocery Store.");
+      closePlantSelectionModal();
+      return;
+    }
+    seeds -= 1;
+    localStorage.setItem('seeds', seeds);
+    garden[slotNumber].plantedTime = Date.now();
+    garden[slotNumber].wateredTime = Date.now();
+    garden[slotNumber].produceType = selectedPlant;
+    updateGardenUI();
+    updatePlayerStatus();
+    closePlantSelectionModal();
+  }
+  function waterPlant(slotNumber) {
+    garden[slotNumber].wateredTime = Date.now();
+    alert("Plant in slot " + slotNumber + " watered.");
+    updateGardenUI();
+  }
+  function fertilizePlant(slotNumber) {
+    garden[slotNumber].fertilized = true;
+    alert("Plant in slot " + slotNumber + " fertilized.");
+    updateGardenUI();
+  }
+  function plantMushroomTree() {
+    let mSeeds = parseInt(localStorage.getItem('mushroomSeeds')) || 0;
+    if (mSeeds <= 0) {
+      alert("No mushroom seeds available. Purchase from the Grocery Store.");
+      return;
+    }
+    if (garden[11].plantedTime === null) {
+      mSeeds -= 1;
+      localStorage.setItem('mushroomSeeds', mSeeds);
+      garden[11].plantedTime = Date.now();
+      garden[11].wateredTime = Date.now();
+      let randomIndex = Math.floor(Math.random() * mushroomTypes.length);
+      garden[11].produceType = mushroomTypes[randomIndex];
+      updateGardenUI();
+      updatePlayerStatus();
+    } else {
+      alert("The mushroom tree is already planted.");
+    }
+  }
+  function sellProduce() {
+    let totalEarnings = 0;
+    for (let i = 1; i <= 10; i++) {
+      if (garden[i].mature && garden[i].produceType) {
+        totalEarnings += garden[i].produceType.price;
+        garden[i] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, produceType: null };
+        let slot = document.getElementById('slot' + i);
+        let btn = slot.querySelector('button');
+        if (btn) btn.style.display = 'inline';
+      }
+    }
+    if (garden[11].mature && garden[11].produceType) {
+      totalEarnings += (garden[11].mushrooms * garden[11].produceType.price);
+      garden[11] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, mushrooms: 0, produceType: null };
+      let slot = document.getElementById('mushroomTree');
+      let btn = slot.querySelector('button');
+      if (btn) btn.style.display = 'inline';
+    }
+    let currentMoney = parseInt(localStorage.getItem('money')) || 50;
+    currentMoney += totalEarnings;
+    localStorage.setItem('money', currentMoney);
+    alert("You sold your produce for $" + totalEarnings + ". Current money: $" + currentMoney);
+    updatePlayerStatus();
+    updateGardenUI();
+  }
+
+  // ----------------------------
   // Power Source Simulation Functions
+  // ----------------------------
   let windSpeed = localStorage.getItem('windSpeed') || 50;
   let brakeEngaged = JSON.parse(localStorage.getItem('brakeEngaged')) || false;
   let powerOutputConfirmed = JSON.parse(localStorage.getItem('powerOutputConfirmed')) || false;
   let lastInteractionTime = localStorage.getItem('lastInteractionTime') || Date.now();
   let garbageLevel = localStorage.getItem('garbageLevel') || 0;
   let lastGarbageUpdate = localStorage.getItem('lastGarbageUpdate') || Date.now();
-  
+  let powerStatus = "Unknown";
   function updateWindSpeed() {
     windSpeed = document.getElementById('windSpeedSlider').value;
     document.getElementById('windSpeedValue').textContent = windSpeed;
@@ -1096,6 +1143,7 @@
     powerOutputConfirmed = !powerOutputConfirmed;
     document.getElementById('powerOutputConfirm').textContent = powerOutputConfirmed ? "Output Confirmed" : "Confirm Output";
     localStorage.setItem('powerOutputConfirmed', powerOutputConfirmed);
+    evaluatePowerOutput();
     updateLastInteraction();
   }
   function lubricate() {
@@ -1108,6 +1156,18 @@
     voltage = Math.max(0, voltage);
     document.getElementById('voltageDisplay').textContent = voltage.toFixed(1);
     localStorage.setItem('voltage', voltage);
+  }
+  function evaluatePowerOutput() {
+    // Simple evaluation: if windSpeed between 40 and 70 and brake properly engaged, power is on.
+    if(windSpeed >= 40 && windSpeed <= 70 && powerOutputConfirmed) {
+      powerStatus = "On";
+    } else {
+      powerStatus = "Off";
+    }
+    document.getElementById('powerStatusDisplay').textContent = powerStatus;
+    if(powerStatus === "Off") {
+      alert("Power is insufficient! Flats will experience reduced services.");
+    }
   }
   function simulateRandomEvent() {
     if (Date.now() - lastInteractionTime > 30000) {
@@ -1135,8 +1195,6 @@
     lastInteractionTime = Date.now();
     localStorage.setItem('lastInteractionTime', lastInteractionTime);
   }
-  
-  // Garbage Chute Simulation Functions
   function updateGarbageDisplay() {
     const now = Date.now();
     const elapsedHours = Math.floor((now - lastGarbageUpdate) / 3600000);
@@ -1145,6 +1203,9 @@
     localStorage.setItem('garbageLevel', garbageLevel);
     localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
     document.getElementById('garbageDisplay').textContent = garbageLevel;
+    if(garbageLevel > 80) {
+      alert("High garbage levels detected! The community is getting sick.");
+    }
   }
   function clearGarbage() {
     garbageLevel = 0;
@@ -1158,8 +1219,62 @@
     logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
     logDiv.scrollTop = logDiv.scrollHeight;
   }
-  
-  // Initialization
+
+  // ----------------------------
+  // Season Simulation
+  // ----------------------------
+  let currentSeason = "Spring";
+  function updateSeason() {
+    // For demonstration, cycle season every 2 minutes.
+    const seasons = ["Spring", "Summer", "Autumn", "Winter"];
+    let index = Math.floor((Date.now() / 120000)) % seasons.length;
+    currentSeason = seasons[index];
+    console.log("Current Season: " + currentSeason);
+  }
+  setInterval(updateSeason, 120000);
+
+  // ----------------------------
+  // Admin Dashboard Functions
+  // ----------------------------
+  function openAdminPanel() {
+    // For demo, only show if logged in user is admin (email includes "admin")
+    const userEmail = localStorage.getItem('playerName') || "";
+    if(userEmail.indexOf("admin") === -1) {
+      alert("Access denied. Admins only.");
+      return;
+    }
+    document.getElementById('adminPanel').style.display = 'block';
+    loadAdminStats();
+  }
+  function closeAdminPanel() {
+    document.getElementById('adminPanel').style.display = 'none';
+  }
+  function loadAdminStats() {
+    // Simple stats: count players and recent messages
+    db.collection("players").get().then(snapshot => {
+      let count = snapshot.size;
+      db.collection("messages").orderBy("timestamp", "desc").limit(5).get().then(msgSnapshot => {
+        let msgs = "";
+        msgSnapshot.forEach(doc => {
+          let m = doc.data();
+          msgs += `<p>${m.sender}: ${m.content}</p>`;
+        });
+        document.getElementById('adminStats').innerHTML = `<p>Total Players: ${count}</p><p>Recent Messages:</p>${msgs}`;
+      });
+    });
+  }
+
+  // ----------------------------
+  // Modal Panel Utilities
+  // ----------------------------
+  function hidePanel(panelId) {
+    document.getElementById(panelId).style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+  }
+
+  // ----------------------------
+  // Direct Initialization on Window Load
+  // ----------------------------
   window.onload = function() {
     document.getElementById('windSpeedSlider').value = windSpeed;
     document.getElementById('windSpeedValue').textContent = windSpeed;
@@ -1167,7 +1282,9 @@
     document.getElementById('powerOutputConfirm').textContent = powerOutputConfirmed ? "Output Confirmed" : "Confirm Output";
     updateVoltage();
     updateGarbageDisplay();
-    if (localStorage.getItem('playerName')) {
+    updateSeason();
+    // If logged in, check character existence
+    if(localStorage.getItem('playerName')){
       checkCharacterExistence();
     }
     setInterval(updateVoltage, 5000);
