@@ -276,6 +276,13 @@
       <option value="Other">Other</option>
     </select>
     <textarea id="charReason" placeholder="Reason for staying at Dissonance Heights" required></textarea>
+    <!-- New customization fields -->
+    <textarea id="charBackstory" placeholder="Backstory" required></textarea>
+    <input type="text" id="charSkills" placeholder="Skills (comma separated)" required>
+    <input type="text" id="charInventory" placeholder="Inventory (comma separated)" required>
+    <input type="text" id="charAlliances" placeholder="Alliances (comma separated)">
+    <input type="text" id="charRivalries" placeholder="Rivalries (comma separated)">
+    <input type="number" id="charReputation" placeholder="Reputation" value="0" required>
     <!-- Room Selection Dropdown (options generated via JS) -->
     <select id="roomNumber" required>
       <option value="">Select Room Number</option>
@@ -472,22 +479,18 @@
     document.getElementById('garbage-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
   }
-
   function showPowerPanel() {
     document.getElementById('minigame-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
   }
-
   function openGroceryPanel() {
     document.getElementById('grocery-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
   }
-
   function openGardenPanel() {
     document.getElementById('garden-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
   }
-
   // Buy item function for Grocery Store
   function buyItem(item) {
     const prices = {
@@ -583,12 +586,25 @@
     const charAge = document.getElementById('charAge').value;
     const charGender = document.getElementById('charGender').value;
     const charReason = document.getElementById('charReason').value;
+    // New fields for deeper customization:
+    const charBackstory = document.getElementById('charBackstory').value;
+    const charSkills = document.getElementById('charSkills').value;
+    const charInventory = document.getElementById('charInventory').value;
+    const charAlliances = document.getElementById('charAlliances').value;
+    const charRivalries = document.getElementById('charRivalries').value;
+    const charReputation = document.getElementById('charReputation').value;
     const roomNumber = document.getElementById('roomNumber').value;
     const playerData = {
       name: charName,
       age: charAge,
       gender: charGender,
       reason: charReason,
+      backstory: charBackstory,
+      skills: charSkills.split(',').map(s => s.trim()),
+      inventory: charInventory.split(',').map(i => i.trim()),
+      alliances: charAlliances ? charAlliances.split(',').map(a => a.trim()) : [],
+      rivalries: charRivalries ? charRivalries.split(',').map(r => r.trim()) : [],
+      reputation: parseInt(charReputation) || 0,
       roomNumber: roomNumber,
       health: 100,
       hunger: 0,
@@ -629,11 +645,24 @@
     const newAge = document.getElementById('editAge').value;
     const newReason = document.getElementById('editReason').value;
     const newRoomNumber = document.getElementById('editRoomNumber').value;
+    // New fields from edit mode
+    const newBackstory = document.getElementById('editBackstory').value;
+    const newSkills = document.getElementById('editSkills').value;
+    const newInventory = document.getElementById('editInventory').value;
+    const newAlliances = document.getElementById('editAlliances').value;
+    const newRivalries = document.getElementById('editRivalries').value;
+    const newReputation = document.getElementById('editReputation').value;
     db.collection('players').doc(safePlayerName).set({
       name: newName,
       age: newAge,
       reason: newReason,
       roomNumber: newRoomNumber,
+      backstory: newBackstory,
+      skills: newSkills.split(',').map(s => s.trim()),
+      inventory: newInventory.split(',').map(i => i.trim()),
+      alliances: newAlliances ? newAlliances.split(',').map(a => a.trim()) : [],
+      rivalries: newRivalries ? newRivalries.split(',').map(r => r.trim()) : [],
+      reputation: parseInt(newReputation) || 0,
       lastUpdated: Date.now()
     }, { merge: true })
     .then(() => {
@@ -668,6 +697,12 @@
             statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
             statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
             statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
+            statusHTML += `<p><strong>Backstory:</strong> ${data.backstory || "N/A"}</p>`;
+            statusHTML += `<p><strong>Skills:</strong> ${data.skills ? data.skills.join(", ") : "N/A"}</p>`;
+            statusHTML += `<p><strong>Inventory:</strong> ${data.inventory ? data.inventory.join(", ") : "N/A"}</p>`;
+            statusHTML += `<p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>`;
+            statusHTML += `<p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>`;
+            statusHTML += `<p><strong>Reputation:</strong> ${data.reputation || 0}</p>`;
             statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
             statusHTML += `<button onclick="enableEdit()">Edit</button>`;
           } else {
@@ -680,6 +715,13 @@
             statusHTML += `<p><strong>Age:</strong> <input type="number" id="editAge" value="${data.age}" /></p>`;
             statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason}</textarea></p>`;
             statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25"/></p>`;
+            // Editable fields for new customization:
+            statusHTML += `<p><strong>Backstory:</strong> <textarea id="editBackstory">${data.backstory || ""}</textarea></p>`;
+            statusHTML += `<p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" /></p>`;
+            statusHTML += `<p><strong>Inventory:</strong> <input type="text" id="editInventory" value="${data.inventory ? data.inventory.join(", ") : ""}" /></p>`;
+            statusHTML += `<p><strong>Alliances:</strong> <input type="text" id="editAlliances" value="${data.alliances ? data.alliances.join(", ") : ""}" /></p>`;
+            statusHTML += `<p><strong>Rivalries:</strong> <input type="text" id="editRivalries" value="${data.rivalries ? data.rivalries.join(", ") : ""}" /></p>`;
+            statusHTML += `<p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" /></p>`;
             statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
             statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
             statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
