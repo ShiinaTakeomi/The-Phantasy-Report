@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Dissonance Heights</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Google Font for Soviet-era signage look -->
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
   <style>
@@ -275,15 +276,9 @@
       <option value="Other">Other</option>
     </select>
     <textarea id="charReason" placeholder="Reason for staying at Dissonance Heights" required></textarea>
-    <!-- New Room Selection Dropdown -->
+    <!-- Room Selection Dropdown (options generated via JS) -->
     <select id="roomNumber" required>
       <option value="">Select Room Number</option>
-      <!-- Rooms 1 to 25 -->
-      <script>
-        for(let i=1; i<=25; i++){
-          document.write('<option value="'+i+'">Room '+i+'</option>');
-        }
-      </script>
     </select>
     <button type="submit">Create Character</button>
   </form>
@@ -300,13 +295,7 @@
       <!-- Community Garden Button -->
       <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
       <div class="grid">
-        <!-- 25 Room Buttons -->
-        <script>
-          const rooms = [21,22,23,24,25,16,17,18,19,20,11,12,13,14,15,6,7,8,9,10,1,2,3,4,5];
-          rooms.forEach(room => {
-            document.write('<button onclick="openRoomInteraction(\'Room '+room+'\')">Room '+room+'</button>');
-          });
-        </script>
+        <!-- Room buttons will be generated dynamically -->
       </div>
       <button class="power-room" onclick="showPowerPanel()">Power Room</button>
     </div>
@@ -411,7 +400,7 @@
       <p><strong>Cigarettes</strong> - $4</p>
       <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
     </div>
-    <button onclick="closeGroceryPanel()">Return to Main Screen</button>
+    <button onclick="hidePanel('grocery-panel')">Return to Main Screen</button>
   </div>
 
   <!-- Community Garden Panel -->
@@ -419,20 +408,10 @@
     <h2>Community Garden</h2>
     <p>Manage your rooftop garden. Plants need watering and fertilizing; seasonal changes affect growth.</p>
     <div id="plantSlots">
-      <!-- 10 Plant Slots -->
-      <script>
-        for(let i=1;i<=10;i++){
-          document.write('<div class="slot" id="slot'+i+'">Slot '+i+': <span class="status">Empty</span> <button onclick="openPlantSelectionModal('+i+')">Plant Seed</button></div>');
-        }
-      </script>
-      <!-- Tree for Mushrooms Slot -->
-      <div class="slot" id="mushroomTree">
-        Tree for Mushrooms: <span class="status">Empty</span>
-        <button onclick="plantMushroomTree()">Plant Mushroom</button>
-      </div>
+      <!-- Plant slots will be generated dynamically -->
     </div>
     <button onclick="sellProduce()">Sell Produce</button>
-    <button onclick="closeGardenPanel()">Return to Main Screen</button>
+    <button onclick="hidePanel('garden-panel')">Return to Main Screen</button>
   </div>
 
   <!-- Chat Panel (Room Chat) -->
@@ -465,7 +444,7 @@
   <div id="plantSelectionModal" class="modal">
     <h2>Select Plant Type</h2>
     <select id="plantTypeSelect">
-      <!-- Options populated from plantTypes array -->
+      <!-- Options populated dynamically -->
     </select>
     <button onclick="confirmPlantSelection()">Plant</button>
     <button onclick="closePlantSelectionModal()">Cancel</button>
@@ -542,6 +521,51 @@
   const db = firebase.firestore();
 
   // ----------------------------
+  // Missing Function Definitions
+  // ----------------------------
+  function showGarbagePanel() {
+    document.getElementById('garbage-panel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+  }
+
+  function showPowerPanel() {
+    document.getElementById('minigame-panel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+  }
+
+  function openGroceryPanel() {
+    document.getElementById('grocery-panel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+  }
+
+  function openGardenPanel() {
+    document.getElementById('garden-panel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+  }
+
+  // Buy item function for Grocery Store
+  function buyItem(item) {
+    const prices = {
+      'Food Staples': 10,
+      'Seeds': 2,
+      'Maintenance Essentials': 5,
+      'Room Decoration': 7,
+      'Alcohol': 3,
+      'Cigarettes': 4
+    };
+    let price = prices[item] || 0;
+    let money = parseInt(localStorage.getItem('money')) || 50;
+    if (money >= price) {
+      money -= price;
+      localStorage.setItem('money', money);
+      alert("Purchased " + item + " for $" + price + ". Remaining money: $" + money);
+      updatePlayerStatus();
+    } else {
+      alert("Not enough money to purchase " + item);
+    }
+  }
+
+  // ----------------------------
   // Authentication Functions
   // ----------------------------
   function loginUser() {
@@ -570,13 +594,11 @@
   }
   auth.onAuthStateChanged(user => {
     if(user){
-      // If logged in, show main game or character creation
       if(!localStorage.getItem('playerName')){
         localStorage.setItem('playerName', user.email);
       }
       checkCharacterExistence();
     } else {
-      // Show login panel if not logged in
       document.getElementById('loginPanel').style.display = 'block';
       document.getElementById('mainGame').style.display = 'none';
       document.getElementById('characterCreation').style.display = 'none';
@@ -982,12 +1004,10 @@
         if (elapsed >= 60 && !garden[i].mature) {
           garden[i].mature = true;
           statusSpan.textContent = "Mature: " + produceName;
-          // Remove plant action buttons when mature
           let btn = slot.querySelector('button');
           if(btn) btn.style.display = 'none';
         } else if (!garden[i].mature) {
           statusSpan.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
-          // Show watering button if not watered in last 5 min
           if(Date.now() - garden[i].wateredTime > 5*60000) {
             if(!slot.querySelector('.waterBtn')){
               let waterBtn = document.createElement('button');
@@ -997,7 +1017,6 @@
               slot.appendChild(waterBtn);
             }
           }
-          // Show fertilize button if not fertilized
           if(!garden[i].fertilized && !slot.querySelector('.fertilizeBtn')){
             let fertBtn = document.createElement('button');
             fertBtn.className = 'fertilizeBtn';
@@ -1158,7 +1177,6 @@
     localStorage.setItem('voltage', voltage);
   }
   function evaluatePowerOutput() {
-    // Simple evaluation: if windSpeed between 40 and 70 and brake properly engaged, power is on.
     if(windSpeed >= 40 && windSpeed <= 70 && powerOutputConfirmed) {
       powerStatus = "On";
     } else {
@@ -1225,7 +1243,6 @@
   // ----------------------------
   let currentSeason = "Spring";
   function updateSeason() {
-    // For demonstration, cycle season every 2 minutes.
     const seasons = ["Spring", "Summer", "Autumn", "Winter"];
     let index = Math.floor((Date.now() / 120000)) % seasons.length;
     currentSeason = seasons[index];
@@ -1237,7 +1254,6 @@
   // Admin Dashboard Functions
   // ----------------------------
   function openAdminPanel() {
-    // For demo, only show if logged in user is admin (email includes "admin")
     const userEmail = localStorage.getItem('playerName') || "";
     if(userEmail.indexOf("admin") === -1) {
       alert("Access denied. Admins only.");
@@ -1250,7 +1266,6 @@
     document.getElementById('adminPanel').style.display = 'none';
   }
   function loadAdminStats() {
-    // Simple stats: count players and recent messages
     db.collection("players").get().then(snapshot => {
       let count = snapshot.size;
       db.collection("messages").orderBy("timestamp", "desc").limit(5).get().then(msgSnapshot => {
@@ -1273,9 +1288,47 @@
   }
 
   // ----------------------------
-  // Direct Initialization on Window Load
+  // DOMContentLoaded & Initialization
   // ----------------------------
   window.onload = function() {
+    // Generate room number options
+    var roomSelect = document.getElementById('roomNumber');
+    if(roomSelect) {
+      for (let i=1; i<=25; i++){
+        let option = document.createElement('option');
+        option.value = i;
+        option.textContent = "Room " + i;
+        roomSelect.appendChild(option);
+      }
+    }
+    // Generate grid buttons for rooms
+    var gridContainer = document.querySelector(".grid");
+    if (gridContainer) {
+      const rooms = [21,22,23,24,25,16,17,18,19,20,11,12,13,14,15,6,7,8,9,10,1,2,3,4,5];
+      rooms.forEach(function(room) {
+        let btn = document.createElement("button");
+        btn.textContent = "Room " + room;
+        btn.onclick = function() { openRoomInteraction("Room " + room); };
+        gridContainer.appendChild(btn);
+      });
+    }
+    // Generate plant slots
+    var plantSlotsDiv = document.getElementById("plantSlots");
+    if(plantSlotsDiv) {
+      plantSlotsDiv.innerHTML = "";
+      for(let i = 1; i<=10; i++){
+        let slotDiv = document.createElement("div");
+        slotDiv.className = "slot";
+        slotDiv.id = "slot" + i;
+        slotDiv.innerHTML = 'Slot ' + i + ': <span class="status">Empty</span> <button onclick="openPlantSelectionModal('+ i +')">Plant Seed</button>';
+        plantSlotsDiv.appendChild(slotDiv);
+      }
+      let treeDiv = document.createElement("div");
+      treeDiv.className = "slot";
+      treeDiv.id = "mushroomTree";
+      treeDiv.innerHTML = 'Tree for Mushrooms: <span class="status">Empty</span> <button onclick="plantMushroomTree()">Plant Mushroom</button>';
+      plantSlotsDiv.appendChild(treeDiv);
+    }
     document.getElementById('windSpeedSlider').value = windSpeed;
     document.getElementById('windSpeedValue').textContent = windSpeed;
     document.getElementById('brakeButton').textContent = brakeEngaged ? "Release Brake" : "Engage Brake";
@@ -1283,7 +1336,6 @@
     updateVoltage();
     updateGarbageDisplay();
     updateSeason();
-    // If logged in, check character existence
     if(localStorage.getItem('playerName')){
       checkCharacterExistence();
     }
