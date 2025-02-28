@@ -167,7 +167,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    /* Modal Styles (for knock, plant selection, DM, trade, login, kitchen, water, admin) */
+    /* Modal Styles (for knock, plant selection, kitchen, water) */
     .modal {
       display: none;
       position: fixed;
@@ -304,9 +304,6 @@
       <button onclick="openGroceryPanel()">Groceries Stand</button>
       <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
       <button onclick="togglePlayerStatus()">Biodata</button>
-      <button onclick="openDMPanel()">Direct Message</button>
-      <button onclick="openTradePanel()">Trade</button>
-      <button onclick="openAdminPanel()">Admin Dashboard</button>
     </div>
     <!-- Biodata Panel -->
     <div id="playerStatus">
@@ -449,58 +446,6 @@
     <button onclick="confirmPlantSelection()">Plant</button>
     <button onclick="closePlantSelectionModal()">Cancel</button>
   </div>
-
-  <!-- Modal: Direct Messaging Panel -->
-  <div id="dmPanel" class="modal">
-    <h2>Direct Message</h2>
-    <input type="text" id="dmRecipient" placeholder="Recipient's Username">
-    <div id="dmChatLog" style="height:100px; overflow-y:auto; background:rgba(255,255,255,0.1); padding:5px;"></div>
-    <input type="text" id="dmMessage" placeholder="Your message">
-    <button onclick="sendDMMessage()">Send DM</button>
-    <button onclick="closeDMPanel()">Close</button>
-  </div>
-
-  <!-- Modal: Trade Panel -->
-  <div id="tradePanel" class="modal">
-    <h2>Trade Request</h2>
-    <input type="text" id="tradeRecipient" placeholder="Recipient's Username">
-    <select id="tradeItemSelect">
-      <option value="Food Staples">Food Staples</option>
-      <option value="Seeds">Seeds</option>
-      <option value="Maintenance Essentials">Maintenance Essentials</option>
-      <option value="Room Decoration">Room Decoration</option>
-      <option value="Alcohol">Alcohol</option>
-      <option value="Cigarettes">Cigarettes</option>
-    </select>
-    <input type="number" id="tradeQuantity" placeholder="Quantity" min="1">
-    <button onclick="sendTradeRequest()">Send Trade</button>
-    <button onclick="closeTradePanel()">Cancel</button>
-  </div>
-
-  <!-- Modal: Community Kitchen Panel -->
-  <div id="kitchenPanel" class="modal">
-    <h2>Community Kitchen</h2>
-    <p>Process food ingredients for safer, more efficient consumption.</p>
-    <button onclick="processFood()">Process Food</button>
-    <button onclick="closeKitchenPanel()">Close</button>
-  </div>
-
-  <!-- Modal: Water Supplies Panel -->
-  <div id="waterPanel" class="modal">
-    <h2>Water Supplies</h2>
-    <p>Distribute water for gardening, cooking, personal consumption, and laundry.</p>
-    <button onclick="useWater()">Use Water</button>
-    <button onclick="closeWaterPanel()">Close</button>
-  </div>
-
-  <!-- Modal: Admin Dashboard -->
-  <div id="adminPanel" class="modal">
-    <h2>Admin Dashboard</h2>
-    <p>Monitoring game activity:</p>
-    <div id="adminStats"></div>
-    <button onclick="closeAdminPanel()">Close</button>
-  </div>
-
 </div>
 
 <script>
@@ -521,7 +466,7 @@
   const db = firebase.firestore();
 
   // ----------------------------
-  // Missing Function Definitions
+  // Missing Function Definitions (Trade, Direct Message, and Admin removed)
   // ----------------------------
   function showGarbagePanel() {
     document.getElementById('garbage-panel').style.display = 'block';
@@ -854,89 +799,6 @@
   });
 
   // ----------------------------
-  // Direct Messaging Functions
-  // ----------------------------
-  function openDMPanel() {
-    document.getElementById('dmPanel').style.display = 'block';
-  }
-  function closeDMPanel() {
-    document.getElementById('dmPanel').style.display = 'none';
-  }
-  async function sendDMMessage() {
-    const recipient = document.getElementById('dmRecipient').value.trim();
-    const msg = document.getElementById('dmMessage').value;
-    if(recipient === "" || msg.trim() === "") {
-      alert("Please enter a recipient and a message.");
-      return;
-    }
-    const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
-    try {
-      await db.collection("directMessages").add({
-        sender: characterName,
-        recipient: recipient,
-        content: msg,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      document.getElementById('dmMessage').value = "";
-      listenForDMMessages(recipient);
-    } catch (error) {
-      console.error("Error sending DM:", error);
-    }
-  }
-  function listenForDMMessages(recipient) {
-    const dmLog = document.getElementById('dmChatLog');
-    const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
-    db.collection("directMessages")
-      .where("sender", "in", [characterName, recipient])
-      .where("recipient", "in", [characterName, recipient])
-      .orderBy("timestamp")
-      .onSnapshot(snapshot => {
-        dmLog.innerHTML = "";
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const p = document.createElement('p');
-          p.innerHTML = `<strong>${data.sender}</strong>: ${data.content}`;
-          dmLog.appendChild(p);
-        });
-        dmLog.scrollTop = dmLog.scrollHeight;
-      });
-  }
-
-  // ----------------------------
-  // Trade Functions
-  // ----------------------------
-  function openTradePanel() {
-    document.getElementById('tradePanel').style.display = 'block';
-  }
-  function closeTradePanel() {
-    document.getElementById('tradePanel').style.display = 'none';
-  }
-  async function sendTradeRequest() {
-    const recipient = document.getElementById('tradeRecipient').value.trim();
-    const item = document.getElementById('tradeItemSelect').value;
-    const quantity = parseInt(document.getElementById('tradeQuantity').value);
-    if(recipient === "" || isNaN(quantity) || quantity <= 0) {
-      alert("Please enter a valid recipient and quantity.");
-      return;
-    }
-    const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
-    try {
-      await db.collection("trades").add({
-        sender: characterName,
-        recipient: recipient,
-        item: item,
-        quantity: quantity,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        status: "pending"
-      });
-      alert("Trade request sent.");
-      closeTradePanel();
-    } catch (error) {
-      console.error("Error sending trade request:", error);
-    }
-  }
-
-  // ----------------------------
   // Community Kitchen & Water Supplies Functions
   // ----------------------------
   function handleClick(facility) {
@@ -1249,35 +1111,6 @@
     console.log("Current Season: " + currentSeason);
   }
   setInterval(updateSeason, 120000);
-
-  // ----------------------------
-  // Admin Dashboard Functions
-  // ----------------------------
-  function openAdminPanel() {
-    const userEmail = localStorage.getItem('playerName') || "";
-    if(userEmail.indexOf("admin") === -1) {
-      alert("Access denied. Admins only.");
-      return;
-    }
-    document.getElementById('adminPanel').style.display = 'block';
-    loadAdminStats();
-  }
-  function closeAdminPanel() {
-    document.getElementById('adminPanel').style.display = 'none';
-  }
-  function loadAdminStats() {
-    db.collection("players").get().then(snapshot => {
-      let count = snapshot.size;
-      db.collection("messages").orderBy("timestamp", "desc").limit(5).get().then(msgSnapshot => {
-        let msgs = "";
-        msgSnapshot.forEach(doc => {
-          let m = doc.data();
-          msgs += `<p>${m.sender}: ${m.content}</p>`;
-        });
-        document.getElementById('adminStats').innerHTML = `<p>Total Players: ${count}</p><p>Recent Messages:</p>${msgs}`;
-      });
-    });
-  }
 
   // ----------------------------
   // Modal Panel Utilities
