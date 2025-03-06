@@ -12,19 +12,16 @@
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      /* Background with dark overlay for a gloomy, wintery feel, plus a concrete texture overlay */
       background: 
         linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
         url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
       background-size: cover;
       color: #eee;
     }
-    /* Use Russo One for headings to evoke Soviet-era signage */
     h1, h2, h3 {
       font-family: 'Russo One', sans-serif;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     }
-    /* Common Panel and Container Styles */
     .container, .panel, #characterCreation, .modal, #loginPanel {
       background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');
       background-color: rgba(0, 0, 0, 0.6);
@@ -49,7 +46,6 @@
       text-align: center;
       color: #fff;
     }
-    /* Grid of Rooms */
     .grid {
       display: grid;
       grid-template-columns: repeat(5, 100px);
@@ -61,7 +57,7 @@
     .grid button {
       width: 100%;
       height: 100%;
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: rgba(255,255,255,0.2);
       border: 1px solid #777;
       cursor: pointer;
       font-size: 14px;
@@ -70,12 +66,11 @@
       transition: background-color 0.3s;
     }
     .grid button:hover {
-      background-color: rgba(255, 255, 255, 0.4);
+      background-color: rgba(255,255,255,0.4);
     }
-    /* Buttons */
     .garden-button {
       position: absolute;
-      left: 210px; /* aligns roughly with column 3 */
+      left: 210px;
       top: 10px;
       padding: 10px;
       background-color: #5DADE2;
@@ -91,7 +86,7 @@
       top: 0;
       width: 50px;
       height: 520px;
-      background-color: rgba(211, 211, 211, 0.3);
+      background-color: rgba(211,211,211,0.3);
       border: 2px solid #999;
       display: flex;
       align-items: center;
@@ -102,7 +97,6 @@
       padding: 5px;
       border-radius: 4px;
     }
-    /* Updated Exit Button - fixed at top right for responsiveness */
     .exit-button {
       position: fixed;
       top: 10px;
@@ -115,7 +109,7 @@
       font-weight: bold;
       border-radius: 4px;
       color: #fff;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
       z-index: 1001;
     }
     .power-room {
@@ -124,7 +118,7 @@
       left: calc(60px + 520px + 10px);
       width: 100px;
       height: 100px;
-      background-color: rgba(192, 192, 255, 0.5);
+      background-color: rgba(192,192,255,0.5);
       border: 2px solid #666;
       cursor: pointer;
       font-size: 14px;
@@ -138,7 +132,7 @@
     }
     .facilities button {
       padding: 10px 20px;
-      background-color: rgba(200, 150, 130, 0.7);
+      background-color: rgba(200,150,130,0.7);
       border: 1px solid #999;
       cursor: pointer;
       font-size: 16px;
@@ -146,7 +140,6 @@
       border-radius: 4px;
       color: #222;
     }
-    /* Character Creation Section */
     #characterCreation {
       margin: 20px auto;
       max-width: 300px;
@@ -168,7 +161,6 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    /* Modal Styles (for knock, plant selection, kitchen, water) */
     .modal {
       display: none;
       position: fixed;
@@ -191,7 +183,6 @@
       cursor: pointer;
       width: 100%;
     }
-    /* Chat Panel */
     #chatPanel {
       display: none;
       border: 2px solid #444;
@@ -211,7 +202,6 @@
       color: #fff;
       border-radius: 4px;
     }
-    /* Biodata Panel */
     #playerStatus {
       margin: 20px auto;
       max-width: 300px;
@@ -222,7 +212,6 @@
       border-radius: 8px;
       background: rgba(0,0,0,0.7);
     }
-    /* Garden Slots */
     #garden-panel .slot {
       margin: 10px 0;
       padding: 5px;
@@ -234,7 +223,6 @@
       padding: 3px 6px;
       font-size: 12px;
     }
-    /* New panel for Login */
     #loginPanel {
       margin: 20px auto;
       max-width: 300px;
@@ -261,7 +249,6 @@
   <input type="password" id="loginPassword" placeholder="Password" required>
   <button onclick="loginUser()">Login</button>
   <button onclick="registerUser()">Register</button>
-  <!-- Google Sign-In Button -->
   <button onclick="googleSignIn()">Sign in with Google</button>
 </div>
 
@@ -279,14 +266,12 @@
       <option value="Other">Other</option>
     </select>
     <textarea id="charReason" placeholder="Reason for staying at Dissonance Heights" required></textarea>
-    <!-- New customization fields -->
     <textarea id="charBackstory" placeholder="Backstory" required></textarea>
     <input type="text" id="charSkills" placeholder="Skills (comma separated)" required>
     <input type="text" id="charInventory" placeholder="Inventory (comma separated)" required>
     <input type="text" id="charAlliances" placeholder="Alliances (comma separated)">
     <input type="text" id="charRivalries" placeholder="Rivalries (comma separated)">
     <input type="number" id="charReputation" placeholder="Reputation" value="0" required>
-    <!-- Room Selection Dropdown (options generated via JS) -->
     <select id="roomNumber" required>
       <option value="">Select Room Number</option>
     </select>
@@ -296,16 +281,13 @@
 
 <!-- Main Game Section -->
 <div id="mainGame" style="display: none;">
-  <!-- Main Screen -->
   <div id="main-screen">
     <div class="container">
       <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
-      <!-- Exit Button (now fixed at top right) -->
       <button class="exit-button" onclick="signOutUser()">Exit</button>
-      <!-- Community Garden Button -->
       <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
       <div class="grid">
-        <!-- Room buttons will be generated dynamically -->
+        <!-- Dynamically generated room buttons -->
       </div>
       <button class="power-room" onclick="showPowerPanel()">Power Room</button>
     </div>
@@ -315,9 +297,8 @@
       <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
       <button onclick="togglePlayerStatus()">Biodata</button>
     </div>
-    <!-- Biodata Panel -->
     <div id="playerStatus">
-      <!-- Populated by updatePlayerStatus() -->
+      <!-- Biodata updated dynamically -->
     </div>
   </div>
 
@@ -413,11 +394,11 @@
   <!-- Community Garden Panel -->
   <div id="garden-panel" class="panel">
     <h2>Community Garden</h2>
-    <p>Manage your rooftop garden. Plants need watering and fertilizing; seasonal changes affect growth.</p>
+    <p>Manage your rooftop garden. Plants need watering, fertilizing, and must be harvested manually when mature. Seasonal changes affect growth.</p>
     <div id="plantSlots">
       <!-- Plant slots will be generated dynamically -->
     </div>
-    <button onclick="sellProduce()">Sell Produce</button>
+    <button onclick="sellProduce()">Sell All Mature Produce</button>
     <button onclick="hidePanel('garden-panel')">Return to Main Screen</button>
   </div>
 
@@ -484,495 +465,108 @@
   }
 
   // ----------------------------
-  // Missing Function Definitions (Trade, Direct Message, and Admin removed)
+  // Gardening System Enhancements
   // ----------------------------
-  function showGarbagePanel() {
-    document.getElementById('garbage-panel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-  }
-  function showPowerPanel() {
-    document.getElementById('minigame-panel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-  }
-  function openGroceryPanel() {
-    document.getElementById('grocery-panel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-  }
-  function openGardenPanel() {
-    document.getElementById('garden-panel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-  }
-  // Buy item function for Grocery Store
-  function buyItem(item) {
-    const prices = {
-      'Food Staples': 10,
-      'Seeds': 2,
-      'Maintenance Essentials': 5,
-      'Room Decoration': 7,
-      'Alcohol': 3,
-      'Cigarettes': 4
-    };
-    let price = prices[item] || 0;
-    let money = parseInt(localStorage.getItem('money')) || 50;
-    if (money >= price) {
-      money -= price;
-      localStorage.setItem('money', money);
-      alert("Purchased " + item + " for $" + price + ". Remaining money: $" + money);
-      updatePlayerStatus();
+  // Define growth thresholds (in minutes) and seasonal growth factors.
+  const growthThresholds = {
+    seed: 0,         // 0+
+    sprout: 10,      // from 10 minutes
+    young: 30,       // from 30 minutes
+    mature: 60       // from 60 minutes onward
+  };
+  // Seasonal growth factors: Spring and Summer: faster; Autumn and Winter: slower.
+  function getGrowthFactor() {
+    if (currentSeason === "Spring" || currentSeason === "Summer") {
+      return 1.5;
     } else {
-      alert("Not enough money to purchase " + item);
+      return 0.75;
     }
   }
-
-  // ----------------------------
-  // Authentication Functions
-  // ----------------------------
-  function loginUser() {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    auth.signInWithEmailAndPassword(email, password)
-      .then(() => {
-        document.getElementById('loginPanel').style.display = 'none';
-        checkCharacterExistence();
-      })
-      .catch(error => {
-        alert("Login error: " + error.message);
-      });
-  }
-  function registerUser() {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    auth.createUserWithEmailAndPassword(email, password)
-      .then(() => {
-        document.getElementById('loginPanel').style.display = 'none';
-        checkCharacterExistence();
-      })
-      .catch(error => {
-        alert("Registration error: " + error.message);
-      });
-  }
-  // New Google Sign-In Function
-  function googleSignIn() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider)
-      .then(result => {
-        // The signed-in user info is in result.user
-        document.getElementById('loginPanel').style.display = 'none';
-        checkCharacterExistence();
-      })
-      .catch(error => {
-        alert("Google sign-in error: " + error.message);
-      });
-  }
-  auth.onAuthStateChanged(user => {
-    if(user){
-      if(!localStorage.getItem('playerName')){
-        localStorage.setItem('playerName', user.email);
-      }
-      checkCharacterExistence();
-    } else {
-      document.getElementById('loginPanel').style.display = 'block';
-      document.getElementById('mainGame').style.display = 'none';
-      document.getElementById('characterCreation').style.display = 'none';
-    }
-  });
-
-  // ----------------------------
-  // Character Creation & Management
-  // ----------------------------
-  function sanitizePlayerName(name) {
-    return name.replace(/[\/\\]/g, '_');
-  }
-  function checkCharacterExistence() {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    db.collection('players').doc(safePlayerName).get().then((doc) => {
-      if (doc.exists) {
-        document.getElementById('characterCreation').style.display = 'none';
-        document.getElementById('mainGame').style.display = 'block';
-        updatePlayerStatus();
-      } else {
-        document.getElementById('characterCreation').style.display = 'block';
-        document.getElementById('mainGame').style.display = 'none';
-        document.getElementById('displayName').innerText = playerName;
-        document.getElementById('charName').value = playerName;
-      }
-    }).catch((error) => {
-      console.error("Error checking character existence:", error);
-    });
-  }
-  function createCharacter() {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    const charName = document.getElementById('charName').value;
-    const charAge = document.getElementById('charAge').value;
-    const charGender = document.getElementById('charGender').value;
-    const charReason = document.getElementById('charReason').value;
-    // New fields for deeper customization:
-    const charBackstory = document.getElementById('charBackstory').value;
-    const charSkills = document.getElementById('charSkills').value;
-    const charInventory = document.getElementById('charInventory').value;
-    const charAlliances = document.getElementById('charAlliances').value;
-    const charRivalries = document.getElementById('charRivalries').value;
-    const charReputation = document.getElementById('charReputation').value;
-    const roomNumber = document.getElementById('roomNumber').value;
-    const playerData = {
-      name: charName,
-      age: charAge,
-      gender: charGender,
-      reason: charReason,
-      backstory: charBackstory,
-      skills: charSkills.split(',').map(s => s.trim()),
-      inventory: charInventory.split(',').map(i => i.trim()),
-      alliances: charAlliances ? charAlliances.split(',').map(a => a.trim()) : [],
-      rivalries: charRivalries ? charRivalries.split(',').map(r => r.trim()) : [],
-      reputation: parseInt(charReputation) || 0,
-      roomNumber: roomNumber,
-      health: 100,
-      hunger: 0,
-      injury: 0,
-      mood: 100,
-      conditions: {
-        physical: "Healthy",
-        mental: "Content",
-        activity: "Idle"
-      },
-      lastUpdated: Date.now()
-    };
-    db.collection('players').doc(safePlayerName).set(playerData, { merge: true })
-      .then(() => {
-        localStorage.setItem('characterName', charName);
-        document.getElementById('characterCreation').style.display = 'none';
-        document.getElementById('mainGame').style.display = 'block';
-        updatePlayerStatus();
-      })
-      .catch((error) => {
-        console.error("Error creating character:", error);
-      });
-  }
-  let isEditing = false;
-  function enableEdit() {
-    isEditing = true;
-    updatePlayerStatus();
-  }
-  function cancelEdit() {
-    isEditing = false;
-    updatePlayerStatus();
-  }
-  function saveBiodata() {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    const newName = document.getElementById('editName').value;
-    const newAge = document.getElementById('editAge').value;
-    const newReason = document.getElementById('editReason').value;
-    const newRoomNumber = document.getElementById('editRoomNumber').value;
-    // New fields from edit mode
-    const newBackstory = document.getElementById('editBackstory').value;
-    const newSkills = document.getElementById('editSkills').value;
-    const newInventory = document.getElementById('editInventory').value;
-    const newAlliances = document.getElementById('editAlliances').value;
-    const newRivalries = document.getElementById('editRivalries').value;
-    const newReputation = document.getElementById('editReputation').value;
-    db.collection('players').doc(safePlayerName).set({
-      name: newName,
-      age: newAge,
-      reason: newReason,
-      roomNumber: newRoomNumber,
-      backstory: newBackstory,
-      skills: newSkills.split(',').map(s => s.trim()),
-      inventory: newInventory.split(',').map(i => i.trim()),
-      alliances: newAlliances ? newAlliances.split(',').map(a => a.trim()) : [],
-      rivalries: newRivalries ? newRivalries.split(',').map(r => r.trim()) : [],
-      reputation: parseInt(newReputation) || 0,
-      lastUpdated: Date.now()
-    }, { merge: true })
-    .then(() => {
-      localStorage.setItem('characterName', newName);
-      isEditing = false;
-      alert('Biodata updated successfully.');
-    })
-    .catch((error) => {
-      console.error("Error updating biodata:", error);
-    });
-  }
-  function updatePlayerStatus() {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    db.collection('players').doc(safePlayerName)
-      .onSnapshot((doc) => {
-        if (doc.exists) {
-          const data = doc.data();
-          localStorage.setItem('characterName', data.name);
-          let statusHTML = `<h3>Biodata</h3>`;
-          if (!isEditing) {
-            statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
-            statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
-            statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
-            statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
-            statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
-            statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
-            statusHTML += `<p><strong>Age:</strong> ${data.age}</p>`;
-            statusHTML += `<p><strong>Reason:</strong> ${data.reason}</p>`;
-            statusHTML += `<p><strong>Room:</strong> ${data.roomNumber || "Not set"}</p>`;
-            statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
-            statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
-            statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
-            statusHTML += `<p><strong>Backstory:</strong> ${data.backstory || "N/A"}</p>`;
-            statusHTML += `<p><strong>Skills:</strong> ${data.skills ? data.skills.join(", ") : "N/A"}</p>`;
-            statusHTML += `<p><strong>Inventory:</strong> ${data.inventory ? data.inventory.join(", ") : "N/A"}</p>`;
-            statusHTML += `<p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>`;
-            statusHTML += `<p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>`;
-            statusHTML += `<p><strong>Reputation:</strong> ${data.reputation || 0}</p>`;
-            statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
-            statusHTML += `<button onclick="enableEdit()">Edit</button>`;
-          } else {
-            statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" /></p>`;
-            statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
-            statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
-            statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
-            statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
-            statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
-            statusHTML += `<p><strong>Age:</strong> <input type="number" id="editAge" value="${data.age}" /></p>`;
-            statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason}</textarea></p>`;
-            statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25"/></p>`;
-            // Editable fields for new customization:
-            statusHTML += `<p><strong>Backstory:</strong> <textarea id="editBackstory">${data.backstory || ""}</textarea></p>`;
-            statusHTML += `<p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" /></p>`;
-            statusHTML += `<p><strong>Inventory:</strong> <input type="text" id="editInventory" value="${data.inventory ? data.inventory.join(", ") : ""}" /></p>`;
-            statusHTML += `<p><strong>Alliances:</strong> <input type="text" id="editAlliances" value="${data.alliances ? data.alliances.join(", ") : ""}" /></p>`;
-            statusHTML += `<p><strong>Rivalries:</strong> <input type="text" id="editRivalries" value="${data.rivalries ? data.rivalries.join(", ") : ""}" /></p>`;
-            statusHTML += `<p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" /></p>`;
-            statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
-            statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
-            statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
-            statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
-            statusHTML += `<button onclick="saveBiodata()">Save Changes</button> `;
-            statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
-          }
-          statusHTML += `<p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>`;
-          statusHTML += `<p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>`;
-          statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
-          document.getElementById('playerStatus').innerHTML = statusHTML;
-        }
-      }, (error) => {
-        console.error("Error getting player status:", error);
-      });
-  }
-  // Updated sign-out function that clears all game state and redirects to index.html
-  function signOutUser() {
-    auth.signOut().then(() => {
-      clearGameState();
-      window.location.href = "index.html";
-    }).catch((error) => {
-      console.error("Error signing out:", error);
-    });
-  }
-
-  // ----------------------------
-  // Room Interaction & Chat Functions
-  // ----------------------------
-  let currentRoomInteraction = "";
-  function openRoomInteraction(roomName) {
-    currentRoomInteraction = roomName;
-    document.getElementById('interactionRoomName').textContent = roomName;
-    document.getElementById('roomInteractionModal').style.display = 'block';
-  }
-  function closeRoomInteractionModal() {
-    document.getElementById('roomInteractionModal').style.display = 'none';
-  }
-  function chooseKnock() {
-    closeRoomInteractionModal();
-    document.getElementById('knockModal').style.display = 'block';
-  }
-  function closeKnockModal() {
-    document.getElementById('knockModal').style.display = 'none';
-  }
-  function sendKnock() {
-    let message = document.getElementById('knockMessage').value;
-    if(message.trim() === "") {
-      alert("Please type a message before knocking.");
-      return;
-    }
-    closeKnockModal();
-    if(confirm("Room owner, do you approve this knock request from " + currentRoomInteraction + "?")) {
-      openRoomChat(currentRoomInteraction);
-    } else {
-      alert("Your knock was rejected.");
-    }
-  }
-  let currentRoom = "";
-  function openRoomChat(roomName) {
-    currentRoom = roomName;
-    document.getElementById('chatRoomTitle').textContent = roomName + " Chat";
-    document.getElementById('chatLog').innerHTML = "";
-    document.getElementById('chatPanel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-    listenForMessages(roomName);
-  }
-  function listenForMessages(roomName) {
-    const chatLog = document.getElementById('chatLog');
-    const messagesRef = db.collection("messages");
-    messagesRef
-      .where("room", "==", roomName)
-      .orderBy("timestamp")
-      .onSnapshot((querySnapshot) => {
-        chatLog.innerHTML = "";
-        querySnapshot.forEach((doc) => {
-          const message = doc.data();
-          const p = document.createElement('p');
-          p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
-          chatLog.appendChild(p);
-        });
-        chatLog.scrollTop = chatLog.scrollHeight;
-      });
-  }
-  function closeChat() {
-    document.getElementById('chatPanel').style.display = 'none';
-    document.getElementById('main-screen').style.display = 'block';
-    currentRoom = "";
-  }
-  async function sendChatMessage() {
-    const msg = document.getElementById('chatInput').value;
-    if (msg.trim() !== "") {
-      const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
-      try {
-        await db.collection("messages").add({
-          room: currentRoom,
-          sender: characterName,
-          content: msg,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        document.getElementById('chatInput').value = "";
-      } catch (error) {
-        console.error("Error sending message:", error);
-      }
-    }
-  }
-  document.addEventListener('DOMContentLoaded', function() {
-    const chatInput = document.getElementById('chatInput');
-    if (chatInput) {
-      chatInput.addEventListener('keydown', function(event) {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          sendChatMessage();
-        }
-      });
-    }
-  });
-
-  // ----------------------------
-  // Community Kitchen & Water Supplies Functions
-  // ----------------------------
-  function handleClick(facility) {
-    if(facility === "Community Kitchen") {
-      openKitchenPanel();
-    } else if(facility === "Water Supplies (Laundry)") {
-      openWaterPanel();
-    }
-  }
-  function openKitchenPanel() {
-    document.getElementById('kitchenPanel').style.display = 'block';
-  }
-  function closeKitchenPanel() {
-    document.getElementById('kitchenPanel').style.display = 'none';
-  }
-  function processFood() {
-    alert("Food processed for improved safety and efficiency.");
-  }
-  function openWaterPanel() {
-    document.getElementById('waterPanel').style.display = 'block';
-  }
-  function closeWaterPanel() {
-    document.getElementById('waterPanel').style.display = 'none';
-  }
-  function useWater() {
-    alert("Water distributed for gardening, cooking, and personal use.");
-  }
-
-  // ----------------------------
-  // Garden & Planting Functions
-  // ----------------------------
-  let plantTypes = [
-    { name: "Tomato", description: "Juicy and tangy", price: 5 },
-    { name: "Lettuce", description: "Crisp leaves", price: 3 },
-    { name: "Carrot", description: "Crunchy roots", price: 4 },
-    { name: "Potato", description: "Starchy tubers", price: 6 },
-    { name: "Cucumber", description: "Refreshing", price: 4 },
-    { name: "Bell Pepper", description: "Vibrant and sweet", price: 5 },
-    { name: "Eggplant", description: "Creamy texture", price: 5 },
-    { name: "Spinach", description: "Tender leaves", price: 3 },
-    { name: "Zucchini", description: "Mild and versatile", price: 4 },
-    { name: "Herb Plant", description: "Aromatic", price: 2 }
-  ];
-  const mushroomTypes = [
-    { name: "Shiitake", description: "Rich umami", price: 10 },
-    { name: "Portobello", description: "Earthy taste", price: 7 },
-    { name: "Enoki", description: "Delicate flavor", price: 15 },
-    { name: "Oyster", description: "Sweet and woody", price: 12 },
-    { name: "Morel", description: "Nutty and earthy", price: 20 }
-  ];
-  let garden = {};
-  for (let i = 1; i <= 10; i++) {
-    garden[i] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, produceType: null };
-  }
-  garden[11] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, mushrooms: 0, produceType: null };
+  // Instead of a simple "mature" flag, we store the current stage.
+  // When a plant is created, add a "stage" property (initially "Seed").
+  // Modify updateGardenUI to update based on elapsed time * growth factor.
   function updateGardenUI() {
+    const factor = getGrowthFactor();
     for (let i = 1; i <= 10; i++) {
       let slot = document.getElementById('slot' + i);
       let statusSpan = slot.querySelector('.status');
       if (garden[i].plantedTime === null) {
         statusSpan.textContent = "Empty";
+        // Remove any existing harvest button if present.
+        let existingBtn = slot.querySelector('.harvestBtn');
+        if (existingBtn) existingBtn.remove();
       } else {
-        let elapsed = (Date.now() - garden[i].plantedTime) / 60000;
-        let produceName = garden[i].produceType ? garden[i].produceType.name : "";
-        if (elapsed >= 60 && !garden[i].mature) {
-          garden[i].mature = true;
-          statusSpan.textContent = "Mature: " + produceName;
-          let btn = slot.querySelector('button');
-          if(btn) btn.style.display = 'none';
-        } else if (!garden[i].mature) {
-          statusSpan.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
-          if(Date.now() - garden[i].wateredTime > 5*60000) {
-            if(!slot.querySelector('.waterBtn')){
-              let waterBtn = document.createElement('button');
-              waterBtn.className = 'waterBtn';
-              waterBtn.textContent = "Water";
-              waterBtn.onclick = function(){ waterPlant(i); };
-              slot.appendChild(waterBtn);
-            }
-          }
-          if(!garden[i].fertilized && !slot.querySelector('.fertilizeBtn')){
-            let fertBtn = document.createElement('button');
-              fertBtn.className = 'fertilizeBtn';
-              fertBtn.textContent = "Fertilize";
-              fertBtn.onclick = function(){ fertilizePlant(i); };
-              slot.appendChild(fertBtn);
-          }
+        let elapsed = ((Date.now() - garden[i].plantedTime) / 60000) * factor;
+        let stage = "Seed";
+        if (elapsed >= growthThresholds.sprout && elapsed < growthThresholds.young) {
+          stage = "Sprout";
+        } else if (elapsed >= growthThresholds.young && elapsed < growthThresholds.mature) {
+          stage = "Young";
+        } else if (elapsed >= growthThresholds.mature) {
+          stage = "Mature";
+        }
+        garden[i].stage = stage;
+        statusSpan.textContent = stage + (garden[i].produceType ? ": " + garden[i].produceType.name : "");
+        // If mature, show a harvest button if not already added.
+        if (stage === "Mature" && !slot.querySelector('.harvestBtn')) {
+          let harvestBtn = document.createElement('button');
+          harvestBtn.className = 'harvestBtn';
+          harvestBtn.textContent = "Harvest";
+          harvestBtn.onclick = function() { harvestPlant(i); };
+          slot.appendChild(harvestBtn);
         }
       }
     }
+    // For the mushroom tree (slot 11)
     let treeSlot = document.getElementById('mushroomTree');
     let treeStatus = treeSlot.querySelector('.status');
     if (garden[11].plantedTime === null) {
       treeStatus.textContent = "Empty";
+      let existingBtn = treeSlot.querySelector('.harvestBtn');
+      if (existingBtn) existingBtn.remove();
     } else {
-      let elapsed = (Date.now() - garden[11].plantedTime) / 60000;
-      let produceName = garden[11].produceType ? garden[11].produceType.name : "";
-      if (elapsed >= 60 && !garden[11].mature) {
-        garden[11].mature = true;
-        garden[11].mushrooms = 5;
-        treeStatus.textContent = "Mature: " + produceName + " (" + garden[11].mushrooms + " mushrooms)";
-        let btn = treeSlot.querySelector('button');
-        if(btn) btn.style.display = 'none';
-      } else if (!garden[11].mature) {
-        treeStatus.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
+      let elapsed = ((Date.now() - garden[11].plantedTime) / 60000) * factor;
+      let stage = "Seed";
+      if (elapsed >= growthThresholds.sprout && elapsed < growthThresholds.young) {
+        stage = "Sprout";
+      } else if (elapsed >= growthThresholds.young && elapsed < growthThresholds.mature) {
+        stage = "Young";
+      } else if (elapsed >= growthThresholds.mature) {
+        stage = "Mature";
+      }
+      garden[11].stage = stage;
+      treeStatus.textContent = stage + (garden[11].produceType ? ": " + garden[11].produceType.name : "");
+      if (stage === "Mature" && !treeSlot.querySelector('.harvestBtn')) {
+        let harvestBtn = document.createElement('button');
+        harvestBtn.className = 'harvestBtn';
+        harvestBtn.textContent = "Harvest";
+        harvestBtn.onclick = function() { harvestPlant(11); };
+        treeSlot.appendChild(harvestBtn);
       }
     }
   }
+  // Harvest function: When a plant is harvested, add money based on produce price.
+  function harvestPlant(slotNumber) {
+    let plant = garden[slotNumber];
+    if (!plant || plant.stage !== "Mature" || !plant.produceType) {
+      alert("This plant is not ready for harvest.");
+      return;
+    }
+    // Example: yield value = produce price × 2 (you can adjust this as needed)
+    let yieldValue = plant.produceType.price * 2;
+    let currentMoney = parseInt(localStorage.getItem('money')) || 50;
+    currentMoney += yieldValue;
+    localStorage.setItem('money', currentMoney);
+    alert("You harvested " + plant.produceType.name + " for $" + yieldValue + "!");
+    // Reset the slot
+    garden[slotNumber] = { plantedTime: null, wateredTime: null, fertilized: false, stage: "Empty", produceType: null };
+    updateGardenUI();
+    updatePlayerStatus();
+  }
+
+  // ----------------------------
+  // Existing Code for Watering, Fertilizing, etc.
+  // ----------------------------
   function openPlantSelectionModal(slotNumber) {
     document.getElementById('plantSelectionModal').style.display = 'block';
     document.getElementById('plantSelectionModal').setAttribute('data-slot', slotNumber);
@@ -993,16 +587,20 @@
     let selectedName = document.getElementById('plantTypeSelect').value;
     let selectedPlant = plantTypes.find(pt => pt.name === selectedName);
     let seeds = parseInt(localStorage.getItem('seeds')) || 0;
-    if(seeds <= 0) {
+    if (seeds <= 0) {
       alert("No seeds available. Purchase from the Grocery Store.");
       closePlantSelectionModal();
       return;
     }
     seeds -= 1;
     localStorage.setItem('seeds', seeds);
-    garden[slotNumber].plantedTime = Date.now();
-    garden[slotNumber].wateredTime = Date.now();
-    garden[slotNumber].produceType = selectedPlant;
+    garden[slotNumber] = {
+      plantedTime: Date.now(),
+      wateredTime: Date.now(),
+      fertilized: false,
+      stage: "Seed",
+      produceType: selectedPlant
+    };
     updateGardenUI();
     updatePlayerStatus();
     closePlantSelectionModal();
@@ -1026,44 +624,49 @@
     if (garden[11].plantedTime === null) {
       mSeeds -= 1;
       localStorage.setItem('mushroomSeeds', mSeeds);
-      garden[11].plantedTime = Date.now();
-      garden[11].wateredTime = Date.now();
-      let randomIndex = Math.floor(Math.random() * mushroomTypes.length);
-      garden[11].produceType = mushroomTypes[randomIndex];
+      garden[11] = {
+        plantedTime: Date.now(),
+        wateredTime: Date.now(),
+        fertilized: false,
+        stage: "Seed",
+        mushrooms: 0,
+        produceType: mushroomTypes[Math.floor(Math.random() * mushroomTypes.length)]
+      };
       updateGardenUI();
       updatePlayerStatus();
     } else {
       alert("The mushroom tree is already planted.");
     }
   }
+  // The sellProduce function (sells all mature produce at once)
   function sellProduce() {
     let totalEarnings = 0;
     for (let i = 1; i <= 10; i++) {
-      if (garden[i].mature && garden[i].produceType) {
+      if (garden[i].stage === "Mature" && garden[i].produceType) {
         totalEarnings += garden[i].produceType.price;
-        garden[i] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, produceType: null };
+        garden[i] = { plantedTime: null, wateredTime: null, fertilized: false, stage: "Empty", produceType: null };
         let slot = document.getElementById('slot' + i);
-        let btn = slot.querySelector('button');
-        if (btn) btn.style.display = 'inline';
+        let btn = slot.querySelector('button.harvestBtn');
+        if (btn) btn.remove();
       }
     }
-    if (garden[11].mature && garden[11].produceType) {
+    if (garden[11].stage === "Mature" && garden[11].produceType) {
       totalEarnings += (garden[11].mushrooms * garden[11].produceType.price);
-      garden[11] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, mushrooms: 0, produceType: null };
+      garden[11] = { plantedTime: null, wateredTime: null, fertilized: false, stage: "Empty", mushrooms: 0, produceType: null };
       let slot = document.getElementById('mushroomTree');
-      let btn = slot.querySelector('button');
-      if (btn) btn.style.display = 'inline';
+      let btn = slot.querySelector('button.harvestBtn');
+      if (btn) btn.remove();
     }
     let currentMoney = parseInt(localStorage.getItem('money')) || 50;
     currentMoney += totalEarnings;
     localStorage.setItem('money', currentMoney);
-    alert("You sold your produce for $" + totalEarnings + ". Current money: $" + currentMoney);
+    alert("You sold your mature produce for $" + totalEarnings + ". Current money: $" + currentMoney);
     updatePlayerStatus();
     updateGardenUI();
   }
 
   // ----------------------------
-  // Power Source Simulation Functions
+  // Power Source Simulation (unchanged)
   // ----------------------------
   let windSpeed = localStorage.getItem('windSpeed') || 50;
   let brakeEngaged = JSON.parse(localStorage.getItem('brakeEngaged')) || false;
@@ -1192,8 +795,8 @@
   window.onload = function() {
     // Generate room number options
     var roomSelect = document.getElementById('roomNumber');
-    if(roomSelect) {
-      for (let i=1; i<=25; i++){
+    if (roomSelect) {
+      for (let i = 1; i <= 25; i++){
         let option = document.createElement('option');
         option.value = i;
         option.textContent = "Room " + i;
@@ -1213,9 +816,9 @@
     }
     // Generate plant slots
     var plantSlotsDiv = document.getElementById("plantSlots");
-    if(plantSlotsDiv) {
+    if (plantSlotsDiv) {
       plantSlotsDiv.innerHTML = "";
-      for(let i = 1; i<=10; i++){
+      for (let i = 1; i <= 10; i++){
         let slotDiv = document.createElement("div");
         slotDiv.className = "slot";
         slotDiv.id = "slot" + i;
@@ -1235,7 +838,7 @@
     updateVoltage();
     updateGarbageDisplay();
     updateSeason();
-    if(localStorage.getItem('playerName')){
+    if (localStorage.getItem('playerName')) {
       checkCharacterExistence();
     }
     setInterval(updateVoltage, 5000);
