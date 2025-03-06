@@ -762,11 +762,11 @@
         console.error("Error getting player status:", error);
       });
   }
-  // Updated sign-out function that clears all game state for consistency
+  // Updated sign-out function that clears all game state and redirects to index.html
   function signOutUser() {
     auth.signOut().then(() => {
       clearGameState();
-      window.location.reload();
+      window.location.href = "index.html";
     }).catch((error) => {
       console.error("Error signing out:", error);
     });
@@ -947,10 +947,10 @@
           }
           if(!garden[i].fertilized && !slot.querySelector('.fertilizeBtn')){
             let fertBtn = document.createElement('button');
-            fertBtn.className = 'fertilizeBtn';
-            fertBtn.textContent = "Fertilize";
-            fertBtn.onclick = function(){ fertilizePlant(i); };
-            slot.appendChild(fertBtn);
+              fertBtn.className = 'fertilizeBtn';
+              fertBtn.textContent = "Fertilize";
+              fertBtn.onclick = function(){ fertilizePlant(i); };
+              slot.appendChild(fertBtn);
           }
         }
       }
