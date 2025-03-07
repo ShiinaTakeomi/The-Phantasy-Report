@@ -741,34 +741,11 @@
   }
 
   // ----------------------------
-  // Room Interaction & Chat Functions (Manual Room Documents)
-  // (Removed duplicate declarations of currentRoomInteraction and currentRoom)
-  let currentRoomInteraction = "";
+  // Room Interaction & Chat Functions
+  // ----------------------------
+  // Removed duplicate variable declaration for currentRoomInteraction.
   let currentRoom = "";
-  function openRoomInteraction(roomName) {
-    // Query the "rooms" collection to check the owner of the room.
-    db.collection("rooms").doc(roomName).get().then(doc => {
-      if (doc.exists) {
-        const roomData = doc.data();
-        const roomOwner = roomData.owner; // The room document includes an "owner" field
-        const currentPlayer = localStorage.getItem("playerName");
-        if (currentPlayer === roomOwner) {
-          // If current user is the owner, open chat directly.
-          openRoomChat(roomName);
-        } else {
-          // Otherwise, just open the chat in read-only mode or prompt a knock request.
-          // (For this updated code, we simply open the chat panel.)
-          openRoomChat(roomName);
-        }
-      } else {
-        // If the room document does not exist, alert the user.
-        alert("Room " + roomName + " does not exist. Please contact support.");
-      }
-    }).catch(error => {
-      console.error("Error fetching room data:", error);
-      alert("Error fetching room data for " + roomName);
-    });
-  }
+  // Removed openRoomInteraction function. Now, room buttons directly open the chat.
   function openRoomChat(roomName) {
     currentRoom = roomName;
     document.getElementById('chatRoomTitle').textContent = roomName + " Chat";
@@ -1164,14 +1141,14 @@
         roomSelect.appendChild(option);
       }
     }
-    // Generate grid buttons for rooms
+    // Generate grid buttons for rooms (now directly calling openRoomChat)
     var gridContainer = document.querySelector(".grid");
     if (gridContainer) {
       const rooms = [21,22,23,24,25,16,17,18,19,20,11,12,13,14,15,6,7,8,9,10,1,2,3,4,5];
       rooms.forEach(function(room) {
         let btn = document.createElement("button");
         btn.textContent = "Room " + room;
-        btn.onclick = function() { openRoomInteraction("Room " + room); };
+        btn.onclick = function() { openRoomChat("Room " + room); };
         gridContainer.appendChild(btn);
       });
     }
