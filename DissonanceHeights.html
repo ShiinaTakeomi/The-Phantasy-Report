@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -309,7 +310,7 @@
       <button onclick="togglePlayerStatus()">Biodata</button>
     </div>
     <div id="playerStatus">
-      <!-- Biodata updated dynamically; includes room info -->
+      <!-- Biodata updated dynamically -->
     </div>
   </div>
 
@@ -420,6 +421,14 @@
     <input type="text" id="chatInput" placeholder="Type your message...">
     <button onclick="sendChatMessage()">Send</button>
     <button onclick="closeChat()">Close Chat</button>
+  </div>
+
+  <!-- Modal: Room Interaction Options -->
+  <div id="roomInteractionModal" class="modal">
+    <h2>Room Interaction</h2>
+    <p>How do you want to interact with <span id="interactionRoomName"></span>?</p>
+    <button onclick="chooseKnock()">Knock on Door</button>
+    <button onclick="closeRoomInteractionModal()">Cancel</button>
   </div>
 
   <!-- Modal: Knock Chat -->
@@ -535,6 +544,7 @@
         alert("Registration error: " + error.message);
       });
   }
+  // New Google Sign-In Function
   function googleSignIn() {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider)
@@ -547,8 +557,8 @@
       });
   }
   auth.onAuthStateChanged(user => {
-    if (user) {
-      if (!localStorage.getItem('playerName')) {
+    if(user){
+      if(!localStorage.getItem('playerName')){
         localStorage.setItem('playerName', user.email);
       }
       checkCharacterExistence();
@@ -741,6 +751,7 @@
         console.error("Error getting player status:", error);
       });
   }
+  // Updated sign-out function that clears all game state and redirects to index.html
   function signOutUser() {
     auth.signOut().then(() => {
       clearGameState();
@@ -751,32 +762,41 @@
   }
 
   // ----------------------------
-  // Room Interaction & Chat Functions (Manual Room Documents)
+  // Room Interaction & Chat Functions
   // ----------------------------
-  // Removed duplicate global variables. Instead, we use a global variable for current room name.
-  let tempRoomName = "";
+  let currentRoomInteraction = "";
   function openRoomInteraction(roomName) {
-    // Query the "rooms" collection to check the owner of the room.
+    // New code: Query the "rooms" collection to check the owner of the room.
     db.collection("rooms").doc(roomName).get().then(doc => {
       if (doc.exists) {
         const roomData = doc.data();
-        const roomOwner = roomData.owner; // The room document includes an "owner" field
+        const roomOwner = roomData.owner; // The room document should include an "owner" field
         const currentPlayer = localStorage.getItem("playerName");
         if (currentPlayer === roomOwner) {
+          // If current user is the owner, open chat directly without knocking.
           openRoomChat(roomName);
         } else {
-          // Store the room name in a temporary variable and show the knock modal
-          tempRoomName = roomName;
-          document.getElementById('knockModal').style.display = 'block';
+          // Otherwise, show the knock modal to request entry.
+          document.getElementById('interactionRoomName').textContent = roomName;
+          document.getElementById('roomInteractionModal').style.display = 'block';
         }
       } else {
-        alert("Room " + roomName + " does not exist. Please contact support.");
+        // If the room document does not exist, fallback to knock modal.
+        document.getElementById('interactionRoomName').textContent = roomName;
+        document.getElementById('roomInteractionModal').style.display = 'block';
       }
     }).catch(error => {
       console.error("Error fetching room data:", error);
-      tempRoomName = roomName;
-      document.getElementById('knockModal').style.display = 'block';
+      document.getElementById('interactionRoomName').textContent = roomName;
+      document.getElementById('roomInteractionModal').style.display = 'block';
     });
+  }
+  function closeRoomInteractionModal() {
+    document.getElementById('roomInteractionModal').style.display = 'none';
+  }
+  function chooseKnock() {
+    closeRoomInteractionModal();
+    document.getElementById('knockModal').style.display = 'block';
   }
   function closeKnockModal() {
     document.getElementById('knockModal').style.display = 'none';
@@ -788,8 +808,8 @@
       return;
     }
     closeKnockModal();
-    if (confirm("Room owner, do you approve this knock request from " + tempRoomName + "?")) {
-      openRoomChat(tempRoomName);
+    if (confirm("Room owner, do you approve this knock request from " + currentRoomInteraction + "?")) {
+      openRoomChat(currentRoomInteraction);
     } else {
       alert("Your knock was rejected.");
     }
@@ -1233,109 +1253,6 @@
     setInterval(updateGarbageDisplay, 3600000);
     setInterval(updateGardenUI, 60000);
   };
-
-  // ----------------------------
-  // Room Interaction & Chat Functions (Manual Room Documents)
-  // ----------------------------
-  // Removed duplicate global declarations. Using a global variable 'tempRoomName' to store the room name for knock requests.
-  let tempRoomName = "";
-  function openRoomInteraction(roomName) {
-    db.collection("rooms").doc(roomName).get().then(doc => {
-      if (doc.exists) {
-        const roomData = doc.data();
-        const roomOwner = roomData.owner;
-        const currentPlayer = localStorage.getItem("playerName");
-        if (currentPlayer === roomOwner) {
-          openRoomChat(roomName);
-        } else {
-          // Store the room name and show the knock modal
-          tempRoomName = roomName;
-          document.getElementById('knockModal').style.display = 'block';
-        }
-      } else {
-        alert("Room " + roomName + " does not exist. Please contact support.");
-      }
-    }).catch(error => {
-      console.error("Error fetching room data:", error);
-      tempRoomName = roomName;
-      document.getElementById('knockModal').style.display = 'block';
-    });
-  }
-  function closeKnockModal() {
-    document.getElementById('knockModal').style.display = 'none';
-  }
-  function sendKnock() {
-    let message = document.getElementById('knockMessage').value;
-    if (message.trim() === "") {
-      alert("Please type a message before knocking.");
-      return;
-    }
-    closeKnockModal();
-    if (confirm("Room owner, do you approve this knock request from " + tempRoomName + "?")) {
-      openRoomChat(tempRoomName);
-    } else {
-      alert("Your knock was rejected.");
-    }
-  }
-  let currentRoom = "";
-  function openRoomChat(roomName) {
-    currentRoom = roomName;
-    document.getElementById('chatRoomTitle').textContent = roomName + " Chat";
-    document.getElementById('chatLog').innerHTML = "";
-    document.getElementById('chatPanel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-    listenForMessages(roomName);
-  }
-  function listenForMessages(roomName) {
-    const chatLog = document.getElementById('chatLog');
-    const messagesRef = db.collection("messages");
-    messagesRef
-      .where("room", "==", roomName)
-      .orderBy("timestamp")
-      .onSnapshot((querySnapshot) => {
-        chatLog.innerHTML = "";
-        querySnapshot.forEach((doc) => {
-          const message = doc.data();
-          const p = document.createElement('p');
-          p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
-          chatLog.appendChild(p);
-        });
-        chatLog.scrollTop = chatLog.scrollHeight;
-      });
-  }
-  function closeChat() {
-    document.getElementById('chatPanel').style.display = 'none';
-    document.getElementById('main-screen').style.display = 'block';
-    currentRoom = "";
-  }
-  async function sendChatMessage() {
-    const msg = document.getElementById('chatInput').value;
-    if (msg.trim() !== "") {
-      const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
-      try {
-        await db.collection("messages").add({
-          room: currentRoom,
-          sender: characterName,
-          content: msg,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        document.getElementById('chatInput').value = "";
-      } catch (error) {
-        console.error("Error sending message:", error);
-      }
-    }
-  }
-  document.addEventListener('DOMContentLoaded', function() {
-    const chatInput = document.getElementById('chatInput');
-    if (chatInput) {
-      chatInput.addEventListener('keydown', function(event) {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          sendChatMessage();
-        }
-      });
-    }
-  });
 </script>
 </body>
 </html>
