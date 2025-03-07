@@ -245,6 +245,21 @@
       background: rgba(0,0,0,0.7);
       display: none;
     }
+    /* In-App Notification Panel */
+    #notificationPanel {
+      position: fixed;
+      top: 70px;
+      right: 20px;
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      padding: 10px;
+      border: 1px solid #fff;
+      border-radius: 4px;
+      z-index: 1002;
+      display: none;
+      max-width: 300px;
+      font-size: 14px;
+    }
   </style>
   <!-- Firebase SDKs: Auth and Firestore -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
@@ -292,6 +307,9 @@
 
 <!-- Main Game Section -->
 <div id="mainGame" style="display: none;">
+  <!-- Notification Panel for In-App Alerts -->
+  <div id="notificationPanel"></div>
+
   <!-- Main Screen -->
   <div id="main-screen">
     <div class="container">
@@ -491,6 +509,31 @@
   let doorChatMode = false; // false: normal room chat, true: door chat
 
   // ----------------------------
+  // In-App Notification Listener
+  // ----------------------------
+  function listenForNotifications() {
+    const ownerEmail = localStorage.getItem('playerName');
+    if (!ownerEmail) return;
+    db.collection("notifications")
+      .where("owner", "==", ownerEmail)
+      .orderBy("timestamp", "desc")
+      .onSnapshot(snapshot => {
+        let notifications = "";
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          notifications += `<p>${data.message}</p>`;
+        });
+        const panel = document.getElementById("notificationPanel");
+        if (notifications) {
+          panel.innerHTML = notifications;
+          panel.style.display = "block";
+        } else {
+          panel.style.display = "none";
+        }
+      });
+  }
+
+  // ----------------------------
   // Utility: Clear All Game State from localStorage
   // ----------------------------
   function clearGameState() {
@@ -583,6 +626,7 @@
         localStorage.setItem('playerName', user.email);
       }
       checkCharacterExistence();
+      listenForNotifications(); // Start listening for in-app notifications
     } else {
       document.getElementById('loginPanel').style.display = 'block';
       document.getElementById('mainGame').style.display = 'none';
@@ -914,6 +958,21 @@
   }
   function handleKnock() {
     alert("You knocked on the door. Please wait for the owner’s response.");
+    // Create an in-app notification for the room owner.
+    db.collection("rooms").doc(currentRoom).get().then(doc => {
+      if (doc.exists) {
+        const owner = doc.data().owner;
+        const visitor = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "A visitor";
+        db.collection("notifications").add({
+          owner: owner,
+          room: currentRoom,
+          message: `${visitor} knocked on your door of ${currentRoom}.`,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    }).catch(error => {
+      console.error("Error sending knock notification:", error);
+    });
     closeDoorModal();
     openDoorChat(currentRoom);
   }
