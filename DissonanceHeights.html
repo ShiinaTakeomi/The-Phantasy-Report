@@ -506,7 +506,7 @@
 
   // Global variables for current room and mode
   let currentRoom = "";
-  let doorChatMode = false; // false: normal room chat, true: door chat
+  let doorChatMode = false; // false: room chat (inside), true: door chat (visitor)
 
   // ----------------------------
   // In-App Notification Listener
@@ -867,6 +867,7 @@
     document.getElementById('chatLog').innerHTML = "";
     document.getElementById('chatPanel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
+    // Listen from the "roomMessages" collection.
     listenForMessages(roomName);
   }
   function openDoorChat(roomName) {
@@ -875,11 +876,14 @@
     document.getElementById('chatLog').innerHTML = "";
     document.getElementById('chatPanel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
+    // Listen from the "doorMessages" collection.
     listenForMessages(roomName);
   }
   function listenForMessages(roomName) {
     const chatLog = document.getElementById('chatLog');
-    const messagesRef = db.collection("messages");
+    // Choose collection based on doorChatMode.
+    const collectionName = doorChatMode ? "doorMessages" : "roomMessages";
+    const messagesRef = db.collection(collectionName);
     messagesRef
       .where("room", "==", roomName)
       .orderBy("timestamp")
@@ -903,8 +907,9 @@
     const msg = document.getElementById('chatInput').value;
     if (msg.trim() !== "") {
       const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
+      const collectionName = doorChatMode ? "doorMessages" : "roomMessages";
       try {
-        await db.collection("messages").add({
+        await db.collection(collectionName).add({
           room: currentRoom,
           sender: characterName,
           content: msg,
