@@ -761,16 +761,15 @@
   }
 
   // ----------------------------
-  // Room Interaction & Chat Functions (Removed Auto-create Room Document)
+  // Room Interaction & Chat Functions
   // ----------------------------
   let currentRoomInteraction = "";
   function openRoomInteraction(roomName) {
-    // Query the "rooms" collection to check the owner of the room.
-    const roomDocRef = db.collection("rooms").doc(roomName);
-    roomDocRef.get().then(doc => {
+    // New code: Query the "rooms" collection to check the owner of the room.
+    db.collection("rooms").doc(roomName).get().then(doc => {
       if (doc.exists) {
         const roomData = doc.data();
-        const roomOwner = roomData.owner; // Expect an "owner" field
+        const roomOwner = roomData.owner; // The room document should include an "owner" field
         const currentPlayer = localStorage.getItem("playerName");
         if (currentPlayer === roomOwner) {
           // If current user is the owner, open chat directly without knocking.
@@ -781,8 +780,9 @@
           document.getElementById('roomInteractionModal').style.display = 'block';
         }
       } else {
-        // If the room document does not exist, alert the user.
-        alert("Room " + roomName + " does not exist. Please contact support.");
+        // If the room document does not exist, fallback to knock modal.
+        document.getElementById('interactionRoomName').textContent = roomName;
+        document.getElementById('roomInteractionModal').style.display = 'block';
       }
     }).catch(error => {
       console.error("Error fetching room data:", error);
@@ -872,6 +872,386 @@
       });
     }
   });
+
+  // ----------------------------
+  // Community Kitchen & Water Supplies Functions
+  // ----------------------------
+  function handleClick(facility) {
+    if (facility === "Community Kitchen") {
+      openKitchenPanel();
+    } else if (facility === "Water Supplies (Laundry)") {
+      openWaterPanel();
+    }
+  }
+  function openKitchenPanel() {
+    document.getElementById('kitchenPanel').style.display = 'block';
+  }
+  function closeKitchenPanel() {
+    document.getElementById('kitchenPanel').style.display = 'none';
+  }
+  function processFood() {
+    alert("Food processed for improved safety and efficiency.");
+  }
+  function openWaterPanel() {
+    document.getElementById('waterPanel').style.display = 'block';
+  }
+  function closeWaterPanel() {
+    document.getElementById('waterPanel').style.display = 'none';
+  }
+  function useWater() {
+    alert("Water distributed for gardening, cooking, and personal use.");
+  }
+
+  // ----------------------------
+  // Garden & Planting Functions
+  // ----------------------------
+  let plantTypes = [
+    { name: "Tomato", description: "Juicy and tangy", price: 5 },
+    { name: "Lettuce", description: "Crisp leaves", price: 3 },
+    { name: "Carrot", description: "Crunchy roots", price: 4 },
+    { name: "Potato", description: "Starchy tubers", price: 6 },
+    { name: "Cucumber", description: "Refreshing", price: 4 },
+    { name: "Bell Pepper", description: "Vibrant and sweet", price: 5 },
+    { name: "Eggplant", description: "Creamy texture", price: 5 },
+    { name: "Spinach", description: "Tender leaves", price: 3 },
+    { name: "Zucchini", description: "Mild and versatile", price: 4 },
+    { name: "Herb Plant", description: "Aromatic", price: 2 }
+  ];
+  const mushroomTypes = [
+    { name: "Shiitake", description: "Rich umami", price: 10 },
+    { name: "Portobello", description: "Earthy taste", price: 7 },
+    { name: "Enoki", description: "Delicate flavor", price: 15 },
+    { name: "Oyster", description: "Sweet and woody", price: 12 },
+    { name: "Morel", description: "Nutty and earthy", price: 20 }
+  ];
+  let garden = {};
+  for (let i = 1; i <= 10; i++) {
+    garden[i] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, produceType: null };
+  }
+  garden[11] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, mushrooms: 0, produceType: null };
+  function updateGardenUI() {
+    for (let i = 1; i <= 10; i++) {
+      let slot = document.getElementById('slot' + i);
+      let statusSpan = slot.querySelector('.status');
+      if (garden[i].plantedTime === null) {
+        statusSpan.textContent = "Empty";
+      } else {
+        let elapsed = (Date.now() - garden[i].plantedTime) / 60000;
+        let produceName = garden[i].produceType ? garden[i].produceType.name : "";
+        if (elapsed >= 60 && !garden[i].mature) {
+          garden[i].mature = true;
+          statusSpan.textContent = "Mature: " + produceName;
+          let btn = slot.querySelector('button');
+          if (btn) btn.style.display = 'none';
+        } else if (!garden[i].mature) {
+          statusSpan.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
+          if (Date.now() - garden[i].wateredTime > 5 * 60000) {
+            if (!slot.querySelector('.waterBtn')) {
+              let waterBtn = document.createElement('button');
+              waterBtn.className = 'waterBtn';
+              waterBtn.textContent = "Water";
+              waterBtn.onclick = function() { waterPlant(i); };
+              slot.appendChild(waterBtn);
+            }
+          }
+          if (!garden[i].fertilized && !slot.querySelector('.fertilizeBtn')) {
+            let fertBtn = document.createElement('button');
+            fertBtn.className = 'fertilizeBtn';
+            fertBtn.textContent = "Fertilize";
+            fertBtn.onclick = function() { fertilizePlant(i); };
+            slot.appendChild(fertBtn);
+          }
+        }
+      }
+    }
+    let treeSlot = document.getElementById('mushroomTree');
+    let treeStatus = treeSlot.querySelector('.status');
+    if (garden[11].plantedTime === null) {
+      treeStatus.textContent = "Empty";
+    } else {
+      let elapsed = (Date.now() - garden[11].plantedTime) / 60000;
+      let produceName = garden[11].produceType ? garden[11].produceType.name : "";
+      if (elapsed >= 60 && !garden[11].mature) {
+        garden[11].mature = true;
+        garden[11].mushrooms = 5;
+        treeStatus.textContent = "Mature: " + produceName + " (" + garden[11].mushrooms + " mushrooms)";
+        let btn = treeSlot.querySelector('button');
+        if (btn) btn.style.display = 'none';
+      } else if (!garden[11].mature) {
+        treeStatus.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
+      }
+    }
+  }
+  function openPlantSelectionModal(slotNumber) {
+    document.getElementById('plantSelectionModal').style.display = 'block';
+    document.getElementById('plantSelectionModal').setAttribute('data-slot', slotNumber);
+    let select = document.getElementById('plantTypeSelect');
+    select.innerHTML = "";
+    plantTypes.forEach(pt => {
+      let option = document.createElement('option');
+      option.value = pt.name;
+      option.textContent = pt.name + " ($" + pt.price + ")";
+      select.appendChild(option);
+    });
+  }
+  function closePlantSelectionModal() {
+    document.getElementById('plantSelectionModal').style.display = 'none';
+  }
+  function confirmPlantSelection() {
+    let slotNumber = document.getElementById('plantSelectionModal').getAttribute('data-slot');
+    let selectedName = document.getElementById('plantTypeSelect').value;
+    let selectedPlant = plantTypes.find(pt => pt.name === selectedName);
+    let seeds = parseInt(localStorage.getItem('seeds')) || 0;
+    if (seeds <= 0) {
+      alert("No seeds available. Purchase from the Grocery Store.");
+      closePlantSelectionModal();
+      return;
+    }
+    seeds -= 1;
+    localStorage.setItem('seeds', seeds);
+    garden[slotNumber].plantedTime = Date.now();
+    garden[slotNumber].wateredTime = Date.now();
+    garden[slotNumber].produceType = selectedPlant;
+    updateGardenUI();
+    updatePlayerStatus();
+    closePlantSelectionModal();
+  }
+  function waterPlant(slotNumber) {
+    garden[slotNumber].wateredTime = Date.now();
+    alert("Plant in slot " + slotNumber + " watered.");
+    updateGardenUI();
+  }
+  function fertilizePlant(slotNumber) {
+    garden[slotNumber].fertilized = true;
+    alert("Plant in slot " + slotNumber + " fertilized.");
+    updateGardenUI();
+  }
+  function plantMushroomTree() {
+    let mSeeds = parseInt(localStorage.getItem('mushroomSeeds')) || 0;
+    if (mSeeds <= 0) {
+      alert("No mushroom seeds available. Purchase from the Grocery Store.");
+      return;
+    }
+    if (garden[11].plantedTime === null) {
+      mSeeds -= 1;
+      localStorage.setItem('mushroomSeeds', mSeeds);
+      garden[11].plantedTime = Date.now();
+      garden[11].wateredTime = Date.now();
+      let randomIndex = Math.floor(Math.random() * mushroomTypes.length);
+      garden[11].produceType = mushroomTypes[randomIndex];
+      updateGardenUI();
+      updatePlayerStatus();
+    } else {
+      alert("The mushroom tree is already planted.");
+    }
+  }
+  function sellProduce() {
+    let totalEarnings = 0;
+    for (let i = 1; i <= 10; i++) {
+      if (garden[i].mature && garden[i].produceType) {
+        totalEarnings += garden[i].produceType.price;
+        garden[i] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, produceType: null };
+        let slot = document.getElementById('slot' + i);
+        let btn = slot.querySelector('button');
+        if (btn) btn.style.display = 'inline';
+      }
+    }
+    if (garden[11].mature && garden[11].produceType) {
+      totalEarnings += (garden[11].mushrooms * garden[11].produceType.price);
+      garden[11] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, mushrooms: 0, produceType: null };
+      let slot = document.getElementById('mushroomTree');
+      let btn = slot.querySelector('button');
+      if (btn) btn.style.display = 'inline';
+    }
+    let currentMoney = parseInt(localStorage.getItem('money')) || 50;
+    currentMoney += totalEarnings;
+    localStorage.setItem('money', currentMoney);
+    alert("You sold your produce for $" + totalEarnings + ". Current money: $" + currentMoney);
+    updatePlayerStatus();
+    updateGardenUI();
+  }
+
+  // ----------------------------
+  // Power Source Simulation Functions
+  // ----------------------------
+  let windSpeed = localStorage.getItem('windSpeed') || 50;
+  let brakeEngaged = JSON.parse(localStorage.getItem('brakeEngaged')) || false;
+  let powerOutputConfirmed = JSON.parse(localStorage.getItem('powerOutputConfirmed')) || false;
+  let lastInteractionTime = localStorage.getItem('lastInteractionTime') || Date.now();
+  let garbageLevel = localStorage.getItem('garbageLevel') || 0;
+  let lastGarbageUpdate = localStorage.getItem('lastGarbageUpdate') || Date.now();
+  let powerStatus = "Unknown";
+  function updateWindSpeed() {
+    windSpeed = document.getElementById('windSpeedSlider').value;
+    document.getElementById('windSpeedValue').textContent = windSpeed;
+    localStorage.setItem('windSpeed', windSpeed);
+    updateVoltage();
+    updateLastInteraction();
+  }
+  function toggleBrake() {
+    brakeEngaged = !brakeEngaged;
+    document.getElementById('brakeButton').textContent = brakeEngaged ? "Release Brake" : "Engage Brake";
+    localStorage.setItem('brakeEngaged', brakeEngaged);
+    updateVoltage();
+    updateLastInteraction();
+  }
+  function togglePowerOutput() {
+    powerOutputConfirmed = !powerOutputConfirmed;
+    document.getElementById('powerOutputConfirm').textContent = powerOutputConfirmed ? "Output Confirmed" : "Confirm Output";
+    localStorage.setItem('powerOutputConfirmed', powerOutputConfirmed);
+    evaluatePowerOutput();
+    updateLastInteraction();
+  }
+  function lubricate() {
+    logPowerMessage("Lubrication complete. Moving parts are now well-oiled.");
+    updateLastInteraction();
+  }
+  function updateVoltage() {
+    let factor = brakeEngaged ? 0.5 : 1.0;
+    let voltage = Math.round(windSpeed * factor + (Math.random() * 10 - 5));
+    voltage = Math.max(0, voltage);
+    document.getElementById('voltageDisplay').textContent = voltage.toFixed(1);
+    localStorage.setItem('voltage', voltage);
+  }
+  function evaluatePowerOutput() {
+    if (windSpeed >= 40 && windSpeed <= 70 && powerOutputConfirmed) {
+      powerStatus = "On";
+    } else {
+      powerStatus = "Off";
+    }
+    document.getElementById('powerStatusDisplay').textContent = powerStatus;
+    if (powerStatus === "Off") {
+      alert("Power is insufficient! Flats will experience reduced services.");
+    }
+  }
+  function simulateRandomEvent() {
+    if (Date.now() - lastInteractionTime > 30000) {
+      logPowerMessage("System overload due to inactivity! Flats experience a blackout for 1-2 days.");
+    }
+    const events = [
+      "Sudden strong winds detected! Adjust wind speed or engage brakes.",
+      "Low energy output observed! Check lubrication or adjust controls.",
+      "Minor electrical fault occurred! Reset the circuit breaker.",
+      "Dust accumulation detected! Perform a quick maintenance check."
+    ];
+    logPowerMessage(events[Math.floor(Math.random() * events.length)]);
+  }
+  function logPowerMessage(message) {
+    const logDiv = document.getElementById('minigameLog');
+    const timestamp = new Date().toLocaleTimeString();
+    logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
+  function toggleInstructions() {
+    const instrDiv = document.getElementById("instructions");
+    instrDiv.style.display = (instrDiv.style.display === "none" || instrDiv.style.display === "") ? "block" : "none";
+  }
+  function updateLastInteraction() {
+    lastInteractionTime = Date.now();
+    localStorage.setItem('lastInteractionTime', lastInteractionTime);
+  }
+  function updateGarbageDisplay() {
+    const now = Date.now();
+    const elapsedHours = Math.floor((now - lastGarbageUpdate) / 3600000);
+    garbageLevel = Math.min(100, Number(garbageLevel) + elapsedHours * 10);
+    lastGarbageUpdate = now;
+    localStorage.setItem('garbageLevel', garbageLevel);
+    localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
+    document.getElementById('garbageDisplay').textContent = garbageLevel;
+    if (garbageLevel > 80) {
+      alert("High garbage levels detected! The community is getting sick.");
+    }
+  }
+  function clearGarbage() {
+    garbageLevel = 0;
+    localStorage.setItem('garbageLevel', garbageLevel);
+    document.getElementById('garbageDisplay').textContent = garbageLevel;
+    logGarbageMessage("Garbage cleared by player.");
+  }
+  function logGarbageMessage(message) {
+    const logDiv = document.getElementById('garbageLog');
+    const timestamp = new Date().toLocaleTimeString();
+    logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
+
+  // ----------------------------
+  // Season Simulation
+  // ----------------------------
+  let currentSeason = "Spring";
+  function updateSeason() {
+    const seasons = ["Spring", "Summer", "Autumn", "Winter"];
+    let index = Math.floor((Date.now() / 120000)) % seasons.length;
+    currentSeason = seasons[index];
+    console.log("Current Season: " + currentSeason);
+  }
+  setInterval(updateSeason, 120000);
+
+  // ----------------------------
+  // Modal Panel Utilities
+  // ----------------------------
+  function hidePanel(panelId) {
+    document.getElementById(panelId).style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+  }
+
+  // ----------------------------
+  // DOMContentLoaded & Initialization
+  // ----------------------------
+  window.onload = function() {
+    // Generate room number options
+    var roomSelect = document.getElementById('roomNumber');
+    if (roomSelect) {
+      for (let i = 1; i <= 25; i++) {
+        let option = document.createElement('option');
+        option.value = i;
+        option.textContent = "Room " + i;
+        roomSelect.appendChild(option);
+      }
+    }
+    // Generate grid buttons for rooms
+    var gridContainer = document.querySelector(".grid");
+    if (gridContainer) {
+      const rooms = [21,22,23,24,25,16,17,18,19,20,11,12,13,14,15,6,7,8,9,10,1,2,3,4,5];
+      rooms.forEach(function(room) {
+        let btn = document.createElement("button");
+        btn.textContent = "Room " + room;
+        btn.onclick = function() { openRoomInteraction("Room " + room); };
+        gridContainer.appendChild(btn);
+      });
+    }
+    // Generate plant slots
+    var plantSlotsDiv = document.getElementById("plantSlots");
+    if (plantSlotsDiv) {
+      plantSlotsDiv.innerHTML = "";
+      for (let i = 1; i <= 10; i++) {
+        let slotDiv = document.createElement("div");
+        slotDiv.className = "slot";
+        slotDiv.id = "slot" + i;
+        slotDiv.innerHTML = 'Slot ' + i + ': <span class="status">Empty</span> <button onclick="openPlantSelectionModal(' + i + ')">Plant Seed</button>';
+        plantSlotsDiv.appendChild(slotDiv);
+      }
+      let treeDiv = document.createElement("div");
+      treeDiv.className = "slot";
+      treeDiv.id = "mushroomTree";
+      treeDiv.innerHTML = 'Tree for Mushrooms: <span class="status">Empty</span> <button onclick="plantMushroomTree()">Plant Mushroom</button>';
+      plantSlotsDiv.appendChild(treeDiv);
+    }
+    document.getElementById('windSpeedSlider').value = windSpeed;
+    document.getElementById('windSpeedValue').textContent = windSpeed;
+    document.getElementById('brakeButton').textContent = brakeEngaged ? "Release Brake" : "Engage Brake";
+    document.getElementById('powerOutputConfirm').textContent = powerOutputConfirmed ? "Output Confirmed" : "Confirm Output";
+    updateVoltage();
+    updateGarbageDisplay();
+    updateSeason();
+    if (localStorage.getItem('playerName')) {
+      checkCharacterExistence();
+    }
+    setInterval(updateVoltage, 5000);
+    setInterval(simulateRandomEvent, 3600000);
+    setInterval(updateGarbageDisplay, 3600000);
+    setInterval(updateGardenUI, 60000);
+  };
 </script>
 </body>
 </html>
