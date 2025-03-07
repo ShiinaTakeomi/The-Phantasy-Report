@@ -221,6 +221,14 @@
       border-radius: 8px;
       background: rgba(0,0,0,0.7);
     }
+    /* Harvest Inventory Display */
+    #harvestInventory {
+      margin-top: 10px;
+      padding: 5px;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.1);
+    }
     /* Garden Slots */
     #garden-panel .slot {
       margin: 10px 0;
@@ -328,7 +336,7 @@
       <button onclick="togglePlayerStatus()">Biodata</button>
     </div>
     <div id="playerStatus">
-      <!-- Biodata updated dynamically; includes room info -->
+      <!-- Biodata updated dynamically; includes room info and harvest inventory -->
     </div>
   </div>
 
@@ -418,7 +426,10 @@
       <p><strong>Cigarettes</strong> - $4</p>
       <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
     </div>
-    <button onclick="hidePanel('grocery-panel')">Return to Main Screen</button>
+    <!-- Harvest Inventory Section -->
+    <h3>Your Harvest Inventory</h3>
+    <div id="harvestInventory"></div>
+    <button onclick="sellHarvest()">Sell Harvest</button>
   </div>
 
   <!-- Community Garden Panel -->
@@ -428,7 +439,8 @@
     <div id="plantSlots">
       <!-- Plant slots will be generated dynamically -->
     </div>
-    <button onclick="sellProduce()">Sell Produce</button>
+    <!-- Replace Sell Produce with Harvest Produce -->
+    <button onclick="harvestProduce()">Harvest Produce</button>
     <button onclick="hidePanel('garden-panel')">Return to Main Screen</button>
   </div>
 
@@ -508,6 +520,8 @@
   let currentRoom = "";
   // doorChatMode: false = room chat (inside), true = door chat (visitor)
   let doorChatMode = false;
+  // New harvest inventory object – stored as an object with produce name keys and quantity values.
+  let harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
 
   // ----------------------------
   // In-App Notification Listener
@@ -538,7 +552,7 @@
   // Utility: Clear All Game State from localStorage
   // ----------------------------
   function clearGameState() {
-    const keys = ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'brakeEngaged', 'powerOutputConfirmed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate'];
+    const keys = ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'brakeEngaged', 'powerOutputConfirmed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate', 'harvestInventory'];
     keys.forEach(key => localStorage.removeItem(key));
   }
 
@@ -556,6 +570,7 @@
   function openGroceryPanel() {
     document.getElementById('grocery-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
+    updateHarvestInventoryUI();
   }
   function openGardenPanel() {
     document.getElementById('garden-panel').style.display = 'block';
@@ -781,7 +796,6 @@
             statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
             statusHTML += `<p><strong>Age:</strong> ${data.age}</p>`;
             statusHTML += `<p><strong>Reason:</strong> ${data.reason}</p>`;
-            // Concatenate "Room " to the room number if set.
             statusHTML += `<p><strong>Room:</strong> ${data.roomNumber ? "Room " + data.roomNumber : "Not set"}</p>`;
             statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
             statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
@@ -803,7 +817,6 @@
             statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
             statusHTML += `<p><strong>Age:</strong> <input type="number" id="editAge" value="${data.age}" /></p>`;
             statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason}</textarea></p>`;
-            // In edit mode the input remains just numeric.
             statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25"/></p>`;
             statusHTML += `<p><strong>Backstory:</strong> <textarea id="editBackstory">${data.backstory || ""}</textarea></p>`;
             statusHTML += `<p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" /></p>`;
@@ -818,29 +831,46 @@
             statusHTML += `<button onclick="saveBiodata()">Save Changes</button> `;
             statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
           }
+          // Display Money and Harvest Inventory from localStorage
           statusHTML += `<p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>`;
           statusHTML += `<p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>`;
           statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
+          // Display harvest inventory
+          statusHTML += `<h4>Harvest Inventory:</h4><div id="harvestInventoryDisplay"></div>`;
           document.getElementById('playerStatus').innerHTML = statusHTML;
+          updateHarvestInventoryUI();
         }
       }, (error) => {
         console.error("Error getting player status:", error);
       });
   }
-  // Updated sign-out function that clears all game state and redirects to index.html
-  function signOutUser() {
-    auth.signOut().then(() => {
-      clearGameState();
-      window.location.href = "index.html";
-    }).catch((error) => {
-      console.error("Error signing out:", error);
-    });
+  // Function to update the harvest inventory display in the biodata panel and grocery store
+  function updateHarvestInventoryUI() {
+    // Update localStorage
+    localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
+    // Update in biodata panel
+    const displayDiv = document.getElementById('harvestInventoryDisplay');
+    if (displayDiv) {
+      let html = "";
+      for (let item in harvestInventory) {
+        html += `<p>${item}: ${harvestInventory[item]}</p>`;
+      }
+      displayDiv.innerHTML = html || "<p>None</p>";
+    }
+    // Also update the grocery store panel inventory
+    const groceryInv = document.getElementById('harvestInventory');
+    if (groceryInv) {
+      let html = "";
+      for (let item in harvestInventory) {
+        html += `<p>${item}: ${harvestInventory[item]}</p>`;
+      }
+      groceryInv.innerHTML = html || "<p>None</p>";
+    }
   }
 
   // ----------------------------
   // Room Interaction & Chat Functions
   // ----------------------------
-  // Check room ownership before opening chat.
   function openRoomInteraction(roomName) {
     currentRoom = roomName;
     db.collection("rooms").doc(roomName).get().then(doc => {
@@ -848,10 +878,8 @@
         const roomData = doc.data();
         const currentPlayer = localStorage.getItem("playerName");
         if (currentPlayer === roomData.owner) {
-          // If owner, open room chat (inside)
           openRoomChat(roomName);
         } else {
-          // If visitor, show door modal
           showDoorModal(roomName);
         }
       } else {
@@ -868,7 +896,6 @@
     document.getElementById('chatLog').innerHTML = "";
     document.getElementById('chatPanel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
-    // Listen from messages with chatType "room"
     listenForMessages(roomName);
   }
   function openDoorChat(roomName) {
@@ -877,13 +904,11 @@
     document.getElementById('chatLog').innerHTML = "";
     document.getElementById('chatPanel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
-    // Listen from messages with chatType "door"
     listenForMessages(roomName);
   }
   function listenForMessages(roomName) {
     const chatLog = document.getElementById('chatLog');
     const messagesRef = db.collection("messages");
-    // Query messages for the current room and chatType
     messagesRef
       .where("room", "==", roomName)
       .where("chatType", "==", doorChatMode ? "door" : "room")
@@ -941,7 +966,6 @@
     currentRoom = roomName;
     document.getElementById('doorTitle').textContent = "You are at the door of " + roomName;
     document.getElementById('doorModal').style.display = 'block';
-    // Hide the password input by default
     document.getElementById('passwordDiv').style.display = 'none';
     document.getElementById('doorPassword').value = "";
   }
@@ -964,7 +988,6 @@
   }
   function handleKnock() {
     alert("You knocked on the door. Please wait for the owner’s response.");
-    // Create an in-app notification for the room owner.
     db.collection("rooms").doc(currentRoom).get().then(doc => {
       if (doc.exists) {
         const owner = doc.data().owner;
@@ -1035,10 +1058,13 @@
     { name: "Morel", description: "Nutty and earthy", price: 20 }
   ];
   let garden = {};
+  // Initialize garden slots 1-10 and a special slot 11 for mushroom tree.
   for (let i = 1; i <= 10; i++) {
     garden[i] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, produceType: null };
   }
   garden[11] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, mushrooms: 0, produceType: null };
+
+  // Update garden UI – note: maturity threshold changed from 60 to 30 minutes.
   function updateGardenUI() {
     for (let i = 1; i <= 10; i++) {
       let slot = document.getElementById('slot' + i);
@@ -1048,7 +1074,7 @@
       } else {
         let elapsed = (Date.now() - garden[i].plantedTime) / 60000;
         let produceName = garden[i].produceType ? garden[i].produceType.name : "";
-        if (elapsed >= 60 && !garden[i].mature) {
+        if (elapsed >= 30 && !garden[i].mature) {  // maturity threshold is now 30 minutes
           garden[i].mature = true;
           statusSpan.textContent = "Mature: " + produceName;
           let btn = slot.querySelector('button');
@@ -1081,7 +1107,7 @@
     } else {
       let elapsed = (Date.now() - garden[11].plantedTime) / 60000;
       let produceName = garden[11].produceType ? garden[11].produceType.name : "";
-      if (elapsed >= 60 && !garden[11].mature) {
+      if (elapsed >= 30 && !garden[11].mature) {
         garden[11].mature = true;
         garden[11].mushrooms = 5;
         treeStatus.textContent = "Mature: " + produceName + " (" + garden[11].mushrooms + " mushrooms)";
@@ -1092,93 +1118,241 @@
       }
     }
   }
-  function openPlantSelectionModal(slotNumber) {
-    document.getElementById('plantSelectionModal').style.display = 'block';
-    document.getElementById('plantSelectionModal').setAttribute('data-slot', slotNumber);
-    let select = document.getElementById('plantTypeSelect');
-    select.innerHTML = "";
-    plantTypes.forEach(pt => {
-      let option = document.createElement('option');
-      option.value = pt.name;
-      option.textContent = pt.name + " ($" + pt.price + ")";
-      select.appendChild(option);
-    });
-  }
-  function closePlantSelectionModal() {
-    document.getElementById('plantSelectionModal').style.display = 'none';
-  }
-  function confirmPlantSelection() {
-    let slotNumber = document.getElementById('plantSelectionModal').getAttribute('data-slot');
-    let selectedName = document.getElementById('plantTypeSelect').value;
-    let selectedPlant = plantTypes.find(pt => pt.name === selectedName);
-    let seeds = parseInt(localStorage.getItem('seeds')) || 0;
-    if (seeds <= 0) {
-      alert("No seeds available. Purchase from the Grocery Store.");
-      closePlantSelectionModal();
-      return;
-    }
-    seeds -= 1;
-    localStorage.setItem('seeds', seeds);
-    garden[slotNumber].plantedTime = Date.now();
-    garden[slotNumber].wateredTime = Date.now();
-    garden[slotNumber].produceType = selectedPlant;
-    updateGardenUI();
-    updatePlayerStatus();
-    closePlantSelectionModal();
-  }
-  function waterPlant(slotNumber) {
-    garden[slotNumber].wateredTime = Date.now();
-    alert("Plant in slot " + slotNumber + " watered.");
-    updateGardenUI();
-  }
-  function fertilizePlant(slotNumber) {
-    garden[slotNumber].fertilized = true;
-    alert("Plant in slot " + slotNumber + " fertilized.");
-    updateGardenUI();
-  }
-  function plantMushroomTree() {
-    let mSeeds = parseInt(localStorage.getItem('mushroomSeeds')) || 0;
-    if (mSeeds <= 0) {
-      alert("No mushroom seeds available. Purchase from the Grocery Store.");
-      return;
-    }
-    if (garden[11].plantedTime === null) {
-      mSeeds -= 1;
-      localStorage.setItem('mushroomSeeds', mSeeds);
-      garden[11].plantedTime = Date.now();
-      garden[11].wateredTime = Date.now();
-      let randomIndex = Math.floor(Math.random() * mushroomTypes.length);
-      garden[11].produceType = mushroomTypes[randomIndex];
-      updateGardenUI();
-      updatePlayerStatus();
-    } else {
-      alert("The mushroom tree is already planted.");
-    }
-  }
-  function sellProduce() {
-    let totalEarnings = 0;
+
+  // ----------------------------
+  // Harvest Produce Functions
+  // ----------------------------
+  // Harvest the produce from any mature garden slot, and add to harvestInventory.
+  function harvestProduce() {
+    let harvested = false;
+    // Loop through garden slots 1-10
     for (let i = 1; i <= 10; i++) {
       if (garden[i].mature && garden[i].produceType) {
-        totalEarnings += garden[i].produceType.price;
+        let produceName = garden[i].produceType.name;
+        // Add one unit per slot harvest (you can adjust logic as needed)
+        harvestInventory[produceName] = (harvestInventory[produceName] || 0) + 1;
+        // Reset slot
         garden[i] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, produceType: null };
-        let slot = document.getElementById('slot' + i);
-        let btn = slot.querySelector('button');
-        if (btn) btn.style.display = 'inline';
+        harvested = true;
       }
     }
+    // Check mushroom tree (slot 11)
     if (garden[11].mature && garden[11].produceType) {
-      totalEarnings += (garden[11].mushrooms * garden[11].produceType.price);
+      let produceName = garden[11].produceType.name;
+      // For mushroom tree, add the number of mushrooms available
+      harvestInventory[produceName] = (harvestInventory[produceName] || 0) + garden[11].mushrooms;
       garden[11] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, mushrooms: 0, produceType: null };
-      let slot = document.getElementById('mushroomTree');
-      let btn = slot.querySelector('button');
-      if (btn) btn.style.display = 'inline';
+      harvested = true;
     }
-    let currentMoney = parseInt(localStorage.getItem('money')) || 50;
-    currentMoney += totalEarnings;
-    localStorage.setItem('money', currentMoney);
-    alert("You sold your produce for $" + totalEarnings + ". Current money: $" + currentMoney);
-    updatePlayerStatus();
-    updateGardenUI();
+    if (harvested) {
+      alert("Harvest successful! Check your Harvest Inventory in your biodata and at the Grocery Stand.");
+      updateGardenUI();
+      updateHarvestInventoryUI();
+      updatePlayerStatus();
+    } else {
+      alert("No mature produce to harvest.");
+    }
+  }
+
+  // ----------------------------
+  // Grocery Store: Sell Harvested Produce
+  // ----------------------------
+  function sellHarvest() {
+    let totalEarnings = 0;
+    // For each produce in harvestInventory, find its price from plantTypes or mushroomTypes arrays.
+    for (let produce in harvestInventory) {
+      let quantity = harvestInventory[produce];
+      let price = 0;
+      // Try to find in plantTypes
+      let plant = plantTypes.find(p => p.name === produce);
+      if (!plant) {
+        // Try in mushroomTypes if not found in plantTypes
+        plant = mushroomTypes.find(p => p.name === produce);
+      }
+      if (plant) {
+        price = plant.price;
+      }
+      totalEarnings += price * quantity;
+    }
+    if (totalEarnings > 0) {
+      let currentMoney = parseInt(localStorage.getItem('money')) || 50;
+      currentMoney += totalEarnings;
+      localStorage.setItem('money', currentMoney);
+      alert("You sold your harvest for $" + totalEarnings + ". Current money: $" + currentMoney);
+      // Clear harvest inventory
+      harvestInventory = {};
+      updateHarvestInventoryUI();
+      updatePlayerStatus();
+    } else {
+      alert("Nothing to sell in your harvest inventory.");
+    }
+  }
+
+  // ----------------------------
+  // Room Interaction & Chat Functions
+  // ----------------------------
+  function openRoomInteraction(roomName) {
+    currentRoom = roomName;
+    db.collection("rooms").doc(roomName).get().then(doc => {
+      if (doc.exists) {
+        const roomData = doc.data();
+        const currentPlayer = localStorage.getItem("playerName");
+        if (currentPlayer === roomData.owner) {
+          openRoomChat(roomName);
+        } else {
+          showDoorModal(roomName);
+        }
+      } else {
+        alert("Room " + roomName + " does not exist. Please contact support.");
+      }
+    }).catch(error => {
+      console.error("Error fetching room data:", error);
+      alert("Error fetching room data for " + roomName);
+    });
+  }
+  function openRoomChat(roomName) {
+    doorChatMode = false;
+    document.getElementById('chatRoomTitle').textContent = roomName + " Chat (Inside)";
+    document.getElementById('chatLog').innerHTML = "";
+    document.getElementById('chatPanel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+    listenForMessages(roomName);
+  }
+  function openDoorChat(roomName) {
+    doorChatMode = true;
+    document.getElementById('chatRoomTitle').textContent = roomName + " Door Chat (Visitor)";
+    document.getElementById('chatLog').innerHTML = "";
+    document.getElementById('chatPanel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+    listenForMessages(roomName);
+  }
+  function listenForMessages(roomName) {
+    const chatLog = document.getElementById('chatLog');
+    const messagesRef = db.collection("messages");
+    messagesRef
+      .where("room", "==", roomName)
+      .where("chatType", "==", doorChatMode ? "door" : "room")
+      .orderBy("timestamp")
+      .onSnapshot((querySnapshot) => {
+        chatLog.innerHTML = "";
+        querySnapshot.forEach((doc) => {
+          const message = doc.data();
+          const p = document.createElement('p');
+          p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+          chatLog.appendChild(p);
+        });
+        chatLog.scrollTop = chatLog.scrollHeight;
+      });
+  }
+  function closeChat() {
+    document.getElementById('chatPanel').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    currentRoom = "";
+  }
+  async function sendChatMessage() {
+    const msg = document.getElementById('chatInput').value;
+    if (msg.trim() !== "") {
+      const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
+      try {
+        await db.collection("messages").add({
+          room: currentRoom,
+          sender: characterName,
+          content: msg,
+          chatType: doorChatMode ? "door" : "room",
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('chatInput').value = "";
+      } catch (error) {
+        console.error("Error sending message:", error);
+      }
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+      chatInput.addEventListener('keydown', function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          sendChatMessage();
+        }
+      });
+    }
+  });
+
+  // ----------------------------
+  // Door Modal Functions
+  // ----------------------------
+  function showDoorModal(roomName) {
+    currentRoom = roomName;
+    document.getElementById('doorTitle').textContent = "You are at the door of " + roomName;
+    document.getElementById('doorModal').style.display = 'block';
+    document.getElementById('passwordDiv').style.display = 'none';
+    document.getElementById('doorPassword').value = "";
+  }
+  function closeDoorModal() {
+    document.getElementById('doorModal').style.display = 'none';
+  }
+  function showPasswordInput() {
+    document.getElementById('passwordDiv').style.display = 'block';
+  }
+  function verifyPassword() {
+    const enteredPassword = document.getElementById('doorPassword').value;
+    const correctPassword = roomPasswords[currentRoom];
+    if (enteredPassword === correctPassword) {
+      alert("Password correct. You now enter the room.");
+      closeDoorModal();
+      openRoomChat(currentRoom);
+    } else {
+      alert("Incorrect password. Please try again or choose to knock.");
+    }
+  }
+  function handleKnock() {
+    alert("You knocked on the door. Please wait for the owner’s response.");
+    db.collection("rooms").doc(currentRoom).get().then(doc => {
+      if (doc.exists) {
+        const owner = doc.data().owner;
+        const visitor = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "A visitor";
+        db.collection("notifications").add({
+          owner: owner,
+          room: currentRoom,
+          message: `${visitor} knocked on your door of ${currentRoom}.`,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    }).catch(error => {
+      console.error("Error sending knock notification:", error);
+    });
+    closeDoorModal();
+    openDoorChat(currentRoom);
+  }
+
+  // ----------------------------
+  // Community Kitchen & Water Supplies Functions
+  // ----------------------------
+  function handleClick(facility) {
+    if (facility === "Community Kitchen") {
+      openKitchenPanel();
+    } else if (facility === "Water Supplies (Laundry)") {
+      openWaterPanel();
+    }
+  }
+  function openKitchenPanel() {
+    document.getElementById('kitchenPanel').style.display = 'block';
+  }
+  function closeKitchenPanel() {
+    document.getElementById('kitchenPanel').style.display = 'none';
+  }
+  function processFood() {
+    alert("Food processed for improved safety and efficiency.");
+  }
+  function openWaterPanel() {
+    document.getElementById('waterPanel').style.display = 'block';
+  }
+  function closeWaterPanel() {
+    document.getElementById('waterPanel').style.display = 'none';
+  }
+  function useWater() {
+    alert("Water distributed for gardening, cooking, and personal use.");
   }
 
   // ----------------------------
@@ -1234,6 +1408,23 @@
       alert("Power is insufficient! Flats will experience reduced services.");
     }
   }
+  // New function: simulate a gradual power event every minute
+  function simulatePowerEvent() {
+    if (Date.now() - lastInteractionTime > 60000) {
+      windSpeed = Math.max(0, windSpeed - 5);
+      localStorage.setItem('windSpeed', windSpeed);
+      updateVoltage();
+    }
+  }
+  // Update garbage more frequently (every minute)
+  function updateGarbageDisplay() {
+    garbageLevel = Math.min(100, Number(garbageLevel) + 1);
+    localStorage.setItem('garbageLevel', garbageLevel);
+    document.getElementById('garbageDisplay').textContent = garbageLevel;
+    if (garbageLevel > 80) {
+      alert("High garbage levels detected! The community is getting sick.");
+    }
+  }
   function simulateRandomEvent() {
     if (Date.now() - lastInteractionTime > 30000) {
       logPowerMessage("System overload due to inactivity! Flats experience a blackout for 1-2 days.");
@@ -1259,30 +1450,6 @@
   function updateLastInteraction() {
     lastInteractionTime = Date.now();
     localStorage.setItem('lastInteractionTime', lastInteractionTime);
-  }
-  function updateGarbageDisplay() {
-    const now = Date.now();
-    const elapsedHours = Math.floor((now - lastGarbageUpdate) / 3600000);
-    garbageLevel = Math.min(100, Number(garbageLevel) + elapsedHours * 10);
-    lastGarbageUpdate = now;
-    localStorage.setItem('garbageLevel', garbageLevel);
-    localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
-    document.getElementById('garbageDisplay').textContent = garbageLevel;
-    if (garbageLevel > 80) {
-      alert("High garbage levels detected! The community is getting sick.");
-    }
-  }
-  function clearGarbage() {
-    garbageLevel = 0;
-    localStorage.setItem('garbageLevel', garbageLevel);
-    document.getElementById('garbageDisplay').textContent = garbageLevel;
-    logGarbageMessage("Garbage cleared by player.");
-  }
-  function logGarbageMessage(message) {
-    const logDiv = document.getElementById('garbageLog');
-    const timestamp = new Date().toLocaleTimeString();
-    logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
-    logDiv.scrollTop = logDiv.scrollHeight;
   }
 
   // ----------------------------
@@ -1319,7 +1486,7 @@
         roomSelect.appendChild(option);
       }
     }
-    // Generate grid buttons for rooms (using openRoomInteraction)
+    // Generate grid buttons for rooms
     var gridContainer = document.querySelector(".grid");
     if (gridContainer) {
       const rooms = [21,22,23,24,25,16,17,18,19,20,11,12,13,14,15,6,7,8,9,10,1,2,3,4,5];
@@ -1357,9 +1524,13 @@
     if (localStorage.getItem('playerName')) {
       checkCharacterExistence();
     }
+    // Initialize harvest inventory from localStorage if exists
+    harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
+    // Set intervals: power event and garbage update every minute, plus existing intervals.
+    setInterval(simulatePowerEvent, 60000);
+    setInterval(updateGarbageDisplay, 60000);
     setInterval(updateVoltage, 5000);
     setInterval(simulateRandomEvent, 3600000);
-    setInterval(updateGarbageDisplay, 3600000);
     setInterval(updateGardenUI, 60000);
   };
 </script>
