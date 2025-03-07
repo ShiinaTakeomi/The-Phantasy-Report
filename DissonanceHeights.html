@@ -12,19 +12,16 @@
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      /* Background with dark overlay for a gloomy, wintery feel, plus a concrete texture overlay */
       background: 
         linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
         url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
       background-size: cover;
       color: #eee;
     }
-    /* Use Russo One for headings to evoke Soviet-era signage */
     h1, h2, h3 {
       font-family: 'Russo One', sans-serif;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     }
-    /* Common Panel and Container Styles */
     .container, .panel, #characterCreation, .modal, #loginPanel {
       background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');
       background-color: rgba(0, 0, 0, 0.6);
@@ -61,7 +58,7 @@
     .grid button {
       width: 100%;
       height: 100%;
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: rgba(255,255,255,0.2);
       border: 1px solid #777;
       cursor: pointer;
       font-size: 14px;
@@ -70,12 +67,12 @@
       transition: background-color 0.3s;
     }
     .grid button:hover {
-      background-color: rgba(255, 255, 255, 0.4);
+      background-color: rgba(255,255,255,0.4);
     }
     /* Buttons */
     .garden-button {
       position: absolute;
-      left: 210px; /* aligns roughly with column 3 */
+      left: 210px;
       top: 10px;
       padding: 10px;
       background-color: #5DADE2;
@@ -91,7 +88,7 @@
       top: 0;
       width: 50px;
       height: 520px;
-      background-color: rgba(211, 211, 211, 0.3);
+      background-color: rgba(211,211,211,0.3);
       border: 2px solid #999;
       display: flex;
       align-items: center;
@@ -102,7 +99,6 @@
       padding: 5px;
       border-radius: 4px;
     }
-    /* Updated Exit Button - fixed at top right for responsiveness */
     .exit-button {
       position: fixed;
       top: 10px;
@@ -115,7 +111,7 @@
       font-weight: bold;
       border-radius: 4px;
       color: #fff;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
       z-index: 1001;
     }
     .power-room {
@@ -124,7 +120,7 @@
       left: calc(60px + 520px + 10px);
       width: 100px;
       height: 100px;
-      background-color: rgba(192, 192, 255, 0.5);
+      background-color: rgba(192,192,255,0.5);
       border: 2px solid #666;
       cursor: pointer;
       font-size: 14px;
@@ -138,7 +134,7 @@
     }
     .facilities button {
       padding: 10px 20px;
-      background-color: rgba(200, 150, 130, 0.7);
+      background-color: rgba(200,150,130,0.7);
       border: 1px solid #999;
       cursor: pointer;
       font-size: 16px;
@@ -191,29 +187,28 @@
       cursor: pointer;
       width: 100%;
     }
-/* Responsive Chat Panel */
-#chatPanel {
-  display: none;
-  border: 2px solid #444;
-  padding: 10px;
-  width: 90%;
-  max-width: 600px;
-  margin: 20px auto;
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 8px;
-}
-
-/* Responsive Chat Log */
-#chatLog {
-  border: 1px solid #ccc;
-  padding: 10px;
-  height: 200px;
-  overflow-y: auto;
-  background: rgba(255, 255, 255, 0.1);
-  margin-bottom: 10px;
-  color: #fff;
-  border-radius: 4px;
-}
+    /* Responsive Chat Panel */
+    #chatPanel {
+      display: none;
+      border: 2px solid #444;
+      padding: 10px;
+      width: 90%;
+      max-width: 600px;
+      margin: 20px auto;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 8px;
+    }
+    /* Responsive Chat Log */
+    #chatLog {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 200px;
+      overflow-y: auto;
+      background: rgba(255, 255, 255, 0.1);
+      margin-bottom: 10px;
+      color: #fff;
+      border-radius: 4px;
+    }
     /* Biodata Panel */
     #playerStatus {
       margin: 20px auto;
@@ -264,7 +259,6 @@
   <input type="password" id="loginPassword" placeholder="Password" required>
   <button onclick="loginUser()">Login</button>
   <button onclick="registerUser()">Register</button>
-  <!-- Google Sign-In Button -->
   <button onclick="googleSignIn()">Sign in with Google</button>
 </div>
 
@@ -282,14 +276,12 @@
       <option value="Other">Other</option>
     </select>
     <textarea id="charReason" placeholder="Reason for staying at Dissonance Heights" required></textarea>
-    <!-- New customization fields -->
     <textarea id="charBackstory" placeholder="Backstory" required></textarea>
     <input type="text" id="charSkills" placeholder="Skills (comma separated)" required>
     <input type="text" id="charInventory" placeholder="Inventory (comma separated)" required>
     <input type="text" id="charAlliances" placeholder="Alliances (comma separated)">
     <input type="text" id="charRivalries" placeholder="Rivalries (comma separated)">
     <input type="number" id="charReputation" placeholder="Reputation" value="0" required>
-    <!-- Room Selection Dropdown (options generated via JS) -->
     <select id="roomNumber" required>
       <option value="">Select Room Number</option>
     </select>
@@ -303,9 +295,7 @@
   <div id="main-screen">
     <div class="container">
       <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
-      <!-- Exit Button (now fixed at top right) -->
       <button class="exit-button" onclick="signOutUser()">Exit</button>
-      <!-- Community Garden Button -->
       <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
       <div class="grid">
         <!-- Room buttons will be generated dynamically -->
@@ -318,9 +308,8 @@
       <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
       <button onclick="togglePlayerStatus()">Biodata</button>
     </div>
-    <!-- Biodata Panel -->
     <div id="playerStatus">
-      <!-- Populated by updatePlayerStatus() -->
+      <!-- Biodata updated dynamically -->
     </div>
   </div>
 
@@ -559,7 +548,6 @@
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider)
       .then(result => {
-        // The signed-in user info is in result.user
         document.getElementById('loginPanel').style.display = 'none';
         checkCharacterExistence();
       })
@@ -613,7 +601,6 @@
     const charAge = document.getElementById('charAge').value;
     const charGender = document.getElementById('charGender').value;
     const charReason = document.getElementById('charReason').value;
-    // New fields for deeper customization:
     const charBackstory = document.getElementById('charBackstory').value;
     const charSkills = document.getElementById('charSkills').value;
     const charInventory = document.getElementById('charInventory').value;
@@ -672,7 +659,6 @@
     const newAge = document.getElementById('editAge').value;
     const newReason = document.getElementById('editReason').value;
     const newRoomNumber = document.getElementById('editRoomNumber').value;
-    // New fields from edit mode
     const newBackstory = document.getElementById('editBackstory').value;
     const newSkills = document.getElementById('editSkills').value;
     const newInventory = document.getElementById('editInventory').value;
@@ -742,7 +728,6 @@
             statusHTML += `<p><strong>Age:</strong> <input type="number" id="editAge" value="${data.age}" /></p>`;
             statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason}</textarea></p>`;
             statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25"/></p>`;
-            // Editable fields for new customization:
             statusHTML += `<p><strong>Backstory:</strong> <textarea id="editBackstory">${data.backstory || ""}</textarea></p>`;
             statusHTML += `<p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" /></p>`;
             statusHTML += `<p><strong>Inventory:</strong> <input type="text" id="editInventory" value="${data.inventory ? data.inventory.join(", ") : ""}" /></p>`;
@@ -780,9 +765,30 @@
   // ----------------------------
   let currentRoomInteraction = "";
   function openRoomInteraction(roomName) {
-    currentRoomInteraction = roomName;
-    document.getElementById('interactionRoomName').textContent = roomName;
-    document.getElementById('roomInteractionModal').style.display = 'block';
+    // New code: Query the "rooms" collection to check the owner of the room.
+    db.collection("rooms").doc(roomName).get().then(doc => {
+      if (doc.exists) {
+        const roomData = doc.data();
+        const roomOwner = roomData.owner; // The room document should include an "owner" field
+        const currentPlayer = localStorage.getItem("playerName");
+        if (currentPlayer === roomOwner) {
+          // If current user is the owner, open chat directly without knocking.
+          openRoomChat(roomName);
+        } else {
+          // Otherwise, show the knock modal to request entry.
+          document.getElementById('interactionRoomName').textContent = roomName;
+          document.getElementById('roomInteractionModal').style.display = 'block';
+        }
+      } else {
+        // If the room document does not exist, fallback to knock modal.
+        document.getElementById('interactionRoomName').textContent = roomName;
+        document.getElementById('roomInteractionModal').style.display = 'block';
+      }
+    }).catch(error => {
+      console.error("Error fetching room data:", error);
+      document.getElementById('interactionRoomName').textContent = roomName;
+      document.getElementById('roomInteractionModal').style.display = 'block';
+    });
   }
   function closeRoomInteractionModal() {
     document.getElementById('roomInteractionModal').style.display = 'none';
@@ -796,12 +802,12 @@
   }
   function sendKnock() {
     let message = document.getElementById('knockMessage').value;
-    if(message.trim() === "") {
+    if (message.trim() === "") {
       alert("Please type a message before knocking.");
       return;
     }
     closeKnockModal();
-    if(confirm("Room owner, do you approve this knock request from " + currentRoomInteraction + "?")) {
+    if (confirm("Room owner, do you approve this knock request from " + currentRoomInteraction + "?")) {
       openRoomChat(currentRoomInteraction);
     } else {
       alert("Your knock was rejected.");
@@ -871,9 +877,9 @@
   // Community Kitchen & Water Supplies Functions
   // ----------------------------
   function handleClick(facility) {
-    if(facility === "Community Kitchen") {
+    if (facility === "Community Kitchen") {
       openKitchenPanel();
-    } else if(facility === "Water Supplies (Laundry)") {
+    } else if (facility === "Water Supplies (Laundry)") {
       openWaterPanel();
     }
   }
@@ -936,24 +942,24 @@
           garden[i].mature = true;
           statusSpan.textContent = "Mature: " + produceName;
           let btn = slot.querySelector('button');
-          if(btn) btn.style.display = 'none';
+          if (btn) btn.style.display = 'none';
         } else if (!garden[i].mature) {
           statusSpan.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
-          if(Date.now() - garden[i].wateredTime > 5*60000) {
-            if(!slot.querySelector('.waterBtn')){
+          if (Date.now() - garden[i].wateredTime > 5 * 60000) {
+            if (!slot.querySelector('.waterBtn')) {
               let waterBtn = document.createElement('button');
               waterBtn.className = 'waterBtn';
               waterBtn.textContent = "Water";
-              waterBtn.onclick = function(){ waterPlant(i); };
+              waterBtn.onclick = function() { waterPlant(i); };
               slot.appendChild(waterBtn);
             }
           }
-          if(!garden[i].fertilized && !slot.querySelector('.fertilizeBtn')){
+          if (!garden[i].fertilized && !slot.querySelector('.fertilizeBtn')) {
             let fertBtn = document.createElement('button');
-              fertBtn.className = 'fertilizeBtn';
-              fertBtn.textContent = "Fertilize";
-              fertBtn.onclick = function(){ fertilizePlant(i); };
-              slot.appendChild(fertBtn);
+            fertBtn.className = 'fertilizeBtn';
+            fertBtn.textContent = "Fertilize";
+            fertBtn.onclick = function() { fertilizePlant(i); };
+            slot.appendChild(fertBtn);
           }
         }
       }
@@ -970,7 +976,7 @@
         garden[11].mushrooms = 5;
         treeStatus.textContent = "Mature: " + produceName + " (" + garden[11].mushrooms + " mushrooms)";
         let btn = treeSlot.querySelector('button');
-        if(btn) btn.style.display = 'none';
+        if (btn) btn.style.display = 'none';
       } else if (!garden[11].mature) {
         treeStatus.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
       }
@@ -996,7 +1002,7 @@
     let selectedName = document.getElementById('plantTypeSelect').value;
     let selectedPlant = plantTypes.find(pt => pt.name === selectedName);
     let seeds = parseInt(localStorage.getItem('seeds')) || 0;
-    if(seeds <= 0) {
+    if (seeds <= 0) {
       alert("No seeds available. Purchase from the Grocery Store.");
       closePlantSelectionModal();
       return;
@@ -1108,13 +1114,13 @@
     localStorage.setItem('voltage', voltage);
   }
   function evaluatePowerOutput() {
-    if(windSpeed >= 40 && windSpeed <= 70 && powerOutputConfirmed) {
+    if (windSpeed >= 40 && windSpeed <= 70 && powerOutputConfirmed) {
       powerStatus = "On";
     } else {
       powerStatus = "Off";
     }
     document.getElementById('powerStatusDisplay').textContent = powerStatus;
-    if(powerStatus === "Off") {
+    if (powerStatus === "Off") {
       alert("Power is insufficient! Flats will experience reduced services.");
     }
   }
@@ -1152,7 +1158,7 @@
     localStorage.setItem('garbageLevel', garbageLevel);
     localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
     document.getElementById('garbageDisplay').textContent = garbageLevel;
-    if(garbageLevel > 80) {
+    if (garbageLevel > 80) {
       alert("High garbage levels detected! The community is getting sick.");
     }
   }
@@ -1195,8 +1201,8 @@
   window.onload = function() {
     // Generate room number options
     var roomSelect = document.getElementById('roomNumber');
-    if(roomSelect) {
-      for (let i=1; i<=25; i++){
+    if (roomSelect) {
+      for (let i = 1; i <= 25; i++) {
         let option = document.createElement('option');
         option.value = i;
         option.textContent = "Room " + i;
@@ -1216,13 +1222,13 @@
     }
     // Generate plant slots
     var plantSlotsDiv = document.getElementById("plantSlots");
-    if(plantSlotsDiv) {
+    if (plantSlotsDiv) {
       plantSlotsDiv.innerHTML = "";
-      for(let i = 1; i<=10; i++){
+      for (let i = 1; i <= 10; i++) {
         let slotDiv = document.createElement("div");
         slotDiv.className = "slot";
         slotDiv.id = "slot" + i;
-        slotDiv.innerHTML = 'Slot ' + i + ': <span class="status">Empty</span> <button onclick="openPlantSelectionModal('+ i +')">Plant Seed</button>';
+        slotDiv.innerHTML = 'Slot ' + i + ': <span class="status">Empty</span> <button onclick="openPlantSelectionModal(' + i + ')">Plant Seed</button>';
         plantSlotsDiv.appendChild(slotDiv);
       }
       let treeDiv = document.createElement("div");
@@ -1238,7 +1244,7 @@
     updateVoltage();
     updateGarbageDisplay();
     updateSeason();
-    if(localStorage.getItem('playerName')){
+    if (localStorage.getItem('playerName')) {
       checkCharacterExistence();
     }
     setInterval(updateVoltage, 5000);
