@@ -761,11 +761,11 @@
   }
 
   // ----------------------------
-  // Room Interaction & Chat Functions (with Auto-create Room Document)
+  // Room Interaction & Chat Functions (Removed Auto-create Room Document)
   // ----------------------------
   let currentRoomInteraction = "";
   function openRoomInteraction(roomName) {
-    // Query the "rooms" collection to check if the room document exists.
+    // Query the "rooms" collection to check the owner of the room.
     const roomDocRef = db.collection("rooms").doc(roomName);
     roomDocRef.get().then(doc => {
       if (doc.exists) {
@@ -781,17 +781,8 @@
           document.getElementById('roomInteractionModal').style.display = 'block';
         }
       } else {
-        // If the room document does not exist, auto-create it with an empty "owner" field.
-        roomDocRef.set({ owner: "" })
-          .then(() => {
-            document.getElementById('interactionRoomName').textContent = roomName;
-            document.getElementById('roomInteractionModal').style.display = 'block';
-          })
-          .catch(error => {
-            console.error("Error creating room document:", error);
-            document.getElementById('interactionRoomName').textContent = roomName;
-            document.getElementById('roomInteractionModal').style.display = 'block';
-          });
+        // If the room document does not exist, alert the user.
+        alert("Room " + roomName + " does not exist. Please contact support.");
       }
     }).catch(error => {
       console.error("Error fetching room data:", error);
@@ -1263,7 +1254,7 @@
   };
 
   // ----------------------------
-  // Room Interaction & Chat Functions (with Auto-create Room Document)
+  // Room Interaction & Chat Functions (Removed Auto-create Room Document)
   // ----------------------------
   let currentRoomInteraction = "";
   function openRoomInteraction(roomName) {
@@ -1283,17 +1274,8 @@
           document.getElementById('roomInteractionModal').style.display = 'block';
         }
       } else {
-        // If the room document does not exist, auto-create it with an empty "owner" field.
-        roomDocRef.set({ owner: "" })
-          .then(() => {
-            document.getElementById('interactionRoomName').textContent = roomName;
-            document.getElementById('roomInteractionModal').style.display = 'block';
-          })
-          .catch(error => {
-            console.error("Error creating room document:", error);
-            document.getElementById('interactionRoomName').textContent = roomName;
-            document.getElementById('roomInteractionModal').style.display = 'block';
-          });
+        // If the room document does not exist, alert the user.
+        alert("Room " + roomName + " does not exist. Please contact support.");
       }
     }).catch(error => {
       console.error("Error fetching room data:", error);
