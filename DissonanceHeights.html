@@ -398,40 +398,40 @@
     <div id="garbageLog"></div>
   </div>
 
-<!-- Grocery Store Panel -->
-<div id="grocery-panel" class="panel">
-  <h2>Grocery Store</h2>
-  <p>Purchase essential items. Prices may vary with electricity availability.</p>
-  <div class="grocery-item">
-    <p><strong>Food Staples</strong> - $10</p>
-    <button onclick="buyItem('Food Staples')">Buy Food</button>
+  <!-- Grocery Store Panel -->
+  <div id="grocery-panel" class="panel">
+    <h2>Grocery Store</h2>
+    <p>Purchase essential items. Prices may vary with electricity availability.</p>
+    <div class="grocery-item">
+      <p><strong>Food Staples</strong> - $10</p>
+      <button onclick="buyItem('Food Staples')">Buy Food</button>
+    </div>
+    <div class="grocery-item">
+      <p><strong>Seeds</strong> (for Community Garden) - $2 each</p>
+      <button onclick="buyItem('Seeds')">Buy Seeds</button>
+    </div>
+    <div class="grocery-item">
+      <p><strong>Maintenance Essentials</strong> - $5</p>
+      <button onclick="buyItem('Maintenance Essentials')">Buy Maintenance</button>
+    </div>
+    <div class="grocery-item">
+      <p><strong>Room Decorations</strong> - $7</p>
+      <button onclick="buyItem('Room Decoration')">Buy Decoration</button>
+    </div>
+    <div class="grocery-item">
+      <p><strong>Alcohol</strong> - $3</p>
+      <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
+    </div>
+    <div class="grocery-item">
+      <p><strong>Cigarettes</strong> - $4</p>
+      <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
+    </div>
+    <!-- Harvest Inventory Section -->
+    <h3>Your Harvest Inventory</h3>
+    <div id="harvestInventory"></div>
+    <button onclick="sellHarvest()">Sell Harvest</button>
+    <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
   </div>
-  <div class="grocery-item">
-    <p><strong>Seeds</strong> (for Community Garden) - $2 each</p>
-    <button onclick="buyItem('Seeds')">Buy Seeds</button>
-  </div>
-  <div class="grocery-item">
-    <p><strong>Maintenance Essentials</strong> - $5</p>
-    <button onclick="buyItem('Maintenance Essentials')">Buy Maintenance</button>
-  </div>
-  <div class="grocery-item">
-    <p><strong>Room Decorations</strong> - $7</p>
-    <button onclick="buyItem('Room Decoration')">Buy Decoration</button>
-  </div>
-  <div class="grocery-item">
-    <p><strong>Alcohol</strong> - $3</p>
-    <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
-  </div>
-  <div class="grocery-item">
-    <p><strong>Cigarettes</strong> - $4</p>
-    <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
-  </div>
-  <!-- Harvest Inventory Section -->
-  <h3>Your Harvest Inventory</h3>
-  <div id="harvestInventory"></div>
-  <button onclick="sellHarvest()">Sell Harvest</button>
-  <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
-</div>
 
   <!-- Community Garden Panel -->
   <div id="garden-panel" class="panel">
@@ -1155,39 +1155,39 @@
     }
   }
 
-// ----------------------------
-// Grocery Store: Sell Harvested Produce
-// ----------------------------
-function sellHarvest() {
-  let totalEarnings = 0;
-  // For each produce in harvestInventory, find its price from plantTypes or mushroomTypes arrays.
-  for (let produce in harvestInventory) {
-    let quantity = harvestInventory[produce];
-    let price = 0;
-    // Try to find in plantTypes
-    let plant = plantTypes.find(p => p.name === produce);
-    if (!plant) {
-      // Try in mushroomTypes if not found in plantTypes
-      plant = mushroomTypes.find(p => p.name === produce);
+  // ----------------------------
+  // Grocery Store: Sell Harvested Produce
+  // ----------------------------
+  function sellHarvest() {
+    let totalEarnings = 0;
+    // For each produce in harvestInventory, find its price from plantTypes or mushroomTypes arrays.
+    for (let produce in harvestInventory) {
+      let quantity = harvestInventory[produce];
+      let price = 0;
+      // Try to find in plantTypes
+      let plant = plantTypes.find(p => p.name === produce);
+      if (!plant) {
+        // Try in mushroomTypes if not found in plantTypes
+        plant = mushroomTypes.find(p => p.name === produce);
+      }
+      if (plant) {
+        price = plant.price;
+      }
+      totalEarnings += price * quantity;
     }
-    if (plant) {
-      price = plant.price;
+    if (totalEarnings > 0) {
+      let currentMoney = parseInt(localStorage.getItem('money')) || 50;
+      currentMoney += totalEarnings;
+      localStorage.setItem('money', currentMoney);
+      alert("You sold your harvest for $" + totalEarnings + ". Current money: $" + currentMoney);
+      // Clear harvest inventory
+      harvestInventory = {};
+      updateHarvestInventoryUI();
+      updatePlayerStatus();
+    } else {
+      alert("Nothing to sell in your harvest inventory.");
     }
-    totalEarnings += price * quantity;
   }
-  if (totalEarnings > 0) {
-    let currentMoney = parseInt(localStorage.getItem('money')) || 50;
-    currentMoney += totalEarnings;
-    localStorage.setItem('money', currentMoney);
-    alert("You sold your harvest for $" + totalEarnings + ". Current money: $" + currentMoney);
-    // Clear harvest inventory
-    harvestInventory = {};
-    updateHarvestInventoryUI();
-    updatePlayerStatus();
-  } else {
-    alert("Nothing to sell in your harvest inventory.");
-  }
-}
 
   // ----------------------------
   // Room Interaction & Chat Functions
@@ -1417,14 +1417,28 @@ function sellHarvest() {
       updateVoltage();
     }
   }
-  // Update garbage more frequently (every minute)
+  // Updated garbage functions: update based on elapsed time and reset timestamp upon clear.
   function updateGarbageDisplay() {
-    garbageLevel = Math.min(100, Number(garbageLevel) + 1);
-    localStorage.setItem('garbageLevel', garbageLevel);
-    document.getElementById('garbageDisplay').textContent = garbageLevel;
-    if (garbageLevel > 80) {
-      alert("High garbage levels detected! The community is getting sick.");
+    const now = Date.now();
+    const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
+    if (elapsedMinutes > 0) {
+      garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
+      lastGarbageUpdate = now;
+      localStorage.setItem('garbageLevel', garbageLevel);
+      localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
+      document.getElementById('garbageDisplay').textContent = garbageLevel;
+      if (garbageLevel > 80) {
+        alert("High garbage levels detected! The community is getting sick.");
+      }
     }
+  }
+  function clearGarbage() {
+    garbageLevel = 0;
+    lastGarbageUpdate = Date.now();
+    localStorage.setItem('garbageLevel', garbageLevel);
+    localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
+    document.getElementById('garbageDisplay').textContent = garbageLevel;
+    logGarbageMessage("Garbage cleared by player.");
   }
   function simulateRandomEvent() {
     if (Date.now() - lastInteractionTime > 30000) {
