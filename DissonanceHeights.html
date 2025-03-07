@@ -761,7 +761,7 @@
   }
 
   // ----------------------------
-  // Room Interaction & Chat Functions
+  // Room Interaction & Chat Functions (Manual Room Documents)
   // ----------------------------
   let currentRoomInteraction = "";
   function openRoomInteraction(roomName) {
@@ -1261,7 +1261,7 @@
     db.collection("rooms").doc(roomName).get().then(doc => {
       if (doc.exists) {
         const roomData = doc.data();
-        const roomOwner = roomData.owner; // Expect an "owner" field
+        const roomOwner = roomData.owner; // The room document includes an "owner" field
         const currentPlayer = localStorage.getItem("playerName");
         if (currentPlayer === roomOwner) {
           // If current user is the owner, open chat directly without knocking.
