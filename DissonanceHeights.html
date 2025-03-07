@@ -422,14 +422,6 @@
     <button onclick="closeChat()">Close Chat</button>
   </div>
 
-  <!-- Modal: Room Interaction Options -->
-  <div id="roomInteractionModal" class="modal" data-room-name="">
-    <h2>Room Interaction</h2>
-    <p>How do you want to interact with <span id="interactionRoomName"></span>?</p>
-    <button onclick="chooseKnock()">Knock on Door</button>
-    <button onclick="closeRoomInteractionModal()">Cancel</button>
-  </div>
-
   <!-- Modal: Knock Chat -->
   <div id="knockModal" class="modal">
     <h2>Knock Request</h2>
@@ -761,37 +753,30 @@
   // ----------------------------
   // Room Interaction & Chat Functions (Manual Room Documents)
   // ----------------------------
-  // The current room name is now stored in the roomInteractionModal's dataset.
+  // Removed duplicate global variables. Instead, we use a global variable for current room name.
+  let tempRoomName = "";
   function openRoomInteraction(roomName) {
-    // Set the current room name on the modal's data attribute.
-    document.getElementById('roomInteractionModal').dataset.roomName = roomName;
     // Query the "rooms" collection to check the owner of the room.
     db.collection("rooms").doc(roomName).get().then(doc => {
       if (doc.exists) {
         const roomData = doc.data();
-        const roomOwner = roomData.owner;
+        const roomOwner = roomData.owner; // The room document includes an "owner" field
         const currentPlayer = localStorage.getItem("playerName");
         if (currentPlayer === roomOwner) {
           openRoomChat(roomName);
         } else {
-          document.getElementById('interactionRoomName').textContent = roomName;
-          document.getElementById('roomInteractionModal').style.display = 'block';
+          // Store the room name in a temporary variable and show the knock modal
+          tempRoomName = roomName;
+          document.getElementById('knockModal').style.display = 'block';
         }
       } else {
         alert("Room " + roomName + " does not exist. Please contact support.");
       }
     }).catch(error => {
       console.error("Error fetching room data:", error);
-      document.getElementById('interactionRoomName').textContent = roomName;
-      document.getElementById('roomInteractionModal').style.display = 'block';
+      tempRoomName = roomName;
+      document.getElementById('knockModal').style.display = 'block';
     });
-  }
-  function closeRoomInteractionModal() {
-    document.getElementById('roomInteractionModal').style.display = 'none';
-  }
-  function chooseKnock() {
-    closeRoomInteractionModal();
-    document.getElementById('knockModal').style.display = 'block';
   }
   function closeKnockModal() {
     document.getElementById('knockModal').style.display = 'none';
@@ -803,9 +788,8 @@
       return;
     }
     closeKnockModal();
-    let roomName = document.getElementById('roomInteractionModal').dataset.roomName;
-    if (confirm("Room owner, do you approve this knock request from " + roomName + "?")) {
-      openRoomChat(roomName);
+    if (confirm("Room owner, do you approve this knock request from " + tempRoomName + "?")) {
+      openRoomChat(tempRoomName);
     } else {
       alert("Your knock was rejected.");
     }
@@ -1253,11 +1237,9 @@
   // ----------------------------
   // Room Interaction & Chat Functions (Manual Room Documents)
   // ----------------------------
-  // currentRoomInteraction code has been removed.
+  // Removed duplicate global declarations. Using a global variable 'tempRoomName' to store the room name for knock requests.
+  let tempRoomName = "";
   function openRoomInteraction(roomName) {
-    // Store the room name in the roomInteractionModal dataset.
-    document.getElementById('roomInteractionModal').dataset.roomName = roomName;
-    // Query the "rooms" collection to check the owner of the room.
     db.collection("rooms").doc(roomName).get().then(doc => {
       if (doc.exists) {
         const roomData = doc.data();
@@ -1266,24 +1248,18 @@
         if (currentPlayer === roomOwner) {
           openRoomChat(roomName);
         } else {
-          document.getElementById('interactionRoomName').textContent = roomName;
-          document.getElementById('roomInteractionModal').style.display = 'block';
+          // Store the room name and show the knock modal
+          tempRoomName = roomName;
+          document.getElementById('knockModal').style.display = 'block';
         }
       } else {
         alert("Room " + roomName + " does not exist. Please contact support.");
       }
     }).catch(error => {
       console.error("Error fetching room data:", error);
-      document.getElementById('interactionRoomName').textContent = roomName;
-      document.getElementById('roomInteractionModal').style.display = 'block';
+      tempRoomName = roomName;
+      document.getElementById('knockModal').style.display = 'block';
     });
-  }
-  function closeRoomInteractionModal() {
-    document.getElementById('roomInteractionModal').style.display = 'none';
-  }
-  function chooseKnock() {
-    closeRoomInteractionModal();
-    document.getElementById('knockModal').style.display = 'block';
   }
   function closeKnockModal() {
     document.getElementById('knockModal').style.display = 'none';
@@ -1295,9 +1271,8 @@
       return;
     }
     closeKnockModal();
-    let roomName = document.getElementById('roomInteractionModal').dataset.roomName;
-    if (confirm("Room owner, do you approve this knock request from " + roomName + "?")) {
-      openRoomChat(roomName);
+    if (confirm("Room owner, do you approve this knock request from " + tempRoomName + "?")) {
+      openRoomChat(tempRoomName);
     } else {
       alert("Your knock was rejected.");
     }
