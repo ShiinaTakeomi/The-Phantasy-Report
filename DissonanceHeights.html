@@ -506,7 +506,8 @@
 
   // Global variables for current room and mode
   let currentRoom = "";
-  let doorChatMode = false; // false: room chat (inside), true: door chat (visitor)
+  // doorChatMode: false = room chat (inside), true = door chat (visitor)
+  let doorChatMode = false;
 
   // ----------------------------
   // In-App Notification Listener
@@ -839,7 +840,7 @@
   // ----------------------------
   // Room Interaction & Chat Functions
   // ----------------------------
-  // Instead of directly opening room chat, we now check room ownership.
+  // Check room ownership before opening chat.
   function openRoomInteraction(roomName) {
     currentRoom = roomName;
     db.collection("rooms").doc(roomName).get().then(doc => {
@@ -847,10 +848,10 @@
         const roomData = doc.data();
         const currentPlayer = localStorage.getItem("playerName");
         if (currentPlayer === roomData.owner) {
-          // If the current user is the owner, open room chat directly.
+          // If owner, open room chat (inside)
           openRoomChat(roomName);
         } else {
-          // Otherwise, show the door modal for front door interaction.
+          // If visitor, show door modal
           showDoorModal(roomName);
         }
       } else {
@@ -867,7 +868,7 @@
     document.getElementById('chatLog').innerHTML = "";
     document.getElementById('chatPanel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
-    // Listen from the "roomMessages" collection.
+    // Listen from messages with chatType "room"
     listenForMessages(roomName);
   }
   function openDoorChat(roomName) {
@@ -876,16 +877,16 @@
     document.getElementById('chatLog').innerHTML = "";
     document.getElementById('chatPanel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
-    // Listen from the "doorMessages" collection.
+    // Listen from messages with chatType "door"
     listenForMessages(roomName);
   }
   function listenForMessages(roomName) {
     const chatLog = document.getElementById('chatLog');
-    // Choose collection based on doorChatMode.
-    const collectionName = doorChatMode ? "doorMessages" : "roomMessages";
-    const messagesRef = db.collection(collectionName);
+    const messagesRef = db.collection("messages");
+    // Query messages for the current room and chatType
     messagesRef
       .where("room", "==", roomName)
+      .where("chatType", "==", doorChatMode ? "door" : "room")
       .orderBy("timestamp")
       .onSnapshot((querySnapshot) => {
         chatLog.innerHTML = "";
@@ -907,12 +908,12 @@
     const msg = document.getElementById('chatInput').value;
     if (msg.trim() !== "") {
       const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
-      const collectionName = doorChatMode ? "doorMessages" : "roomMessages";
       try {
-        await db.collection(collectionName).add({
+        await db.collection("messages").add({
           room: currentRoom,
           sender: characterName,
           content: msg,
+          chatType: doorChatMode ? "door" : "room",
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
         document.getElementById('chatInput').value = "";
