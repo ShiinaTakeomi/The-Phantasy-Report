@@ -763,6 +763,7 @@
   // ----------------------------
   // Room Interaction & Chat Functions (Manual Room Documents)
   // ----------------------------
+  // Removed duplicate declaration: We now have only one global declaration for currentRoomInteraction.
   let currentRoomInteraction = "";
   function openRoomInteraction(roomName) {
     // Query the "rooms" collection to check the owner of the room.
@@ -1255,6 +1256,7 @@
   // ----------------------------
   // Room Interaction & Chat Functions (Manual Room Documents)
   // ----------------------------
+  // Only one global declaration for currentRoomInteraction
   let currentRoomInteraction = "";
   function openRoomInteraction(roomName) {
     // Query the "rooms" collection to check the owner of the room.
