@@ -191,26 +191,29 @@
       cursor: pointer;
       width: 100%;
     }
-    /* Chat Panel */
-    #chatPanel {
-      display: none;
-      border: 2px solid #444;
-      padding: 10px;
-      width: 400px;
-      margin: 20px auto;
-      background: rgba(0,0,0,0.8);
-      border-radius: 8px;
-    }
-    #chatLog {
-      border: 1px solid #ccc;
-      padding: 10px;
-      height: 100px;
-      overflow-y: auto;
-      background: rgba(255,255,255,0.1);
-      margin-bottom: 10px;
-      color: #fff;
-      border-radius: 4px;
-    }
+/* Responsive Chat Panel */
+#chatPanel {
+  display: none;
+  border: 2px solid #444;
+  padding: 10px;
+  width: 90%;
+  max-width: 600px;
+  margin: 20px auto;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+}
+
+/* Responsive Chat Log */
+#chatLog {
+  border: 1px solid #ccc;
+  padding: 10px;
+  height: 200px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.1);
+  margin-bottom: 10px;
+  color: #fff;
+  border-radius: 4px;
+}
     /* Biodata Panel */
     #playerStatus {
       margin: 20px auto;
