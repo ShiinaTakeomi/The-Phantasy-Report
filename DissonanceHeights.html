@@ -1432,13 +1432,22 @@
       }
     }
   }
+  // New function: log garbage messages to the garbage log panel.
+  function logGarbageMessage(message) {
+    const garbageLog = document.getElementById('garbageLog');
+    const timestamp = new Date().toLocaleTimeString();
+    garbageLog.innerHTML += `<p>[${timestamp}] ${message}</p>`;
+    garbageLog.scrollTop = garbageLog.scrollHeight;
+  }
   function clearGarbage() {
     garbageLevel = 0;
     lastGarbageUpdate = Date.now();
     localStorage.setItem('garbageLevel', garbageLevel);
     localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
     document.getElementById('garbageDisplay').textContent = garbageLevel;
-    logGarbageMessage("Garbage cleared by player.");
+    // Get the character's name for roleplay flavor
+    const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
+    logGarbageMessage(`Garbage cleared by ${characterName}.`);
   }
   function simulateRandomEvent() {
     if (Date.now() - lastInteractionTime > 30000) {
