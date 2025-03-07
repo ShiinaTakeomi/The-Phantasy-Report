@@ -1154,39 +1154,39 @@
     }
   }
 
-  // ----------------------------
-  // Grocery Store: Sell Harvested Produce
-  // ----------------------------
-  function sellHarvest() {
-    let totalEarnings = 0;
-    // For each produce in harvestInventory, find its price from plantTypes or mushroomTypes arrays.
-    for (let produce in harvestInventory) {
-      let quantity = harvestInventory[produce];
-      let price = 0;
-      // Try to find in plantTypes
-      let plant = plantTypes.find(p => p.name === produce);
-      if (!plant) {
-        // Try in mushroomTypes if not found in plantTypes
-        plant = mushroomTypes.find(p => p.name === produce);
-      }
-      if (plant) {
-        price = plant.price;
-      }
-      totalEarnings += price * quantity;
+// ----------------------------
+// Grocery Store: Sell Harvested Produce
+// ----------------------------
+function sellHarvest() {
+  let totalEarnings = 0;
+  // For each produce in harvestInventory, find its price from plantTypes or mushroomTypes arrays.
+  for (let produce in harvestInventory) {
+    let quantity = harvestInventory[produce];
+    let price = 0;
+    // Try to find in plantTypes
+    let plant = plantTypes.find(p => p.name === produce);
+    if (!plant) {
+      // Try in mushroomTypes if not found in plantTypes
+      plant = mushroomTypes.find(p => p.name === produce);
     }
-    if (totalEarnings > 0) {
-      let currentMoney = parseInt(localStorage.getItem('money')) || 50;
-      currentMoney += totalEarnings;
-      localStorage.setItem('money', currentMoney);
-      alert("You sold your harvest for $" + totalEarnings + ". Current money: $" + currentMoney);
-      // Clear harvest inventory
-      harvestInventory = {};
-      updateHarvestInventoryUI();
-      updatePlayerStatus();
-    } else {
-      alert("Nothing to sell in your harvest inventory.");
+    if (plant) {
+      price = plant.price;
     }
+    totalEarnings += price * quantity;
   }
+  if (totalEarnings > 0) {
+    let currentMoney = parseInt(localStorage.getItem('money')) || 50;
+    currentMoney += totalEarnings;
+    localStorage.setItem('money', currentMoney);
+    alert("You sold your harvest for $" + totalEarnings + ". Current money: $" + currentMoney);
+    // Clear harvest inventory
+    harvestInventory = {};
+    updateHarvestInventoryUI();
+    updatePlayerStatus();
+  } else {
+    alert("Nothing to sell in your harvest inventory.");
+  }
+}
 
   // ----------------------------
   // Room Interaction & Chat Functions
