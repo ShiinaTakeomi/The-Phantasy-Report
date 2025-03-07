@@ -761,15 +761,16 @@
   }
 
   // ----------------------------
-  // Room Interaction & Chat Functions
+  // Room Interaction & Chat Functions (with Auto-create Room Document)
   // ----------------------------
   let currentRoomInteraction = "";
   function openRoomInteraction(roomName) {
-    // New code: Query the "rooms" collection to check the owner of the room.
-    db.collection("rooms").doc(roomName).get().then(doc => {
+    // Query the "rooms" collection to check if the room document exists.
+    const roomDocRef = db.collection("rooms").doc(roomName);
+    roomDocRef.get().then(doc => {
       if (doc.exists) {
         const roomData = doc.data();
-        const roomOwner = roomData.owner; // The room document should include an "owner" field
+        const roomOwner = roomData.owner; // Expect an "owner" field
         const currentPlayer = localStorage.getItem("playerName");
         if (currentPlayer === roomOwner) {
           // If current user is the owner, open chat directly without knocking.
@@ -780,9 +781,17 @@
           document.getElementById('roomInteractionModal').style.display = 'block';
         }
       } else {
-        // If the room document does not exist, fallback to knock modal.
-        document.getElementById('interactionRoomName').textContent = roomName;
-        document.getElementById('roomInteractionModal').style.display = 'block';
+        // If the room document does not exist, auto-create it with an empty "owner" field.
+        roomDocRef.set({ owner: "" })
+          .then(() => {
+            document.getElementById('interactionRoomName').textContent = roomName;
+            document.getElementById('roomInteractionModal').style.display = 'block';
+          })
+          .catch(error => {
+            console.error("Error creating room document:", error);
+            document.getElementById('interactionRoomName').textContent = roomName;
+            document.getElementById('roomInteractionModal').style.display = 'block';
+          });
       }
     }).catch(error => {
       console.error("Error fetching room data:", error);
@@ -1252,6 +1261,128 @@
     setInterval(updateGarbageDisplay, 3600000);
     setInterval(updateGardenUI, 60000);
   };
+
+  // ----------------------------
+  // Room Interaction & Chat Functions (with Auto-create Room Document)
+  // ----------------------------
+  let currentRoomInteraction = "";
+  function openRoomInteraction(roomName) {
+    // Query the "rooms" collection to check the owner of the room.
+    const roomDocRef = db.collection("rooms").doc(roomName);
+    roomDocRef.get().then(doc => {
+      if (doc.exists) {
+        const roomData = doc.data();
+        const roomOwner = roomData.owner; // Expect an "owner" field
+        const currentPlayer = localStorage.getItem("playerName");
+        if (currentPlayer === roomOwner) {
+          // If current user is the owner, open chat directly without knocking.
+          openRoomChat(roomName);
+        } else {
+          // Otherwise, show the knock modal to request entry.
+          document.getElementById('interactionRoomName').textContent = roomName;
+          document.getElementById('roomInteractionModal').style.display = 'block';
+        }
+      } else {
+        // If the room document does not exist, auto-create it with an empty "owner" field.
+        roomDocRef.set({ owner: "" })
+          .then(() => {
+            document.getElementById('interactionRoomName').textContent = roomName;
+            document.getElementById('roomInteractionModal').style.display = 'block';
+          })
+          .catch(error => {
+            console.error("Error creating room document:", error);
+            document.getElementById('interactionRoomName').textContent = roomName;
+            document.getElementById('roomInteractionModal').style.display = 'block';
+          });
+      }
+    }).catch(error => {
+      console.error("Error fetching room data:", error);
+      document.getElementById('interactionRoomName').textContent = roomName;
+      document.getElementById('roomInteractionModal').style.display = 'block';
+    });
+  }
+  function closeRoomInteractionModal() {
+    document.getElementById('roomInteractionModal').style.display = 'none';
+  }
+  function chooseKnock() {
+    closeRoomInteractionModal();
+    document.getElementById('knockModal').style.display = 'block';
+  }
+  function closeKnockModal() {
+    document.getElementById('knockModal').style.display = 'none';
+  }
+  function sendKnock() {
+    let message = document.getElementById('knockMessage').value;
+    if (message.trim() === "") {
+      alert("Please type a message before knocking.");
+      return;
+    }
+    closeKnockModal();
+    if (confirm("Room owner, do you approve this knock request from " + currentRoomInteraction + "?")) {
+      openRoomChat(currentRoomInteraction);
+    } else {
+      alert("Your knock was rejected.");
+    }
+  }
+  let currentRoom = "";
+  function openRoomChat(roomName) {
+    currentRoom = roomName;
+    document.getElementById('chatRoomTitle').textContent = roomName + " Chat";
+    document.getElementById('chatLog').innerHTML = "";
+    document.getElementById('chatPanel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+    listenForMessages(roomName);
+  }
+  function listenForMessages(roomName) {
+    const chatLog = document.getElementById('chatLog');
+    const messagesRef = db.collection("messages");
+    messagesRef
+      .where("room", "==", roomName)
+      .orderBy("timestamp")
+      .onSnapshot((querySnapshot) => {
+        chatLog.innerHTML = "";
+        querySnapshot.forEach((doc) => {
+          const message = doc.data();
+          const p = document.createElement('p');
+          p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+          chatLog.appendChild(p);
+        });
+        chatLog.scrollTop = chatLog.scrollHeight;
+      });
+  }
+  function closeChat() {
+    document.getElementById('chatPanel').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    currentRoom = "";
+  }
+  async function sendChatMessage() {
+    const msg = document.getElementById('chatInput').value;
+    if (msg.trim() !== "") {
+      const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
+      try {
+        await db.collection("messages").add({
+          room: currentRoom,
+          sender: characterName,
+          content: msg,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('chatInput').value = "";
+      } catch (error) {
+        console.error("Error sending message:", error);
+      }
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+      chatInput.addEventListener('keydown', function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          sendChatMessage();
+        }
+      });
+    }
+  });
 </script>
 </body>
 </html>
