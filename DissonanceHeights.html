@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -310,7 +309,7 @@
       <button onclick="togglePlayerStatus()">Biodata</button>
     </div>
     <div id="playerStatus">
-      <!-- Biodata updated dynamically -->
+      <!-- Biodata updated dynamically; includes room info -->
     </div>
   </div>
 
@@ -422,33 +421,6 @@
     <button onclick="sendChatMessage()">Send</button>
     <button onclick="closeChat()">Close Chat</button>
   </div>
-
-  <!-- Modal: Room Interaction Options -->
-  <div id="roomInteractionModal" class="modal">
-    <h2>Room Interaction</h2>
-    <p>How do you want to interact with <span id="interactionRoomName"></span>?</p>
-    <button onclick="chooseKnock()">Knock on Door</button>
-    <button onclick="closeRoomInteractionModal()">Cancel</button>
-  </div>
-
-  <!-- Modal: Knock Chat -->
-  <div id="knockModal" class="modal">
-    <h2>Knock Request</h2>
-    <p>Type a brief message (max 50 characters):</p>
-    <input type="text" id="knockMessage" maxlength="50" placeholder="Your knock message...">
-    <button onclick="sendKnock()">Send Knock</button>
-    <button onclick="closeKnockModal()">Cancel</button>
-  </div>
-
-  <!-- Modal: Plant Selection -->
-  <div id="plantSelectionModal" class="modal">
-    <h2>Select Plant Type</h2>
-    <select id="plantTypeSelect">
-      <!-- Options populated dynamically -->
-    </select>
-    <button onclick="confirmPlantSelection()">Plant</button>
-    <button onclick="closePlantSelectionModal()">Cancel</button>
-  </div>
 </div>
 
 <script>
@@ -544,7 +516,6 @@
         alert("Registration error: " + error.message);
       });
   }
-  // New Google Sign-In Function
   function googleSignIn() {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider)
@@ -558,7 +529,7 @@
   }
   auth.onAuthStateChanged(user => {
     if(user){
-      if(!localStorage.getItem('playerName')){
+      if (!localStorage.getItem('playerName')) {
         localStorage.setItem('playerName', user.email);
       }
       checkCharacterExistence();
@@ -638,6 +609,10 @@
         document.getElementById('characterCreation').style.display = 'none';
         document.getElementById('mainGame').style.display = 'block';
         updatePlayerStatus();
+        // Update room ownership based on chosen roomNumber.
+        db.collection('rooms').doc('Room ' + roomNumber).set({
+          owner: playerName
+        }, { merge: true });
       })
       .catch((error) => {
         console.error("Error creating character:", error);
@@ -683,6 +658,10 @@
       localStorage.setItem('characterName', newName);
       isEditing = false;
       alert('Biodata updated successfully.');
+      // Update room ownership if roomNumber changed.
+      db.collection('rooms').doc('Room ' + newRoomNumber).set({
+        owner: newName
+      }, { merge: true });
     })
     .catch((error) => {
       console.error("Error updating biodata:", error);
@@ -762,59 +741,34 @@
   }
 
   // ----------------------------
-  // Room Interaction & Chat Functions
-  // ----------------------------
+  // Room Interaction & Chat Functions (Manual Room Documents)
+  // (Removed duplicate declarations of currentRoomInteraction and currentRoom)
   let currentRoomInteraction = "";
+  let currentRoom = "";
   function openRoomInteraction(roomName) {
-    // New code: Query the "rooms" collection to check the owner of the room.
+    // Query the "rooms" collection to check the owner of the room.
     db.collection("rooms").doc(roomName).get().then(doc => {
       if (doc.exists) {
         const roomData = doc.data();
-        const roomOwner = roomData.owner; // The room document should include an "owner" field
+        const roomOwner = roomData.owner; // The room document includes an "owner" field
         const currentPlayer = localStorage.getItem("playerName");
         if (currentPlayer === roomOwner) {
-          // If current user is the owner, open chat directly without knocking.
+          // If current user is the owner, open chat directly.
           openRoomChat(roomName);
         } else {
-          // Otherwise, show the knock modal to request entry.
-          document.getElementById('interactionRoomName').textContent = roomName;
-          document.getElementById('roomInteractionModal').style.display = 'block';
+          // Otherwise, just open the chat in read-only mode or prompt a knock request.
+          // (For this updated code, we simply open the chat panel.)
+          openRoomChat(roomName);
         }
       } else {
-        // If the room document does not exist, fallback to knock modal.
-        document.getElementById('interactionRoomName').textContent = roomName;
-        document.getElementById('roomInteractionModal').style.display = 'block';
+        // If the room document does not exist, alert the user.
+        alert("Room " + roomName + " does not exist. Please contact support.");
       }
     }).catch(error => {
       console.error("Error fetching room data:", error);
-      document.getElementById('interactionRoomName').textContent = roomName;
-      document.getElementById('roomInteractionModal').style.display = 'block';
+      alert("Error fetching room data for " + roomName);
     });
   }
-  function closeRoomInteractionModal() {
-    document.getElementById('roomInteractionModal').style.display = 'none';
-  }
-  function chooseKnock() {
-    closeRoomInteractionModal();
-    document.getElementById('knockModal').style.display = 'block';
-  }
-  function closeKnockModal() {
-    document.getElementById('knockModal').style.display = 'none';
-  }
-  function sendKnock() {
-    let message = document.getElementById('knockMessage').value;
-    if (message.trim() === "") {
-      alert("Please type a message before knocking.");
-      return;
-    }
-    closeKnockModal();
-    if (confirm("Room owner, do you approve this knock request from " + currentRoomInteraction + "?")) {
-      openRoomChat(currentRoomInteraction);
-    } else {
-      alert("Your knock was rejected.");
-    }
-  }
-  let currentRoom = "";
   function openRoomChat(roomName) {
     currentRoom = roomName;
     document.getElementById('chatRoomTitle').textContent = roomName + " Chat";
