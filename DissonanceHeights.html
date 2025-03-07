@@ -423,7 +423,7 @@
   </div>
 
   <!-- Modal: Room Interaction Options -->
-  <div id="roomInteractionModal" class="modal">
+  <div id="roomInteractionModal" class="modal" data-room-name="">
     <h2>Room Interaction</h2>
     <p>How do you want to interact with <span id="interactionRoomName"></span>?</p>
     <button onclick="chooseKnock()">Knock on Door</button>
@@ -543,7 +543,6 @@
         alert("Registration error: " + error.message);
       });
   }
-  // New Google Sign-In Function
   function googleSignIn() {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider)
@@ -750,7 +749,6 @@
         console.error("Error getting player status:", error);
       });
   }
-  // Updated sign-out function that clears all game state and redirects to index.html
   function signOutUser() {
     auth.signOut().then(() => {
       clearGameState();
@@ -763,25 +761,23 @@
   // ----------------------------
   // Room Interaction & Chat Functions (Manual Room Documents)
   // ----------------------------
-  // Only one global declaration for currentRoomInteraction is present now.
-  let currentRoomInteraction = "";
+  // The current room name is now stored in the roomInteractionModal's dataset.
   function openRoomInteraction(roomName) {
+    // Set the current room name on the modal's data attribute.
+    document.getElementById('roomInteractionModal').dataset.roomName = roomName;
     // Query the "rooms" collection to check the owner of the room.
     db.collection("rooms").doc(roomName).get().then(doc => {
       if (doc.exists) {
         const roomData = doc.data();
-        const roomOwner = roomData.owner; // The room document includes an "owner" field
+        const roomOwner = roomData.owner;
         const currentPlayer = localStorage.getItem("playerName");
         if (currentPlayer === roomOwner) {
-          // If current user is the owner, open chat directly without knocking.
           openRoomChat(roomName);
         } else {
-          // Otherwise, show the knock modal to request entry.
           document.getElementById('interactionRoomName').textContent = roomName;
           document.getElementById('roomInteractionModal').style.display = 'block';
         }
       } else {
-        // If the room document does not exist, alert the user.
         alert("Room " + roomName + " does not exist. Please contact support.");
       }
     }).catch(error => {
@@ -807,8 +803,9 @@
       return;
     }
     closeKnockModal();
-    if (confirm("Room owner, do you approve this knock request from " + currentRoomInteraction + "?")) {
-      openRoomChat(currentRoomInteraction);
+    let roomName = document.getElementById('roomInteractionModal').dataset.roomName;
+    if (confirm("Room owner, do you approve this knock request from " + roomName + "?")) {
+      openRoomChat(roomName);
     } else {
       alert("Your knock was rejected.");
     }
@@ -1256,25 +1253,23 @@
   // ----------------------------
   // Room Interaction & Chat Functions (Manual Room Documents)
   // ----------------------------
-  // Only one global declaration for currentRoomInteraction is present.
-  let currentRoomInteraction = "";
+  // currentRoomInteraction code has been removed.
   function openRoomInteraction(roomName) {
+    // Store the room name in the roomInteractionModal dataset.
+    document.getElementById('roomInteractionModal').dataset.roomName = roomName;
     // Query the "rooms" collection to check the owner of the room.
     db.collection("rooms").doc(roomName).get().then(doc => {
       if (doc.exists) {
         const roomData = doc.data();
-        const roomOwner = roomData.owner; // The room document includes an "owner" field
+        const roomOwner = roomData.owner;
         const currentPlayer = localStorage.getItem("playerName");
         if (currentPlayer === roomOwner) {
-          // If current user is the owner, open chat directly without knocking.
           openRoomChat(roomName);
         } else {
-          // Otherwise, show the knock modal to request entry.
           document.getElementById('interactionRoomName').textContent = roomName;
           document.getElementById('roomInteractionModal').style.display = 'block';
         }
       } else {
-        // If the room document does not exist, alert the user.
         alert("Room " + roomName + " does not exist. Please contact support.");
       }
     }).catch(error => {
@@ -1300,8 +1295,9 @@
       return;
     }
     closeKnockModal();
-    if (confirm("Room owner, do you approve this knock request from " + currentRoomInteraction + "?")) {
-      openRoomChat(currentRoomInteraction);
+    let roomName = document.getElementById('roomInteractionModal').dataset.roomName;
+    if (confirm("Room owner, do you approve this knock request from " + roomName + "?")) {
+      openRoomChat(roomName);
     } else {
       alert("Your knock was rejected.");
     }
