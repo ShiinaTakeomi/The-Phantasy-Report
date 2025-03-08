@@ -12,7 +12,7 @@
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      background: 
+      background:
         linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
         url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
       background-size: cover;
@@ -99,10 +99,11 @@
       padding: 5px;
       border-radius: 4px;
     }
+    /* Exit button moved below garbage chute */
     .exit-button {
-      position: fixed;
-      top: 10px;
-      right: 10px;
+      position: absolute;
+      left: 0;
+      top: 530px;
       padding: 10px 15px;
       background-color: #FF4136;
       border: 2px solid #fff;
@@ -268,6 +269,37 @@
       max-width: 300px;
       font-size: 14px;
     }
+    /* New Community Kitchen Panel */
+    #kitchen-panel {
+      display: none;
+      border: 2px solid #444;
+      padding: 20px;
+      width: 600px;
+      margin: 20px auto;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.7);
+    }
+    /* New Water Supplies Panel */
+    #water-panel {
+      display: none;
+      border: 2px solid #444;
+      padding: 20px;
+      width: 600px;
+      margin: 20px auto;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.7);
+    }
+    /* Chat area within panels */
+    .panel .chatArea {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 150px;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.1);
+      margin-bottom: 10px;
+      color: #fff;
+      border-radius: 4px;
+    }
   </style>
   <!-- Firebase SDKs: Auth and Firestore -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
@@ -329,8 +361,8 @@
   <!-- Main Screen -->
   <div id="main-screen">
     <div class="container">
+      <!-- Garbage Chute and Exit Button (Exit below the chute) -->
       <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
-      <!-- Exit Button -->
       <button class="exit-button" onclick="signOutUser()">Exit</button>
       <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
       <div class="grid">
@@ -342,13 +374,13 @@
       </button>
     </div>
     <div class="facilities">
-      <button onclick="handleClick('Community Kitchen')">Community Kitchen</button>
+      <button onclick="openKitchenPanel()">Community Kitchen</button>
       <button onclick="openGroceryPanel()">Groceries Stand</button>
-      <button onclick="handleClick('Water Supplies (Laundry)')">Water Supplies (Laundry)</button>
+      <button onclick="openWaterPanel()">Water Supplies (Laundry)</button>
       <button onclick="togglePlayerStatus()">Biodata</button>
     </div>
     <div id="playerStatus">
-      <!-- Biodata updated dynamically; includes room info, core stats, narrative details and inventory -->
+      <!-- Biodata updated dynamically; toggle show/hide -->
     </div>
   </div>
 
@@ -438,7 +470,6 @@
       <p><strong>Cigarettes</strong> - $4</p>
       <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
     </div>
-    <!-- Harvest Inventory Section -->
     <h3>Your Harvest Inventory</h3>
     <div id="harvestInventory"></div>
     <button onclick="sellHarvest()">Sell Harvest</button>
@@ -452,9 +483,49 @@
     <div id="plantSlots">
       <!-- Plant slots will be generated dynamically -->
     </div>
-    <!-- Replace Sell Produce with Harvest Produce -->
     <button onclick="harvestProduce()">Harvest Produce</button>
     <button onclick="hidePanel('garden-panel')">Return to Main Screen</button>
+  </div>
+
+  <!-- Community Kitchen Panel -->
+  <div id="kitchen-panel" class="panel">
+    <h2>Community Kitchen</h2>
+    <p>Here you can cook recipes to create healthier meals using fewer ingredients than raw harvest. Share your recipes and chat with others.</p>
+    <!-- Recipe Creation / Stove Area -->
+    <div>
+      <h4>Recipe Creation</h4>
+      <input type="text" id="recipeName" placeholder="Recipe Name">
+      <textarea id="recipeIngredients" placeholder="Ingredients (comma separated)"></textarea>
+      <textarea id="recipeInstructions" placeholder="Instructions"></textarea>
+      <button onclick="submitRecipe()">Submit Recipe</button>
+    </div>
+    <!-- Chat area for Community Kitchen -->
+    <div>
+      <h4>Kitchen Chat</h4>
+      <div class="chatArea" id="kitchenChatLog"></div>
+      <input type="text" id="kitchenChatInput" placeholder="Type a message...">
+      <button onclick="sendKitchenChat()">Send</button>
+    </div>
+    <button onclick="hidePanel('kitchen-panel')">Return to Main Screen</button>
+  </div>
+
+  <!-- Water Supplies (Laundry) Panel -->
+  <div id="water-panel" class="panel">
+    <h2>Water Supplies (Laundry)</h2>
+    <p>Water pressure is linked to the power panel. Use the washing machine to clean clothes. If you don't wash for a day, you risk getting sick.</p>
+    <!-- Water Pressure Display -->
+    <div>
+      <p><strong>Water Pressure:</strong> <span id="waterPressureDisplay">Calculating...</span> PSI</p>
+    </div>
+    <!-- Washing Machine Interface -->
+    <div>
+      <h4>Washing Machine</h4>
+      <button onclick="washClothes()">Wash Clothes</button>
+      <div class="chatArea" id="laundryChatLog"></div>
+      <input type="text" id="laundryChatInput" placeholder="Type a message...">
+      <button onclick="sendLaundryChat()">Send</button>
+    </div>
+    <button onclick="hidePanel('water-panel')">Return to Main Screen</button>
   </div>
 
   <!-- Chat Panel (Room Chat / Door Chat) -->
@@ -534,9 +605,7 @@
 
   // Global variables for current room and mode
   let currentRoom = "";
-  // doorChatMode: false = room chat (inside), true = door chat (visitor)
   let doorChatMode = false;
-  // New harvest inventory object – stored as an object with produce name keys and quantity values.
   let harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
 
   // ----------------------------
@@ -572,7 +641,6 @@
   // Inventory Functions
   // ----------------------------
   function addItem(item, qty = 1) {
-    // Add or update item quantity in harvestInventory.
     if (harvestInventory[item]) {
       harvestInventory[item] += qty;
     } else {
@@ -625,7 +693,7 @@
   }
 
   // ----------------------------
-  // Sign Out Function (Exit Button Fix)
+  // Sign Out Function
   // ----------------------------
   function signOutUser() {
     firebase.auth().signOut().then(() => {
@@ -637,14 +705,13 @@
   }
 
   // ----------------------------
-  // Missing Function Definitions (Trade, Direct Message, and Admin removed)
+  // Exit Button, Garbage Chute, and Panel Toggles
   // ----------------------------
   function showGarbagePanel() {
     document.getElementById('garbage-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
   }
   function showPowerPanel() {
-    // Change the background image and ensure it fits both PC and mobile screens.
     document.body.style.backgroundImage = "url('https://i.pinimg.com/736x/2d/d9/76/2dd9762815138628d3c380fe097241d2.jpg')";
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundPosition = "center center";
@@ -660,7 +727,20 @@
     document.getElementById('garden-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
   }
-  // Buy item function for Grocery Store
+  function openKitchenPanel() {
+    document.getElementById('kitchen-panel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+  }
+  function openWaterPanel() {
+    document.getElementById('water-panel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+    // Update water pressure based on voltage from power panel.
+    document.getElementById('waterPressureDisplay').textContent = Math.round(localStorage.getItem('voltage') * 0.8);
+  }
+
+  // ----------------------------
+  // Buy Item Function (Grocery Store)
+  // ----------------------------
   function buyItem(item) {
     const prices = {
       'Food Staples': 10,
@@ -676,7 +756,6 @@
       money -= price;
       localStorage.setItem('money', money);
       alert("Purchased " + item + " for $" + price + ". Remaining money: $" + money);
-      // When purchasing, add the item to inventory.
       addItem(item, 1);
       updatePlayerStatus();
     } else {
@@ -723,12 +802,12 @@
       });
   }
   auth.onAuthStateChanged(user => {
-    if(user){
+    if (user) {
       if (!localStorage.getItem('playerName')) {
         localStorage.setItem('playerName', user.email);
       }
       checkCharacterExistence();
-      listenForNotifications(); // Start listening for in-app notifications
+      listenForNotifications();
     } else {
       document.getElementById('loginPanel').style.display = 'block';
       document.getElementById('mainGame').style.display = 'none';
@@ -805,7 +884,6 @@
         document.getElementById('characterCreation').style.display = 'none';
         document.getElementById('mainGame').style.display = 'block';
         updatePlayerStatus();
-        // Update room ownership based on chosen roomNumber.
         db.collection('rooms').doc('Room ' + roomNumber).set({
           owner: playerName
         }, { merge: true });
@@ -823,7 +901,15 @@
     isEditing = false;
     updatePlayerStatus();
   }
-  // Updated biodata function: In view mode, show Core Stats (without inventory) by default with a toggle for Narrative details and a separate Inventory section.
+  // Biodata Toggle: In view mode, show Core Stats (without inventory) and a separate Inventory section
+  function togglePlayerStatus() {
+    const biodataDiv = document.getElementById('playerStatus');
+    if(biodataDiv.style.display === "none" || biodataDiv.style.display === "") {
+      biodataDiv.style.display = "block";
+    } else {
+      biodataDiv.style.display = "none";
+    }
+  }
   function updatePlayerStatus() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
@@ -835,7 +921,6 @@
           localStorage.setItem('characterName', data.name);
           let statusHTML = `<h3>Biodata</h3>`;
           if (!isEditing) {
-            // View mode: Show Core Stats and a toggle button to display Narrative details.
             let coreStatsHTML = `<h4>Core Stats</h4>`;
             coreStatsHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
             coreStatsHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
@@ -852,7 +937,6 @@
             narrativeHTML += `<p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>`;
             narrativeHTML += `<p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>`;
             
-            // Inventory Section (from harvestInventory)
             let inventoryHTML = `<h4>Inventory</h4>`;
             if (Object.keys(harvestInventory).length > 0) {
               for (let item in harvestInventory) {
@@ -867,7 +951,6 @@
             statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
             statusHTML += inventoryHTML;
           } else {
-            // Edit mode: Show all fields in a grouped layout.
             statusHTML += `<h3>Edit Character</h3>`;
             statusHTML += `<div><strong>Core Stats</strong><br>`;
             statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" /></p>`;
@@ -886,7 +969,6 @@
             statusHTML += `<button onclick="saveBiodata()">Save Changes</button>`;
             statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
           }
-          // Display Money and other basic info
           statusHTML += `<p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>`;
           statusHTML += `<p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>`;
           statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
@@ -897,7 +979,6 @@
         console.error("Error getting player status:", error);
       });
   }
-  // Function to toggle display of Narrative details in view mode
   function toggleNarrative() {
     const narrativeDiv = document.getElementById('narrativeStats');
     const toggleButton = document.getElementById('toggleNarrative');
@@ -910,28 +991,94 @@
     }
   }
 
-  // Function to update the harvest inventory display in the biodata panel and grocery store
-  function updateHarvestInventoryUI() {
-    // Update localStorage
-    localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
-    // Update in biodata panel inventory display (if present)
-    const displayDiv = document.getElementById('harvestInventoryDisplay');
-    if (displayDiv) {
-      let html = "";
-      for (let item in harvestInventory) {
-        html += `<p>${item}: ${harvestInventory[item]}</p>`;
-      }
-      displayDiv.innerHTML = html || "<p>None</p>";
+  // ----------------------------
+  // Community Kitchen Chat & Recipe Functions
+  // ----------------------------
+  function sendKitchenChat() {
+    const msg = document.getElementById('kitchenChatInput').value;
+    if (msg.trim() !== "") {
+      // For simplicity, we use Firebase messages collection (could be separated later)
+      db.collection("messages").add({
+        room: "Community Kitchen",
+        sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown",
+        content: msg,
+        chatType: "kitchen",
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      document.getElementById('kitchenChatInput').value = "";
     }
-    // Also update the grocery store panel inventory if it exists
-    const groceryInv = document.getElementById('harvestInventory');
-    if (groceryInv) {
-      let html = "";
-      for (let item in harvestInventory) {
-        html += `<p>${item}: ${harvestInventory[item]}</p>`;
-      }
-      groceryInv.innerHTML = html || "<p>None</p>";
+  }
+  // Listen for Community Kitchen chat messages
+  function listenForKitchenChat() {
+    const chatLog = document.getElementById('kitchenChatLog');
+    db.collection("messages")
+      .where("room", "==", "Community Kitchen")
+      .where("chatType", "==", "kitchen")
+      .orderBy("timestamp")
+      .onSnapshot((querySnapshot) => {
+        chatLog.innerHTML = "";
+        querySnapshot.forEach((doc) => {
+          const message = doc.data();
+          const p = document.createElement('p');
+          p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+          chatLog.appendChild(p);
+        });
+        chatLog.scrollTop = chatLog.scrollHeight;
+      });
+  }
+  function submitRecipe() {
+    const name = document.getElementById('recipeName').value;
+    const ingredients = document.getElementById('recipeIngredients').value;
+    const instructions = document.getElementById('recipeInstructions').value;
+    if(name && ingredients && instructions) {
+      alert("Recipe '" + name + "' submitted! Cooking a recipe will reduce ingredient costs and improve health benefits.");
+      // Clear recipe inputs after submission.
+      document.getElementById('recipeName').value = "";
+      document.getElementById('recipeIngredients').value = "";
+      document.getElementById('recipeInstructions').value = "";
+    } else {
+      alert("Please fill in all fields for the recipe.");
     }
+  }
+
+  // ----------------------------
+  // Water Supplies (Laundry) Chat & Washing Machine Functions
+  // ----------------------------
+  function sendLaundryChat() {
+    const msg = document.getElementById('laundryChatInput').value;
+    if (msg.trim() !== "") {
+      db.collection("messages").add({
+        room: "Water Supplies",
+        sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown",
+        content: msg,
+        chatType: "laundry",
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      document.getElementById('laundryChatInput').value = "";
+    }
+  }
+  function listenForLaundryChat() {
+    const chatLog = document.getElementById('laundryChatLog');
+    db.collection("messages")
+      .where("room", "==", "Water Supplies")
+      .where("chatType", "==", "laundry")
+      .orderBy("timestamp")
+      .onSnapshot((querySnapshot) => {
+        chatLog.innerHTML = "";
+        querySnapshot.forEach((doc) => {
+          const message = doc.data();
+          const p = document.createElement('p');
+          p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+          chatLog.appendChild(p);
+        });
+        chatLog.scrollTop = chatLog.scrollHeight;
+      });
+  }
+  // Washing machine simulation
+  function washClothes() {
+    alert("You washed your clothes. Your health improves slightly.");
+    updateMood(3);
+    // Reset a wash timer if you want to track real-life days (not fully implemented here).
   }
 
   // ----------------------------
@@ -1082,32 +1229,6 @@
       openWaterPanel();
     }
   }
-  function openKitchenPanel() {
-    document.getElementById('kitchenPanel').style.display = 'block';
-  }
-  function closeKitchenPanel() {
-    document.getElementById('kitchenPanel').style.display = 'none';
-  }
-  // Process food in the kitchen: reduce hunger and boost mood.
-  function processFood() {
-    alert("Food processed for improved safety and efficiency.");
-    updateHunger(-10); // Reduce hunger by 10 points.
-    updateMood(5);     // Boost mood by 5 points.
-    // Optionally add food to inventory as a harvest item.
-    addItem("Food Staples", 1);
-  }
-  function openWaterPanel() {
-    document.getElementById('waterPanel').style.display = 'block';
-  }
-  function closeWaterPanel() {
-    document.getElementById('waterPanel').style.display = 'none';
-  }
-  // Use water: reduces hunger and slightly boosts mood.
-  function useWater() {
-    alert("Water distributed for gardening, cooking, and personal use.");
-    updateHunger(-5);  // Reduce hunger by 5 points.
-    updateMood(2);     // Boost mood by 2 points.
-  }
 
   // ----------------------------
   // Power Source Simulation Functions
@@ -1151,7 +1272,6 @@
     document.getElementById('voltageDisplay').textContent = voltage.toFixed(1);
     localStorage.setItem('voltage', voltage);
   }
-  // Modified evaluatePowerOutput to show/hide the critical alert (!) on the power button.
   function evaluatePowerOutput() {
     if (windSpeed >= 40 && windSpeed <= 70 && powerOutputConfirmed) {
       powerStatus = "On";
@@ -1166,7 +1286,6 @@
       document.getElementById('powerAlert').style.display = "none";
     }
   }
-  // New function: simulate a gradual power event every minute
   function simulatePowerEvent() {
     if (Date.now() - lastInteractionTime > 60000) {
       windSpeed = Math.max(0, windSpeed - 5);
@@ -1174,7 +1293,6 @@
       updateVoltage();
     }
   }
-  // Updated garbage functions: update based on elapsed time and reset timestamp upon clear.
   function updateGarbageDisplay() {
     const now = Date.now();
     const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
@@ -1188,35 +1306,6 @@
         alert("High garbage levels detected! The community is getting sick.");
       }
     }
-  }
-  // New function: log garbage messages to the garbage log panel.
-  function logGarbageMessage(message) {
-    const garbageLog = document.getElementById('garbageLog');
-    const timestamp = new Date().toLocaleTimeString();
-    garbageLog.innerHTML += `<p>[${timestamp}] ${message}</p>`;
-    garbageLog.scrollTop = garbageLog.scrollHeight;
-  }
-  function clearGarbage() {
-    garbageLevel = 0;
-    lastGarbageUpdate = Date.now();
-    localStorage.setItem('garbageLevel', garbageLevel);
-    localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
-    document.getElementById('garbageDisplay').textContent = garbageLevel;
-    // Get the character's name for roleplay flavor
-    const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
-    logGarbageMessage(`Garbage cleared by ${characterName}.`);
-  }
-  function simulateRandomEvent() {
-    if (Date.now() - lastInteractionTime > 30000) {
-      logPowerMessage("System overload due to inactivity! Flats experience a blackout for 1-2 days.");
-    }
-    const events = [
-      "Sudden strong winds detected! Adjust wind speed or engage brakes.",
-      "Low energy output observed! Check lubrication or adjust controls.",
-      "Minor electrical fault occurred! Reset the circuit breaker.",
-      "Dust accumulation detected! Perform a quick maintenance check."
-    ];
-    logPowerMessage(events[Math.floor(Math.random() * events.length)]);
   }
   function logPowerMessage(message) {
     const logDiv = document.getElementById('minigameLog');
@@ -1237,7 +1326,6 @@
   // NEW: Health Decline Due to High Garbage
   // ----------------------------
   function simulateHealthDecline() {
-    // If garbage is high, decrease player's health
     if (garbageLevel > 80) {
       const playerEmail = localStorage.getItem('playerName');
       if (!playerEmail) return;
@@ -1246,11 +1334,8 @@
         if (doc.exists) {
           let data = doc.data();
           let currentHealth = data.health || 100;
-          // Decrease health by 1 point
           let newHealth = Math.max(0, currentHealth - 1);
-          // Update the player's document with the new health value
           db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
-          // If health reaches zero, trigger death
           if (newHealth === 0) {
             playerDied();
           }
@@ -1262,7 +1347,6 @@
   }
   function playerDied() {
     alert("Your health has reached zero. You have died.");
-    // Clear game state and redirect to index.html (or you could redirect to a dedicated death screen)
     clearGameState();
     window.location.href = "index.html";
   }
@@ -1285,7 +1369,6 @@
   function hidePanel(panelId) {
     document.getElementById(panelId).style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
-    // If hiding the power panel, revert the background to the original state.
     if (panelId === 'minigame-panel') {
       document.body.style.background = originalBackground;
       document.body.style.backgroundSize = "cover";
@@ -1298,16 +1381,13 @@
   // ----------------------------
   function toggleMusicPlayer() {
     var player = document.getElementById("bgMusic");
-    // If the player is hidden (or off-screen), show it so the user can click on the skip ads button
     if (player.style.display === "none" || player.style.display === "" || player.style.width === "0px") {
       player.style.display = "block";
-      // Give it a small visible size for interaction (e.g., 300x200)
       player.style.width = "300px";
       player.style.height = "200px";
       player.style.position = "relative";
       player.style.left = "0";
     } else {
-      // Otherwise, hide the player again
       player.style.display = "none";
       player.style.width = "0";
       player.style.height = "0";
@@ -1320,7 +1400,6 @@
   // DOMContentLoaded & Initialization
   // ----------------------------
   window.onload = function() {
-    // Generate room number options
     var roomSelect = document.getElementById('roomNumber');
     if (roomSelect) {
       for (let i = 1; i <= 25; i++) {
@@ -1330,7 +1409,6 @@
         roomSelect.appendChild(option);
       }
     }
-    // Generate grid buttons for rooms
     var gridContainer = document.querySelector(".grid");
     if (gridContainer) {
       const rooms = [21,22,23,24,25,16,17,18,19,20,11,12,13,14,15,6,7,8,9,10,1,2,3,4,5];
@@ -1341,7 +1419,6 @@
         gridContainer.appendChild(btn);
       });
     }
-    // Generate plant slots
     var plantSlotsDiv = document.getElementById("plantSlots");
     if (plantSlotsDiv) {
       plantSlotsDiv.innerHTML = "";
@@ -1368,15 +1445,16 @@
     if (localStorage.getItem('playerName')) {
       checkCharacterExistence();
     }
-    // Initialize harvest inventory from localStorage if exists
     harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
-    // Set intervals: power event, garbage update, health decline, and random events.
     setInterval(simulatePowerEvent, 60000);
     setInterval(updateGarbageDisplay, 60000);
     setInterval(updateVoltage, 5000);
     setInterval(simulateRandomEvent, 3600000);
     setInterval(updateGardenUI, 60000);
-    setInterval(simulateHealthDecline, 60000);  // Decrease health if garbage is high
+    setInterval(simulateHealthDecline, 60000);
+    // Start listening for kitchen and laundry chat when panels open
+    listenForKitchenChat();
+    listenForLaundryChat();
   };
 </script>
 </body>
