@@ -511,14 +511,12 @@
     <button onclick="hidePanel('garden-panel')">Return to Main Screen</button>
   </div>
 
-  <!-- Community Kitchen Panel with Cookbook, Stove & Cooking Process -->
+  <!-- Community Kitchen Panel with Unified Cooking Process -->
   <div id="kitchen-panel" class="panel">
     <h2>Community Kitchen</h2>
-    <p>Access the cookbook to view 20 available recipes. Each recipe has a single sentence description and is based on plants and mushrooms grown in the community garden.</p>
-    <button onclick="showCookbook()">Cookbook</button>
-    <!-- New Stove Button -->
-    <button onclick="useStove()" style="margin-left:10px;">Stove</button>
-    <!-- Stove Status (shows if stove is available) -->
+    <p>Access the cookbook to view 20 available recipes. Each recipe has a single-sentence description based on plants and mushrooms grown in the community garden, along with its benefits and setbacks.</p>
+    <button onclick="openRecipeSelection()">Cook</button>
+    <!-- Display dynamic stove status -->
     <div id="stoveStatus" style="margin-top:10px; font-size:14px;">Stove: Available</div>
     <!-- Cooking Process Simulation (hidden by default) -->
     <div id="cookingProcess" style="display:none; margin-top:10px; font-size:14px;">
@@ -540,11 +538,9 @@
     <p>
       Water pressure is directly linked to the performance of the power panel. Use the washing machine to clean clothes – remember, low power output may result in lower water pressure.
     </p>
-    <!-- Water Pressure Display -->
     <div>
       <p><strong>Water Pressure:</strong> <span id="waterPressureDisplay">Calculating...</span> PSI</p>
     </div>
-    <!-- Washing Machine Interface -->
     <div>
       <h4>Washing Machine</h4>
       <button onclick="washClothes()">Wash Clothes</button>
@@ -634,6 +630,34 @@
   let currentRoom = "";
   let doorChatMode = false;
   let harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
+  
+  // Centralized recipes array (20 recipes - here we use 2 unique samples duplicated for brevity)
+  const recipes = [];
+  // Create 20 recipe objects (for demonstration, we use two samples repeated)
+  for (let i = 0; i < 10; i++) {
+    recipes.push({
+      title: "Garden Salad " + (i+1),
+      description: "A refreshing mix of greens and button mushrooms that boosts vitality, though too much may slightly lower hunger.",
+      ingredients: [
+        { name: "Sunflower Seed", amount: 2 },
+        { name: "Button Mushroom", amount: 3 }
+      ],
+      water: "100ml",
+      benefits: "Boosts energy and mood.",
+      setbacks: "Slightly decreases hunger."
+    });
+    recipes.push({
+      title: "Mushroom Medley " + (i+1),
+      description: "A savory dish combining portobello mushrooms with pumpkin seeds that improves strength but may affect mood if overconsumed.",
+      ingredients: [
+        { name: "Portobello Mushroom", amount: 2 },
+        { name: "Pumpkin Seed", amount: 2 }
+      ],
+      water: "120ml",
+      benefits: "Improves strength.",
+      setbacks: "May lower mood if eaten in excess."
+    });
+  }
 
   // ----------------------------
   // Helper Functions: Update Mood and Hunger
@@ -761,7 +785,6 @@
   function openWaterPanel() {
     document.getElementById('water-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
-    // Update water pressure based on voltage from power panel.
     document.getElementById('waterPressureDisplay').textContent = Math.round(localStorage.getItem('voltage') * 0.8);
   }
 
@@ -1068,7 +1091,7 @@
   }
 
   // ----------------------------
-  // Community Kitchen Chat & Cookbook Functions
+  // Community Kitchen Chat & Unified Cooking Functions
   // ----------------------------
   function sendKitchenChat() {
     const msg = document.getElementById('kitchenChatInput').value;
@@ -1100,58 +1123,8 @@
         chatLog.scrollTop = chatLog.scrollHeight;
       });
   }
-  // Updated Cookbook function with detailed recipes (each with a single-sentence description)
-  function showCookbook() {
-    let recipes = [
-      {
-        title: "Garden Salad",
-        description: "A refreshing mix of greens and button mushrooms that boosts vitality.",
-        ingredients: [
-          { name: "Sunflower Seed", amount: 2 },
-          { name: "Button Mushroom", amount: 3 }
-        ],
-        water: "100ml"
-      },
-      {
-        title: "Mushroom Medley",
-        description: "A savory dish combining portobello mushrooms with a hint of herb flavor.",
-        ingredients: [
-          { name: "Portobello Mushroom", amount: 2 },
-          { name: "Pumpkin Seed", amount: 2 }
-        ],
-        water: "120ml"
-      }
-      // ... Additional recipes up to 20 can be added here
-    ];
-    let recipeText = recipes.map((r, index) => {
-      let ing = r.ingredients.map(i => `${i.name} (${i.amount})`).join(", ");
-      return `Recipe ${index+1}: ${r.title} - ${r.description}\nIngredients: ${ing}. Water: ${r.water}`;
-    }).join("\n\n");
-    alert("Cookbook Recipes:\n\n" + recipeText);
-  }
-  // New function: Use Stove to cook a recipe based on inventory
-  function useStove() {
-    let recipes = [
-      {
-        title: "Garden Salad",
-        description: "A refreshing mix of greens and button mushrooms that boosts vitality.",
-        ingredients: [
-          { name: "Sunflower Seed", amount: 2 },
-          { name: "Button Mushroom", amount: 3 }
-        ],
-        water: "100ml"
-      },
-      {
-        title: "Mushroom Medley",
-        description: "A savory dish combining portobello mushrooms with a hint of herb flavor.",
-        ingredients: [
-          { name: "Portobello Mushroom", amount: 2 },
-          { name: "Pumpkin Seed", amount: 2 }
-        ],
-        water: "120ml"
-      }
-    ];
-    // Let the player select a recipe (for simplicity, we prompt with a number)
+  // New function to open recipe selection and cook a dish
+  function openRecipeSelection() {
     let recipeList = recipes.map((r, index) => `${index+1}: ${r.title} - ${r.description}`).join("\n");
     let choice = prompt("Select a recipe to cook:\n" + recipeList);
     let index = parseInt(choice) - 1;
@@ -1159,8 +1132,10 @@
       alert("Invalid recipe selection.");
       return;
     }
-    let recipe = recipes[index];
-    // Check inventory for each ingredient
+    cookRecipe(recipes[index]);
+  }
+  function cookRecipe(recipe) {
+    // Check inventory for each required ingredient
     let missingIngredients = [];
     recipe.ingredients.forEach(ing => {
       if (!harvestInventory[ing.name] || harvestInventory[ing.name] < ing.amount) {
@@ -1171,19 +1146,22 @@
       alert("Cannot cook recipe. Missing ingredients:\n" + missingIngredients.join("\n"));
       return;
     }
-    // If ingredients are available, remove them from inventory
+    // Remove the required ingredients from inventory
     recipe.ingredients.forEach(ing => {
       removeItem(ing.name, ing.amount);
     });
-    // Optionally check water supply here (if water is tracked separately)
-    // Simulate cooking process with a 1-minute delay
+    // Update stove status to "In Use"
+    document.getElementById("stoveStatus").textContent = "Stove: In Use";
+    // Show cooking process indicator
     document.getElementById("cookingProcess").style.display = "block";
+    // Simulate a 1-minute cooking delay
     setTimeout(() => {
       document.getElementById("cookingProcess").style.display = "none";
+      document.getElementById("stoveStatus").textContent = "Stove: Available";
       alert("Cooking complete! You made: " + recipe.title);
-      // Add the cooked recipe to the inventory as a tradable/giftable/eatable item.
+      // Add the cooked dish to inventory (as a tradable/giftable/eatable item)
       addItem("Cooked: " + recipe.title, 1);
-      // Optionally update player stats or provide further effects.
+      // Optionally update player stats based on recipe benefits and setbacks
     }, 60000);
   }
 
