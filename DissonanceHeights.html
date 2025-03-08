@@ -390,7 +390,12 @@
     <p><strong>Objective:</strong> Ensure the turbine provides electricity, water heating, and lighting.</p>
     <button id="instructionsButton" onclick="toggleInstructions()">Instructions</button>
     <div id="instructions" style="display: none;">
-      <p>Adjust wind speed, engage brakes as needed, lubricate, and confirm power output.</p>
+      <p>
+        <strong>Step 1:</strong> Adjust the wind speed using the slider.<br>
+        <strong>Step 2:</strong> Engage or release the brake as needed.<br>
+        <strong>Step 3:</strong> Apply Lubricant Oil (if available) to maintain smooth operation.<br>
+        <strong>Step 4:</strong> Confirm power output to ensure optimal performance.
+      </p>
     </div>
     <div class="control">
       <label for="windSpeedSlider">Wind Speed Regulator:</label>
@@ -406,8 +411,8 @@
       <span id="voltageDisplay"></span> V
     </div>
     <div class="control">
-      <label for="lubricateButton">Lubrication Check:</label>
-      <button id="lubricateButton" onclick="lubricate()">Lubricate</button>
+      <label for="lubricateButton">Apply Lubricant Oil:</label>
+      <button id="lubricateButton" onclick="lubricate()">Apply Oil</button>
     </div>
     <div class="control">
       <label for="powerOutputConfirm">Power Output Confirm:</label>
@@ -446,28 +451,37 @@
   <div id="grocery-panel" class="panel">
     <h2>Grocery Store</h2>
     <p>Purchase essential items. Prices may vary with electricity availability.</p>
+    <!-- Food Staples -->
     <div class="grocery-item">
-      <p><strong>Food Staples</strong> - $10</p>
+      <p><strong>Food Staples</strong> - $10<br><em>Basic nourishment to reduce hunger.</em></p>
       <button onclick="buyItem('Food Staples')">Buy Food</button>
     </div>
-    <div class="grocery-item">
-      <p><strong>Seeds</strong> (for Community Garden) - $2 each</p>
-      <button onclick="buyItem('Seeds')">Buy Seeds</button>
+    <!-- 20 Types of Seeds -->
+    <div id="seedList">
+      <h4>Seeds for Community Garden</h4>
+      <!-- Dynamically generated seed items -->
     </div>
-    <div class="grocery-item">
-      <p><strong>Maintenance Essentials</strong> - $5</p>
-      <button onclick="buyItem('Maintenance Essentials')">Buy Maintenance</button>
+    <!-- 5 Types of Mushrooms -->
+    <div id="mushroomList">
+      <h4>Mushrooms for Cultivation</h4>
+      <!-- Dynamically generated mushroom items -->
     </div>
+    <!-- Lubricant Oil (replaces Maintenance Essentials) -->
     <div class="grocery-item">
-      <p><strong>Room Decorations</strong> - $7</p>
+      <p><strong>Lubricant Oil</strong> - $5<br><em>Essential for keeping the power panel running smoothly. Consumed on use.</em></p>
+      <button onclick="buyItem('Lubricant Oil')">Buy Lubricant Oil</button>
+    </div>
+    <!-- Other items -->
+    <div class="grocery-item">
+      <p><strong>Room Decorations</strong> - $7<br><em>Add personality to your room.</em></p>
       <button onclick="buyItem('Room Decoration')">Buy Decoration</button>
     </div>
     <div class="grocery-item">
-      <p><strong>Alcohol</strong> - $3</p>
+      <p><strong>Alcohol</strong> - $3<br><em>Boosts mood but may have minor setbacks on health.</em></p>
       <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
     </div>
     <div class="grocery-item">
-      <p><strong>Cigarettes</strong> - $4</p>
+      <p><strong>Cigarettes</strong> - $4<br><em>Temporarily improves mood but reduces health over time.</em></p>
       <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
     </div>
     <h3>Your Harvest Inventory</h3>
@@ -479,7 +493,7 @@
   <!-- Community Garden Panel -->
   <div id="garden-panel" class="panel">
     <h2>Community Garden</h2>
-    <p>Manage your rooftop garden. Plants need watering and fertilizing; seasonal changes affect growth.</p>
+    <p>Manage your rooftop garden. Plants (seeds or mushrooms) need watering and fertilizing; seasonal changes affect growth.</p>
     <div id="plantSlots">
       <!-- Plant slots will be generated dynamically -->
     </div>
@@ -490,15 +504,8 @@
   <!-- Community Kitchen Panel -->
   <div id="kitchen-panel" class="panel">
     <h2>Community Kitchen</h2>
-    <p>Here you can cook recipes to create healthier meals using fewer ingredients than raw harvest. Share your recipes and chat with others.</p>
-    <!-- Recipe Creation / Stove Area -->
-    <div>
-      <h4>Recipe Creation</h4>
-      <input type="text" id="recipeName" placeholder="Recipe Name">
-      <textarea id="recipeIngredients" placeholder="Ingredients (comma separated)"></textarea>
-      <textarea id="recipeInstructions" placeholder="Instructions"></textarea>
-      <button onclick="submitRecipe()">Submit Recipe</button>
-    </div>
+    <p>Access the cookbook to view 20 available recipes. Each recipe has a brief description and uses ingredients from your harvest.</p>
+    <button onclick="showCookbook()">Cookbook</button>
     <!-- Chat area for Community Kitchen -->
     <div>
       <h4>Kitchen Chat</h4>
@@ -512,7 +519,9 @@
   <!-- Water Supplies (Laundry) Panel -->
   <div id="water-panel" class="panel">
     <h2>Water Supplies (Laundry)</h2>
-    <p>Water pressure is linked to the power panel. Use the washing machine to clean clothes. If you don't wash for a day, you risk getting sick.</p>
+    <p>
+      Water pressure is directly linked to the performance of the power panel. Use the washing machine to clean clothes – remember, low power output may result in lower water pressure.
+    </p>
     <!-- Water Pressure Display -->
     <div>
       <p><strong>Water Pressure:</strong> <span id="waterPressureDisplay">Calculating...</span> PSI</p>
@@ -739,27 +748,58 @@
   }
 
   // ----------------------------
-  // Buy Item Function (Grocery Store)
+  // Buy Item Function (Grocery Store) with Benefits/Setbacks
   // ----------------------------
   function buyItem(item) {
     const prices = {
       'Food Staples': 10,
-      'Seeds': 2,
-      'Maintenance Essentials': 5,
+      // Price for seeds and mushrooms will be defined in seed/mushroom list
+      'Lubricant Oil': 5,
       'Room Decoration': 7,
       'Alcohol': 3,
       'Cigarettes': 4
     };
-    let price = prices[item] || 0;
+    // For seeds and mushrooms, prices are defined individually
+    let price = prices[item] || 2; // default price for seeds/mushrooms is $2
     let money = parseInt(localStorage.getItem('money')) || 50;
     if (money >= price) {
       money -= price;
       localStorage.setItem('money', money);
       alert("Purchased " + item + " for $" + price + ". Remaining money: $" + money);
       addItem(item, 1);
+      applyItemEffects(item);
       updatePlayerStatus();
     } else {
       alert("Not enough money to purchase " + item);
+    }
+  }
+
+  // Function to apply benefits and setbacks for each item
+  function applyItemEffects(item) {
+    // Example effects (can be expanded):
+    switch(item) {
+      case "Food Staples":
+        updateHunger(-5);
+        updateMood(2);
+        break;
+      case "Lubricant Oil":
+        updateMood(1);
+        break;
+      // For seeds, mushrooms, alcohol, cigarettes, etc.
+      default:
+        if(item.includes("Seed")) {
+          updateMood(2); // seeds improve mood (hope for growth)
+        } else if(item.includes("Mushroom")) {
+          updateMood(1);
+          updateHunger(-1);
+        } else if(item === "Alcohol") {
+          updateMood(3);
+          updateHunger(1);
+        } else if(item === "Cigarettes") {
+          updateMood(2);
+          updateHunger(1);
+        }
+        break;
     }
   }
 
@@ -949,6 +989,8 @@
             statusHTML += `<div id="coreStats">${coreStatsHTML}</div>`;
             statusHTML += `<div id="narrativeStats" style="display:none;">${narrativeHTML}</div>`;
             statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
+            // Add an Edit button here to allow updating character info
+            statusHTML += `<button onclick="enableEdit()">Edit Biodata</button>`;
             statusHTML += inventoryHTML;
           } else {
             statusHTML += `<h3>Edit Character</h3>`;
@@ -990,14 +1032,37 @@
       toggleButton.textContent = "Show Narrative";
     }
   }
+  function saveBiodata() {
+    const playerName = localStorage.getItem('playerName');
+    if (!playerName) return;
+    const safePlayerName = sanitizePlayerName(playerName);
+    const updatedData = {
+      name: document.getElementById('editName').value,
+      roomNumber: document.getElementById('editRoomNumber').value,
+      reputation: parseInt(document.getElementById('editReputation').value) || 0,
+      reason: document.getElementById('editReason').value,
+      backstory: document.getElementById('editBackstory').value,
+      skills: document.getElementById('editSkills').value.split(',').map(s => s.trim()),
+      alliances: document.getElementById('editAlliances').value.split(',').map(a => a.trim()),
+      rivalries: document.getElementById('editRivalries').value.split(',').map(r => r.trim()),
+      lastUpdated: Date.now()
+    };
+    db.collection('players').doc(safePlayerName).set(updatedData, { merge: true })
+      .then(() => {
+        isEditing = false;
+        updatePlayerStatus();
+      })
+      .catch(error => {
+        console.error("Error saving biodata:", error);
+      });
+  }
 
   // ----------------------------
-  // Community Kitchen Chat & Recipe Functions
+  // Community Kitchen Chat & Cookbook Functions
   // ----------------------------
   function sendKitchenChat() {
     const msg = document.getElementById('kitchenChatInput').value;
     if (msg.trim() !== "") {
-      // For simplicity, we use Firebase messages collection (could be separated later)
       db.collection("messages").add({
         room: "Community Kitchen",
         sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown",
@@ -1008,7 +1073,6 @@
       document.getElementById('kitchenChatInput').value = "";
     }
   }
-  // Listen for Community Kitchen chat messages
   function listenForKitchenChat() {
     const chatLog = document.getElementById('kitchenChatLog');
     db.collection("messages")
@@ -1026,19 +1090,31 @@
         chatLog.scrollTop = chatLog.scrollHeight;
       });
   }
-  function submitRecipe() {
-    const name = document.getElementById('recipeName').value;
-    const ingredients = document.getElementById('recipeIngredients').value;
-    const instructions = document.getElementById('recipeInstructions').value;
-    if(name && ingredients && instructions) {
-      alert("Recipe '" + name + "' submitted! Cooking a recipe will reduce ingredient costs and improve health benefits.");
-      // Clear recipe inputs after submission.
-      document.getElementById('recipeName').value = "";
-      document.getElementById('recipeIngredients').value = "";
-      document.getElementById('recipeInstructions').value = "";
-    } else {
-      alert("Please fill in all fields for the recipe.");
-    }
+  // Cookbook function to show 20 recipes
+  function showCookbook() {
+    let recipes = [
+      "Recipe 1: A hearty stew made with harvested seeds and fresh vegetables.",
+      "Recipe 2: A light salad featuring a mix of garden greens and mushrooms.",
+      "Recipe 3: A savory soup enriched with seed broth and herbs.",
+      "Recipe 4: Grilled mushrooms served with a side of spiced seeds.",
+      "Recipe 5: A refreshing seed smoothie with hints of mint.",
+      "Recipe 6: Baked seed crackers for a crunchy snack.",
+      "Recipe 7: Mushroom risotto with a rich, creamy texture.",
+      "Recipe 8: A zesty seed dip perfect for gatherings.",
+      "Recipe 9: Roasted mushrooms with garlic and herbs.",
+      "Recipe 10: A layered seed parfait with seasonal fruits.",
+      "Recipe 11: Stir-fried vegetables tossed with mushrooms and seeds.",
+      "Recipe 12: A seed-infused bread with a crispy crust.",
+      "Recipe 13: Mushroom pizza with a thin, flavorful crust.",
+      "Recipe 14: A refreshing salad with mixed mushrooms and crunchy seeds.",
+      "Recipe 15: A warming stew featuring seeds and earthy mushrooms.",
+      "Recipe 16: Mushroom pasta in a light cream sauce.",
+      "Recipe 17: A tangy seed vinaigrette over fresh greens.",
+      "Recipe 18: Roasted seed medley as a nutritious side.",
+      "Recipe 19: Mushroom tacos with a hint of spice and seed garnish.",
+      "Recipe 20: A fusion dish blending seeds and mushrooms in a savory sauce."
+    ];
+    alert("Cookbook Recipes:\n\n" + recipes.join("\n"));
   }
 
   // ----------------------------
@@ -1074,11 +1150,9 @@
         chatLog.scrollTop = chatLog.scrollHeight;
       });
   }
-  // Washing machine simulation
   function washClothes() {
     alert("You washed your clothes. Your health improves slightly.");
     updateMood(3);
-    // Reset a wash timer if you want to track real-life days (not fully implemented here).
   }
 
   // ----------------------------
@@ -1220,17 +1294,6 @@
   }
 
   // ----------------------------
-  // Community Kitchen & Water Supplies Functions
-  // ----------------------------
-  function handleClick(facility) {
-    if (facility === "Community Kitchen") {
-      openKitchenPanel();
-    } else if (facility === "Water Supplies (Laundry)") {
-      openWaterPanel();
-    }
-  }
-
-  // ----------------------------
   // Power Source Simulation Functions
   // ----------------------------
   let windSpeed = localStorage.getItem('windSpeed') || 50;
@@ -1261,9 +1324,15 @@
     evaluatePowerOutput();
     updateLastInteraction();
   }
+  // Updated lubricate function to check for Lubricant Oil in inventory
   function lubricate() {
-    logPowerMessage("Lubrication complete. Moving parts are now well-oiled.");
-    updateLastInteraction();
+    if (harvestInventory["Lubricant Oil"] && harvestInventory["Lubricant Oil"] > 0) {
+      removeItem("Lubricant Oil", 1);
+      logPowerMessage("Lubricant applied. Moving parts are now well-oiled.");
+      updateLastInteraction();
+    } else {
+      alert("You don't have any Lubricant Oil. Please purchase some from the Grocery Store.");
+    }
   }
   function updateVoltage() {
     let factor = brakeEngaged ? 0.5 : 1.0;
@@ -1397,6 +1466,54 @@
   }
 
   // ----------------------------
+  // Functions to Generate Seed and Mushroom Items in Grocery Stand
+  // ----------------------------
+  const seedTypes = [
+    "Sunflower Seed", "Pumpkin Seed", "Corn Seed", "Wheat Seed", "Rice Seed",
+    "Barley Seed", "Oat Seed", "Millet Seed", "Sorghum Seed", "Quinoa Seed",
+    "Flax Seed", "Sesame Seed", "Chia Seed", "Cumin Seed", "Mustard Seed",
+    "Fennel Seed", "Caraway Seed", "Anise Seed", "Poppy Seed", "Basil Seed"
+  ];
+  const mushroomTypes = [
+    "Button Mushroom", "Portobello Mushroom", "Shiitake Mushroom", "Oyster Mushroom", "Enoki Mushroom"
+  ];
+  function generateGroceryItems() {
+    let seedContainer = document.getElementById("seedList");
+    seedTypes.forEach(seed => {
+      let div = document.createElement("div");
+      div.className = "grocery-item";
+      div.innerHTML = `<p><strong>${seed}</strong> - $2<br><em>${seed} is ideal for growing nutrient-rich produce.</em></p>
+                       <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
+      seedContainer.appendChild(div);
+    });
+    let mushroomContainer = document.getElementById("mushroomList");
+    mushroomTypes.forEach(mushroom => {
+      let div = document.createElement("div");
+      div.className = "grocery-item";
+      div.innerHTML = `<p><strong>${mushroom}</strong> - $2<br><em>${mushroom} adds unique flavor and nutrients.</em></p>
+                       <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
+      mushroomContainer.appendChild(div);
+    });
+  }
+
+  // ----------------------------
+  // Clear Garbage Function with Logging
+  // ----------------------------
+  function clearGarbage() {
+    // Reset garbage level
+    garbageLevel = 0;
+    localStorage.setItem('garbageLevel', garbageLevel);
+    document.getElementById('garbageDisplay').textContent = garbageLevel;
+    // Log the action with character name
+    const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
+    const logDiv = document.getElementById('garbageLog');
+    const timestamp = new Date().toLocaleTimeString();
+    logDiv.innerHTML += `<p>[${timestamp}] ${characterName} cleared the garbage.</p>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
+    // Notify others (if desired, add a Firebase notification here)
+  }
+
+  // ----------------------------
   // DOMContentLoaded & Initialization
   // ----------------------------
   window.onload = function() {
@@ -1446,16 +1563,31 @@
       checkCharacterExistence();
     }
     harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
+    generateGroceryItems();
     setInterval(simulatePowerEvent, 60000);
     setInterval(updateGarbageDisplay, 60000);
     setInterval(updateVoltage, 5000);
-    setInterval(simulateRandomEvent, 3600000);
-    setInterval(updateGardenUI, 60000);
+    // simulateRandomEvent and updateGardenUI functions need to be defined if used; otherwise, comment out.
+    // setInterval(simulateRandomEvent, 3600000);
+    // setInterval(updateGardenUI, 60000);
     setInterval(simulateHealthDecline, 60000);
-    // Start listening for kitchen and laundry chat when panels open
     listenForKitchenChat();
     listenForLaundryChat();
   };
+
+  // Placeholder functions for planting seeds and mushrooms (ensure seeds can be planted in the community garden)
+  function openPlantSelectionModal(slotNumber) {
+    alert("Select a seed to plant in Slot " + slotNumber + ". (Functionality to be implemented.)");
+  }
+  function plantMushroomTree() {
+    alert("Planting a mushroom tree. (Functionality to be implemented.)");
+  }
+  function harvestProduce() {
+    alert("Harvesting produce from the Community Garden. (Functionality to be implemented.)");
+  }
+  function sellHarvest() {
+    alert("Selling harvested produce. (Functionality to be implemented.)");
+  }
 </script>
 </body>
 </html>
