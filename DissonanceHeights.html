@@ -287,6 +287,16 @@
       border-radius: 8px;
       background: rgba(0,0,0,0.7);
     }
+    /* Recipe Panel for Cooking (new) */
+    #recipePanel {
+      display: none;
+      border: 2px solid #444;
+      padding: 20px;
+      width: 600px;
+      margin: 20px auto;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.7);
+    }
     /* New Water Supplies Panel */
     #water-panel {
       display: none;
@@ -515,7 +525,8 @@
   <div id="kitchen-panel" class="panel">
     <h2>Community Kitchen</h2>
     <p>Access the cookbook to view 20 available recipes. Each recipe has a single-sentence description based on plants and mushrooms grown in the community garden, along with its benefits and setbacks.</p>
-    <button onclick="openRecipeSelection()">Cook</button>
+    <!-- The Cook button now opens the Recipe Panel -->
+    <button onclick="openRecipePanel()">Cook</button>
     <!-- Display dynamic stove status -->
     <div id="stoveStatus" style="margin-top:10px; font-size:14px;">Stove: Available</div>
     <!-- Cooking Process Simulation (hidden by default) -->
@@ -532,12 +543,17 @@
     <button onclick="hidePanel('kitchen-panel')">Return to Main Screen</button>
   </div>
 
+  <!-- Recipe Panel for Cooking -->
+  <div id="recipePanel" class="panel">
+    <h2>Recipe Selection</h2>
+    <div id="recipeListContainer" style="max-height:300px; overflow-y:auto;"></div>
+    <button onclick="hidePanel('recipePanel')">Cancel</button>
+  </div>
+
   <!-- Water Supplies (Laundry) Panel -->
   <div id="water-panel" class="panel">
     <h2>Water Supplies (Laundry)</h2>
-    <p>
-      Water pressure is directly linked to the performance of the power panel. Use the washing machine to clean clothes – remember, low power output may result in lower water pressure.
-    </p>
+    <p>Water pressure is directly linked to the performance of the power panel. Use the washing machine to clean clothes – remember, low power output may result in lower water pressure.</p>
     <div>
       <p><strong>Water Pressure:</strong> <span id="waterPressureDisplay">Calculating...</span> PSI</p>
     </div>
@@ -610,7 +626,7 @@
     "Room 9": "0009",
     "Room 10": "0010",
     "Room 11": "0011",
-    "Room 12": "0715",  // Note: Room 12 uses a different password now.
+    "Room 12": "0715",
     "Room 13": "0013",
     "Room 14": "0014",
     "Room 15": "0015",
@@ -630,10 +646,12 @@
   let currentRoom = "";
   let doorChatMode = false;
   let harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
-  
-  // Centralized recipes array (20 recipes - here we use 2 unique samples duplicated for brevity)
+
+  // ----------------------------
+  // Centralized Recipes Array (20 recipes)
+  // ----------------------------
   const recipes = [];
-  // Create 20 recipe objects (for demonstration, we use two samples repeated)
+  // For demonstration, we create 20 recipes using two samples duplicated
   for (let i = 0; i < 10; i++) {
     recipes.push({
       title: "Garden Salad " + (i+1),
@@ -1123,18 +1141,29 @@
         chatLog.scrollTop = chatLog.scrollHeight;
       });
   }
-  // New function to open recipe selection and cook a dish
-  function openRecipeSelection() {
-    let recipeList = recipes.map((r, index) => `${index+1}: ${r.title} - ${r.description}`).join("\n");
-    let choice = prompt("Select a recipe to cook:\n" + recipeList);
-    let index = parseInt(choice) - 1;
-    if (isNaN(index) || index < 0 || index >= recipes.length) {
-      alert("Invalid recipe selection.");
-      return;
-    }
-    cookRecipe(recipes[index]);
+  // New function to open the Recipe Panel instead of a popup
+  function openRecipePanel() {
+    // Render the recipe list into the recipe panel container
+    const container = document.getElementById('recipeListContainer');
+    container.innerHTML = "";
+    recipes.forEach((r, index) => {
+      const div = document.createElement('div');
+      div.style.borderBottom = "1px solid #555";
+      div.style.padding = "5px 0";
+      div.innerHTML = `<strong>${index+1}: ${r.title}</strong><br>
+                       ${r.description}<br>
+                       <em>Ingredients:</em> ${r.ingredients.map(i => `${i.name} (${i.amount})`).join(", ")}<br>
+                       <em>Water:</em> ${r.water}<br>
+                       <em>Benefits:</em> ${r.benefits} &nbsp;&nbsp; <em>Setbacks:</em> ${r.setbacks}<br>
+                       <button onclick="cookRecipe(recipes[${index}])">Cook</button>`;
+      container.appendChild(div);
+    });
+    document.getElementById('recipePanel').style.display = 'block';
+    document.getElementById('kitchen-panel').style.display = 'none';
   }
   function cookRecipe(recipe) {
+    // Hide the recipe panel
+    document.getElementById('recipePanel').style.display = 'none';
     // Check inventory for each required ingredient
     let missingIngredients = [];
     recipe.ingredients.forEach(ing => {
