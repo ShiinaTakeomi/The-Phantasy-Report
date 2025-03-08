@@ -6,15 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Google Font for Soviet-era signage look -->
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+  <!-- Favicon to prevent 404 error -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <style>
     /* Global Styles & Eastern European Snowy Minimal Theme */
     body {
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      background:
-        linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-        url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
+      /* Main menu background */
+      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
       background-size: cover;
       color: #eee;
     }
@@ -435,6 +436,11 @@
       <span id="lightStatusDisplay">Unknown</span>
     </div>
     <div class="control">
+      <label>Voltage:</label>
+      <!-- Voltage display element added here -->
+      <span id="voltageDisplay">0.0</span>
+    </div>
+    <div class="control">
       <h4>Service Impact & Suggestions:</h4>
       <div id="powerSuggestions" style="font-size:14px; background:rgba(255,255,255,0.1); padding:5px; border-radius:4px;"></div>
     </div>
@@ -587,7 +593,7 @@
 </div>
 
 <script>
-  // Store original background settings (unchanged)
+  // Store original background settings (main menu background)
   const originalBackground = "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed";
 
   // ----------------------------
@@ -819,6 +825,10 @@
     updateHarvestInventoryUI();
   }
   function openGardenPanel() {
+    // Set community garden background when opening garden panel
+    document.body.style.backgroundImage = "url('https://i.pinimg.com/736x/1a/97/af/1a97af089b326864a32ddb9f788c7c2d.jpg')";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center center";
     document.getElementById('garden-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
     renderGardenSlots();
@@ -834,6 +844,20 @@
     const pressure = Math.round(voltage * 0.8);
     document.getElementById('waterPressureDisplay').textContent = pressure;
     document.getElementById('waterInventoryDisplay').textContent = waterInventory;
+  }
+
+  // ----------------------------
+  // Hide Panel Function (also revert background if needed)
+  // ----------------------------
+  function hidePanel(panelId) {
+    document.getElementById(panelId).style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    // Revert background for panels that change it (minigame & garden)
+    if (panelId === 'minigame-panel' || panelId === 'garden-panel') {
+      document.body.style.backgroundImage = originalBackground;
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center center";
+    }
   }
 
   // ----------------------------
@@ -1436,7 +1460,11 @@
     let factor = electricalOutput ? 1.0 : 0.5;
     let voltage = Math.round(windSpeed * factor + (Math.random() * 10 - 5));
     voltage = Math.max(0, voltage);
-    document.getElementById('voltageDisplay').textContent = voltage.toFixed(1);
+    // Check if voltageDisplay exists before updating.
+    const voltageDisplayElement = document.getElementById('voltageDisplay');
+    if (voltageDisplayElement) {
+      voltageDisplayElement.textContent = voltage.toFixed(1);
+    }
     localStorage.setItem('voltage', voltage);
   }
 
@@ -1480,23 +1508,23 @@
     }
   }
 
-function updateGarbageDisplay() {
-  // Always update the display with the current garbageLevel
-  document.getElementById('garbageDisplay').textContent = garbageLevel;
-  const now = Date.now();
-  const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
-  if (elapsedMinutes > 0) {
-    garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
-    lastGarbageUpdate = now;
-    localStorage.setItem('garbageLevel', garbageLevel);
-    localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
-    // Update the display after increasing the value
+  function updateGarbageDisplay() {
+    // Always update the display with the current garbageLevel
     document.getElementById('garbageDisplay').textContent = garbageLevel;
-    if (garbageLevel > 80) {
-      alert("High garbage levels detected! The community is getting sick.");
+    const now = Date.now();
+    const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
+    if (elapsedMinutes > 0) {
+      garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
+      lastGarbageUpdate = now;
+      localStorage.setItem('garbageLevel', garbageLevel);
+      localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
+      // Update the display after increasing the value
+      document.getElementById('garbageDisplay').textContent = garbageLevel;
+      if (garbageLevel > 80) {
+        alert("High garbage levels detected! The community is getting sick.");
+      }
     }
   }
-}
 
   function logPowerMessage(message) {
     const logDiv = document.getElementById('minigameLog');
@@ -1555,19 +1583,6 @@ function updateGarbageDisplay() {
     console.log("Current Season: " + currentSeason);
   }
   setInterval(updateSeason, 120000);
-
-  // ----------------------------
-  // Modal Panel Utilities
-  // ----------------------------
-  function hidePanel(panelId) {
-    document.getElementById(panelId).style.display = 'none';
-    document.getElementById('main-screen').style.display = 'block';
-    if (panelId === 'minigame-panel') {
-      document.body.style.background = originalBackground;
-      document.body.style.backgroundSize = "cover";
-      document.body.style.backgroundPosition = "center center";
-    }
-  }
 
   // ----------------------------
   // Toggle Music Player Function
