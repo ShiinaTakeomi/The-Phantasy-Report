@@ -844,16 +844,13 @@
   // ----------------------------
   // Hide Panel Function (also revert background if needed)
   // ----------------------------
-  function hidePanel(panelId) {
-    document.getElementById(panelId).style.display = 'none';
-    document.getElementById('main-screen').style.display = 'block';
-    // Revert background for panels that change it (minigame & garden)
-    if (panelId === 'minigame-panel' || panelId === 'garden-panel') {
-      document.body.style.backgroundImage = originalBackground;
-      document.body.style.backgroundSize = "cover";
-      document.body.style.backgroundPosition = "center center";
-    }
-  }
+function hidePanel(panelId) {
+  document.getElementById(panelId).style.display = 'none';
+  document.getElementById('main-screen').style.display = 'block';
+  document.body.style.backgroundImage = originalBackground;
+  document.body.style.backgroundSize = "cover";
+  document.body.style.backgroundPosition = "center center";
+}
 
   // ----------------------------
   // Buy Item Function
