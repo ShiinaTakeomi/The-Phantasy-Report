@@ -1143,7 +1143,6 @@
   }
   // New function to open the Recipe Panel instead of a popup
   function openRecipePanel() {
-    // Render the recipe list into the recipe panel container
     const container = document.getElementById('recipeListContainer');
     container.innerHTML = "";
     recipes.forEach((r, index) => {
@@ -1173,6 +1172,8 @@
     });
     if (missingIngredients.length > 0) {
       alert("Cannot cook recipe. Missing ingredients:\n" + missingIngredients.join("\n"));
+      // Redirect back to the Recipe Panel
+      openRecipePanel();
       return;
     }
     // Remove the required ingredients from inventory
