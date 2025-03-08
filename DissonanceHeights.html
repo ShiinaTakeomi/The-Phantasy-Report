@@ -102,7 +102,6 @@
       padding: 5px;
       border-radius: 4px;
     }
-    /* Exit button moved below garbage chute */
     .exit-button {
       position: absolute;
       left: 0;
@@ -340,7 +339,6 @@
   allowfullscreen 
   style="position:absolute; left:-9999px;">
 </iframe>
-
 
 <!-- Toggle Music Player Button -->
 <div style="text-align:center; margin-top:10px;">
@@ -830,7 +828,7 @@
     updateHarvestInventoryUI();
   }
   function openGardenPanel() {
-    // Set community garden background (covers both PC and phone because of background-size: cover)
+    // Set community garden background
     document.body.style.backgroundImage = "url('https://i.pinimg.com/736x/1a/97/af/1a97af089b326864a32ddb9f788c7c2d.jpg')";
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundPosition = "center center";
@@ -852,16 +850,15 @@
   }
 
   // ----------------------------
-  // Hide Panel Function (also revert background if needed)
+  // Hide Panel Function (revert background)
   // ----------------------------
-function hidePanel(panelId) {
-  document.getElementById(panelId).style.display = 'none';
-  document.getElementById('main-screen').style.display = 'block';
-  document.body.style.backgroundImage = originalBackground;
-  document.body.style.backgroundSize = "cover";
-  document.body.style.backgroundPosition = "center center";
-  // Removed location.reload() to prevent reloading the entire page
-}
+  function hidePanel(panelId) {
+    document.getElementById(panelId).style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    document.body.style.backgroundImage = originalBackground;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center center";
+  }
 
   // ----------------------------
   // Buy Item Function
