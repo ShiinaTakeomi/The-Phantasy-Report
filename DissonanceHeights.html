@@ -815,6 +815,7 @@
   function openGroceryPanel() {
     document.getElementById('grocery-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
+    generateGroceryItems(); // Regenerate items when panel is opened
     updateHarvestInventoryUI();
   }
   function openGardenPanel() {
