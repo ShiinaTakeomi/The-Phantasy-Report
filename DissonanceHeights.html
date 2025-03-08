@@ -504,7 +504,7 @@
   <!-- Community Kitchen Panel -->
   <div id="kitchen-panel" class="panel">
     <h2>Community Kitchen</h2>
-    <p>Access the cookbook to view 20 available recipes. Each recipe has a brief description and uses ingredients from your harvest.</p>
+    <p>Access the cookbook to view 20 available recipes. Each recipe includes a brief description, a list of required ingredients and amounts, and uses produce from your garden.</p>
     <button onclick="showCookbook()">Cookbook</button>
     <!-- Chat area for Community Kitchen -->
     <div>
@@ -753,14 +753,13 @@
   function buyItem(item) {
     const prices = {
       'Food Staples': 10,
-      // Price for seeds and mushrooms will be defined in seed/mushroom list
       'Lubricant Oil': 5,
       'Room Decoration': 7,
       'Alcohol': 3,
       'Cigarettes': 4
     };
-    // For seeds and mushrooms, prices are defined individually
-    let price = prices[item] || 2; // default price for seeds/mushrooms is $2
+    // For seeds and mushrooms, default price is $2
+    let price = prices[item] || 2;
     let money = parseInt(localStorage.getItem('money')) || 50;
     if (money >= price) {
       money -= price;
@@ -776,7 +775,6 @@
 
   // Function to apply benefits and setbacks for each item
   function applyItemEffects(item) {
-    // Example effects (can be expanded):
     switch(item) {
       case "Food Staples":
         updateHunger(-5);
@@ -785,10 +783,9 @@
       case "Lubricant Oil":
         updateMood(1);
         break;
-      // For seeds, mushrooms, alcohol, cigarettes, etc.
       default:
         if(item.includes("Seed")) {
-          updateMood(2); // seeds improve mood (hope for growth)
+          updateMood(2);
         } else if(item.includes("Mushroom")) {
           updateMood(1);
           updateHunger(-1);
@@ -941,7 +938,7 @@
     isEditing = false;
     updatePlayerStatus();
   }
-  // Biodata Toggle: In view mode, show Core Stats (without inventory) and a separate Inventory section
+  // Biodata Toggle
   function togglePlayerStatus() {
     const biodataDiv = document.getElementById('playerStatus');
     if(biodataDiv.style.display === "none" || biodataDiv.style.display === "") {
@@ -989,7 +986,6 @@
             statusHTML += `<div id="coreStats">${coreStatsHTML}</div>`;
             statusHTML += `<div id="narrativeStats" style="display:none;">${narrativeHTML}</div>`;
             statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
-            // Add an Edit button here to allow updating character info
             statusHTML += `<button onclick="enableEdit()">Edit Biodata</button>`;
             statusHTML += inventoryHTML;
           } else {
@@ -1090,31 +1086,184 @@
         chatLog.scrollTop = chatLog.scrollHeight;
       });
   }
-  // Cookbook function to show 20 recipes
+  // Updated Cookbook function including ingredient lists and amounts
   function showCookbook() {
-    let recipes = [
-      "Recipe 1: A hearty stew made with harvested seeds and fresh vegetables.",
-      "Recipe 2: A light salad featuring a mix of garden greens and mushrooms.",
-      "Recipe 3: A savory soup enriched with seed broth and herbs.",
-      "Recipe 4: Grilled mushrooms served with a side of spiced seeds.",
-      "Recipe 5: A refreshing seed smoothie with hints of mint.",
-      "Recipe 6: Baked seed crackers for a crunchy snack.",
-      "Recipe 7: Mushroom risotto with a rich, creamy texture.",
-      "Recipe 8: A zesty seed dip perfect for gatherings.",
-      "Recipe 9: Roasted mushrooms with garlic and herbs.",
-      "Recipe 10: A layered seed parfait with seasonal fruits.",
-      "Recipe 11: Stir-fried vegetables tossed with mushrooms and seeds.",
-      "Recipe 12: A seed-infused bread with a crispy crust.",
-      "Recipe 13: Mushroom pizza with a thin, flavorful crust.",
-      "Recipe 14: A refreshing salad with mixed mushrooms and crunchy seeds.",
-      "Recipe 15: A warming stew featuring seeds and earthy mushrooms.",
-      "Recipe 16: Mushroom pasta in a light cream sauce.",
-      "Recipe 17: A tangy seed vinaigrette over fresh greens.",
-      "Recipe 18: Roasted seed medley as a nutritious side.",
-      "Recipe 19: Mushroom tacos with a hint of spice and seed garnish.",
-      "Recipe 20: A fusion dish blending seeds and mushrooms in a savory sauce."
+    const recipes = [
+      {
+        name: "Hearty Stew",
+        description: "A warming stew made with harvested seeds and vegetables.",
+        ingredients: [
+          { item: "Pumpkin Seed", amount: "10 units" },
+          { item: "Carrot", amount: "5 units" },
+          { item: "Wheat Seed", amount: "8 units" }
+        ]
+      },
+      {
+        name: "Garden Salad",
+        description: "A fresh salad featuring mixed greens and mushrooms.",
+        ingredients: [
+          { item: "Sunflower Seed", amount: "4 units" },
+          { item: "Button Mushroom", amount: "3 units" },
+          { item: "Basil Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Savory Soup",
+        description: "A rich soup enriched with seed broth and herbs.",
+        ingredients: [
+          { item: "Rice Seed", amount: "6 units" },
+          { item: "Flax Seed", amount: "3 units" },
+          { item: "Portobello Mushroom", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Grilled Mushrooms",
+        description: "Grilled mushrooms with a side of spiced seeds.",
+        ingredients: [
+          { item: "Shiitake Mushroom", amount: "4 units" },
+          { item: "Sesame Seed", amount: "5 units" }
+        ]
+      },
+      {
+        name: "Refreshing Smoothie",
+        description: "A cool seed smoothie with mint for a refreshing taste.",
+        ingredients: [
+          { item: "Chia Seed", amount: "3 units" },
+          { item: "Pumpkin Seed", amount: "3 units" },
+          { item: "Mint Leaf", amount: "5 units" }
+        ]
+      },
+      {
+        name: "Baked Crackers",
+        description: "Crunchy baked seed crackers for snacking.",
+        ingredients: [
+          { item: "Oat Seed", amount: "5 units" },
+          { item: "Flax Seed", amount: "4 units" }
+        ]
+      },
+      {
+        name: "Mushroom Risotto",
+        description: "Creamy risotto enriched with mushrooms and a seed infusion.",
+        ingredients: [
+          { item: "Oyster Mushroom", amount: "4 units" },
+          { item: "Quinoa Seed", amount: "6 units" }
+        ]
+      },
+      {
+        name: "Zesty Seed Dip",
+        description: "A tangy seed dip perfect for gatherings.",
+        ingredients: [
+          { item: "Millet Seed", amount: "4 units" },
+          { item: "Caraway Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Roasted Mushrooms",
+        description: "Mushrooms roasted with garlic and herbs.",
+        ingredients: [
+          { item: "Enoki Mushroom", amount: "4 units" },
+          { item: "Fennel Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Layered Parfait",
+        description: "A layered parfait with seeds and seasonal fruits.",
+        ingredients: [
+          { item: "Sesame Seed", amount: "3 units" },
+          { item: "Poppy Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Stir-Fried Medley",
+        description: "A stir-fry of vegetables with mushrooms and seeds.",
+        ingredients: [
+          { item: "Corn Seed", amount: "4 units" },
+          { item: "Portobello Mushroom", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Seed-Infused Bread",
+        description: "Freshly baked bread with a crispy seed crust.",
+        ingredients: [
+          { item: "Rice Seed", amount: "5 units" },
+          { item: "Chia Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Mushroom Pizza",
+        description: "A thin-crust pizza topped with mushrooms and seeds.",
+        ingredients: [
+          { item: "Button Mushroom", amount: "4 units" },
+          { item: "Flax Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Mixed Mushroom Salad",
+        description: "A refreshing salad with assorted mushrooms and crunchy seeds.",
+        ingredients: [
+          { item: "Oyster Mushroom", amount: "3 units" },
+          { item: "Quinoa Seed", amount: "4 units" }
+        ]
+      },
+      {
+        name: "Hearty Stew Deluxe",
+        description: "A robust stew featuring an assortment of seeds and mushrooms.",
+        ingredients: [
+          { item: "Pumpkin Seed", amount: "8 units" },
+          { item: "Portobello Mushroom", amount: "3 units" },
+          { item: "Sunflower Seed", amount: "4 units" }
+        ]
+      },
+      {
+        name: "Creamy Mushroom Pasta",
+        description: "Pasta in a light cream sauce with tender mushrooms.",
+        ingredients: [
+          { item: "Shiitake Mushroom", amount: "4 units" },
+          { item: "Millet Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Tangy Vinaigrette Salad",
+        description: "Fresh greens tossed in a seed-based tangy vinaigrette.",
+        ingredients: [
+          { item: "Basil Seed", amount: "2 units" },
+          { item: "Anise Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Roasted Seed Medley",
+        description: "A nutritious roasted medley of assorted seeds.",
+        ingredients: [
+          { item: "Oat Seed", amount: "3 units" },
+          { item: "Quinoa Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Spicy Mushroom Tacos",
+        description: "Tacos with mushrooms and a spicy seed garnish.",
+        ingredients: [
+          { item: "Portobello Mushroom", amount: "3 units" },
+          { item: "Cumin Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Fusion Seed & Mushroom Dish",
+        description: "A unique blend of seeds and mushrooms in a savory sauce.",
+        ingredients: [
+          { item: "Sorghum Seed", amount: "4 units" },
+          { item: "Enoki Mushroom", amount: "3 units" }
+        ]
+      }
     ];
-    alert("Cookbook Recipes:\n\n" + recipes.join("\n"));
+    let cookbookText = "Cookbook Recipes:\n\n";
+    recipes.forEach(recipe => {
+      cookbookText += recipe.name + ":\n" + recipe.description + "\nIngredients:\n";
+      recipe.ingredients.forEach(ing => {
+        cookbookText += ` - ${ing.item}: ${ing.amount}\n`;
+      });
+      cookbookText += "\n";
+    });
+    alert(cookbookText);
   }
 
   // ----------------------------
@@ -1324,7 +1473,6 @@
     evaluatePowerOutput();
     updateLastInteraction();
   }
-  // Updated lubricate function to check for Lubricant Oil in inventory
   function lubricate() {
     if (harvestInventory["Lubricant Oil"] && harvestInventory["Lubricant Oil"] > 0) {
       removeItem("Lubricant Oil", 1);
@@ -1392,7 +1540,7 @@
   }
 
   // ----------------------------
-  // NEW: Health Decline Due to High Garbage
+  // Health Decline Due to High Garbage
   // ----------------------------
   function simulateHealthDecline() {
     if (garbageLevel > 80) {
@@ -1500,17 +1648,946 @@
   // Clear Garbage Function with Logging
   // ----------------------------
   function clearGarbage() {
-    // Reset garbage level
     garbageLevel = 0;
     localStorage.setItem('garbageLevel', garbageLevel);
     document.getElementById('garbageDisplay').textContent = garbageLevel;
-    // Log the action with character name
     const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
     const logDiv = document.getElementById('garbageLog');
     const timestamp = new Date().toLocaleTimeString();
     logDiv.innerHTML += `<p>[${timestamp}] ${characterName} cleared the garbage.</p>`;
     logDiv.scrollTop = logDiv.scrollHeight;
-    // Notify others (if desired, add a Firebase notification here)
+  }
+
+  // ----------------------------
+  // Updated Cookbook: Include Recipe Ingredient Lists with Amounts
+  // ----------------------------
+  function showCookbook() {
+    const recipes = [
+      {
+        name: "Hearty Stew",
+        description: "A warming stew made with harvested seeds and vegetables.",
+        ingredients: [
+          { item: "Pumpkin Seed", amount: "10 units" },
+          { item: "Carrot", amount: "5 units" },
+          { item: "Wheat Seed", amount: "8 units" }
+        ]
+      },
+      {
+        name: "Garden Salad",
+        description: "A fresh salad featuring mixed greens and mushrooms.",
+        ingredients: [
+          { item: "Sunflower Seed", amount: "4 units" },
+          { item: "Button Mushroom", amount: "3 units" },
+          { item: "Basil Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Savory Soup",
+        description: "A rich soup enriched with seed broth and herbs.",
+        ingredients: [
+          { item: "Rice Seed", amount: "6 units" },
+          { item: "Flax Seed", amount: "3 units" },
+          { item: "Portobello Mushroom", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Grilled Mushrooms",
+        description: "Grilled mushrooms with a side of spiced seeds.",
+        ingredients: [
+          { item: "Shiitake Mushroom", amount: "4 units" },
+          { item: "Sesame Seed", amount: "5 units" }
+        ]
+      },
+      {
+        name: "Refreshing Smoothie",
+        description: "A cool seed smoothie with mint for a refreshing taste.",
+        ingredients: [
+          { item: "Chia Seed", amount: "3 units" },
+          { item: "Pumpkin Seed", amount: "3 units" },
+          { item: "Mint Leaf", amount: "5 units" }
+        ]
+      },
+      {
+        name: "Baked Crackers",
+        description: "Crunchy baked seed crackers for snacking.",
+        ingredients: [
+          { item: "Oat Seed", amount: "5 units" },
+          { item: "Flax Seed", amount: "4 units" }
+        ]
+      },
+      {
+        name: "Mushroom Risotto",
+        description: "Creamy risotto enriched with mushrooms and a seed infusion.",
+        ingredients: [
+          { item: "Oyster Mushroom", amount: "4 units" },
+          { item: "Quinoa Seed", amount: "6 units" }
+        ]
+      },
+      {
+        name: "Zesty Seed Dip",
+        description: "A tangy seed dip perfect for gatherings.",
+        ingredients: [
+          { item: "Millet Seed", amount: "4 units" },
+          { item: "Caraway Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Roasted Mushrooms",
+        description: "Mushrooms roasted with garlic and herbs.",
+        ingredients: [
+          { item: "Enoki Mushroom", amount: "4 units" },
+          { item: "Fennel Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Layered Parfait",
+        description: "A layered parfait with seeds and seasonal fruits.",
+        ingredients: [
+          { item: "Sesame Seed", amount: "3 units" },
+          { item: "Poppy Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Stir-Fried Medley",
+        description: "A stir-fry of vegetables with mushrooms and seeds.",
+        ingredients: [
+          { item: "Corn Seed", amount: "4 units" },
+          { item: "Portobello Mushroom", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Seed-Infused Bread",
+        description: "Freshly baked bread with a crispy seed crust.",
+        ingredients: [
+          { item: "Rice Seed", amount: "5 units" },
+          { item: "Chia Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Mushroom Pizza",
+        description: "A thin-crust pizza topped with mushrooms and seeds.",
+        ingredients: [
+          { item: "Button Mushroom", amount: "4 units" },
+          { item: "Flax Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Mixed Mushroom Salad",
+        description: "A refreshing salad with assorted mushrooms and crunchy seeds.",
+        ingredients: [
+          { item: "Oyster Mushroom", amount: "3 units" },
+          { item: "Quinoa Seed", amount: "4 units" }
+        ]
+      },
+      {
+        name: "Hearty Stew Deluxe",
+        description: "A robust stew featuring an assortment of seeds and mushrooms.",
+        ingredients: [
+          { item: "Pumpkin Seed", amount: "8 units" },
+          { item: "Portobello Mushroom", amount: "3 units" },
+          { item: "Sunflower Seed", amount: "4 units" }
+        ]
+      },
+      {
+        name: "Creamy Mushroom Pasta",
+        description: "Pasta in a light cream sauce with tender mushrooms.",
+        ingredients: [
+          { item: "Shiitake Mushroom", amount: "4 units" },
+          { item: "Millet Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Tangy Vinaigrette Salad",
+        description: "Fresh greens tossed in a seed-based tangy vinaigrette.",
+        ingredients: [
+          { item: "Basil Seed", amount: "2 units" },
+          { item: "Anise Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Roasted Seed Medley",
+        description: "A nutritious roasted medley of assorted seeds.",
+        ingredients: [
+          { item: "Oat Seed", amount: "3 units" },
+          { item: "Quinoa Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Spicy Mushroom Tacos",
+        description: "Tacos with mushrooms and a spicy seed garnish.",
+        ingredients: [
+          { item: "Portobello Mushroom", amount: "3 units" },
+          { item: "Cumin Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Fusion Seed & Mushroom Dish",
+        description: "A unique blend of seeds and mushrooms in a savory sauce.",
+        ingredients: [
+          { item: "Sorghum Seed", amount: "4 units" },
+          { item: "Enoki Mushroom", amount: "3 units" }
+        ]
+      }
+    ];
+    let cookbookText = "Cookbook Recipes:\n\n";
+    recipes.forEach(recipe => {
+      cookbookText += recipe.name + ":\n" + recipe.description + "\nIngredients:\n";
+      recipe.ingredients.forEach(ing => {
+        cookbookText += ` - ${ing.item}: ${ing.amount}\n`;
+      });
+      cookbookText += "\n";
+    });
+    alert(cookbookText);
+  }
+
+  // ----------------------------
+  // Water Supplies (Laundry) Chat & Washing Machine Functions
+  // ----------------------------
+  function sendLaundryChat() {
+    const msg = document.getElementById('laundryChatInput').value;
+    if (msg.trim() !== "") {
+      db.collection("messages").add({
+        room: "Water Supplies",
+        sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown",
+        content: msg,
+        chatType: "laundry",
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      document.getElementById('laundryChatInput').value = "";
+    }
+  }
+  function listenForLaundryChat() {
+    const chatLog = document.getElementById('laundryChatLog');
+    db.collection("messages")
+      .where("room", "==", "Water Supplies")
+      .where("chatType", "==", "laundry")
+      .orderBy("timestamp")
+      .onSnapshot((querySnapshot) => {
+        chatLog.innerHTML = "";
+        querySnapshot.forEach((doc) => {
+          const message = doc.data();
+          const p = document.createElement('p');
+          p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+          chatLog.appendChild(p);
+        });
+        chatLog.scrollTop = chatLog.scrollHeight;
+      });
+  }
+  function washClothes() {
+    alert("You washed your clothes. Your health improves slightly.");
+    updateMood(3);
+  }
+
+  // ----------------------------
+  // Room Interaction & Chat Functions
+  // ----------------------------
+  function openRoomInteraction(roomName) {
+    currentRoom = roomName;
+    db.collection("rooms").doc(roomName).get().then(doc => {
+      if (doc.exists) {
+        const roomData = doc.data();
+        const currentPlayer = localStorage.getItem("playerName");
+        if (currentPlayer === roomData.owner) {
+          openRoomChat(roomName);
+        } else {
+          showDoorModal(roomName);
+        }
+      } else {
+        alert("Room " + roomName + " does not exist. Please contact support.");
+      }
+    }).catch(error => {
+      console.error("Error fetching room data:", error);
+      alert("Error fetching room data for " + roomName);
+    });
+  }
+  function openRoomChat(roomName) {
+    doorChatMode = false;
+    document.getElementById('chatRoomTitle').textContent = roomName + " Chat (Inside)";
+    document.getElementById('chatLog').innerHTML = "";
+    document.getElementById('chatPanel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+    listenForMessages(roomName);
+  }
+  function openDoorChat(roomName) {
+    doorChatMode = true;
+    document.getElementById('chatRoomTitle').textContent = roomName + " Door Chat (Visitor)";
+    document.getElementById('chatLog').innerHTML = "";
+    document.getElementById('chatPanel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+    listenForMessages(roomName);
+  }
+  function listenForMessages(roomName) {
+    const chatLog = document.getElementById('chatLog');
+    const messagesRef = db.collection("messages");
+    messagesRef
+      .where("room", "==", roomName)
+      .where("chatType", "==", doorChatMode ? "door" : "room")
+      .orderBy("timestamp")
+      .onSnapshot((querySnapshot) => {
+        chatLog.innerHTML = "";
+        querySnapshot.forEach((doc) => {
+          const message = doc.data();
+          const p = document.createElement('p');
+          p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+          chatLog.appendChild(p);
+        });
+        chatLog.scrollTop = chatLog.scrollHeight;
+      });
+  }
+  function closeChat() {
+    document.getElementById('chatPanel').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    currentRoom = "";
+  }
+  async function sendChatMessage() {
+    const msg = document.getElementById('chatInput').value;
+    if (msg.trim() !== "") {
+      const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
+      try {
+        await db.collection("messages").add({
+          room: currentRoom,
+          sender: characterName,
+          content: msg,
+          chatType: doorChatMode ? "door" : "room",
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('chatInput').value = "";
+      } catch (error) {
+        console.error("Error sending message:", error);
+      }
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+      chatInput.addEventListener('keydown', function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          sendChatMessage();
+        }
+      });
+    }
+  });
+
+  // ----------------------------
+  // Door Modal Functions
+  // ----------------------------
+  function showDoorModal(roomName) {
+    currentRoom = roomName;
+    document.getElementById('doorTitle').textContent = "You are at the door of " + roomName;
+    document.getElementById('doorModal').style.display = 'block';
+    document.getElementById('passwordDiv').style.display = 'none';
+    document.getElementById('doorPassword').value = "";
+  }
+  function closeDoorModal() {
+    document.getElementById('doorModal').style.display = 'none';
+  }
+  function showPasswordInput() {
+    document.getElementById('passwordDiv').style.display = 'block';
+  }
+  function verifyPassword() {
+    const enteredPassword = document.getElementById('doorPassword').value;
+    const correctPassword = roomPasswords[currentRoom];
+    if (enteredPassword === correctPassword) {
+      alert("Password correct. You now enter the room.");
+      closeDoorModal();
+      openRoomChat(currentRoom);
+    } else {
+      alert("Incorrect password. Please try again or choose to knock.");
+    }
+  }
+  function handleKnock() {
+    alert("You knocked on the door. Please wait for the owner’s response.");
+    db.collection("rooms").doc(currentRoom).get().then(doc => {
+      if (doc.exists) {
+        const owner = doc.data().owner;
+        const visitor = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "A visitor";
+        db.collection("notifications").add({
+          owner: owner,
+          room: currentRoom,
+          message: `${visitor} knocked on your door of ${currentRoom}.`,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    }).catch(error => {
+      console.error("Error sending knock notification:", error);
+    });
+    closeDoorModal();
+    openDoorChat(currentRoom);
+  }
+
+  // ----------------------------
+  // Power Source Simulation Functions
+  // ----------------------------
+  let windSpeed = localStorage.getItem('windSpeed') || 50;
+  let brakeEngaged = JSON.parse(localStorage.getItem('brakeEngaged')) || false;
+  let powerOutputConfirmed = JSON.parse(localStorage.getItem('powerOutputConfirmed')) || false;
+  let lastInteractionTime = localStorage.getItem('lastInteractionTime') || Date.now();
+  let garbageLevel = localStorage.getItem('garbageLevel') || 0;
+  let lastGarbageUpdate = localStorage.getItem('lastGarbageUpdate') || Date.now();
+  let powerStatus = "Unknown";
+  function updateWindSpeed() {
+    windSpeed = document.getElementById('windSpeedSlider').value;
+    document.getElementById('windSpeedValue').textContent = windSpeed;
+    localStorage.setItem('windSpeed', windSpeed);
+    updateVoltage();
+    updateLastInteraction();
+  }
+  function toggleBrake() {
+    brakeEngaged = !brakeEngaged;
+    document.getElementById('brakeButton').textContent = brakeEngaged ? "Release Brake" : "Engage Brake";
+    localStorage.setItem('brakeEngaged', brakeEngaged);
+    updateVoltage();
+    updateLastInteraction();
+  }
+  function togglePowerOutput() {
+    powerOutputConfirmed = !powerOutputConfirmed;
+    document.getElementById('powerOutputConfirm').textContent = powerOutputConfirmed ? "Output Confirmed" : "Confirm Output";
+    localStorage.setItem('powerOutputConfirmed', powerOutputConfirmed);
+    evaluatePowerOutput();
+    updateLastInteraction();
+  }
+  function lubricate() {
+    if (harvestInventory["Lubricant Oil"] && harvestInventory["Lubricant Oil"] > 0) {
+      removeItem("Lubricant Oil", 1);
+      logPowerMessage("Lubricant applied. Moving parts are now well-oiled.");
+      updateLastInteraction();
+    } else {
+      alert("You don't have any Lubricant Oil. Please purchase some from the Grocery Store.");
+    }
+  }
+  function updateVoltage() {
+    let factor = brakeEngaged ? 0.5 : 1.0;
+    let voltage = Math.round(windSpeed * factor + (Math.random() * 10 - 5));
+    voltage = Math.max(0, voltage);
+    document.getElementById('voltageDisplay').textContent = voltage.toFixed(1);
+    localStorage.setItem('voltage', voltage);
+  }
+  function evaluatePowerOutput() {
+    if (windSpeed >= 40 && windSpeed <= 70 && powerOutputConfirmed) {
+      powerStatus = "On";
+    } else {
+      powerStatus = "Off";
+    }
+    document.getElementById('powerStatusDisplay').textContent = powerStatus;
+    if (powerStatus === "Off") {
+      document.getElementById('powerAlert').style.display = "inline";
+      alert("Power is insufficient! Flats will experience reduced services.");
+    } else {
+      document.getElementById('powerAlert').style.display = "none";
+    }
+  }
+  function simulatePowerEvent() {
+    if (Date.now() - lastInteractionTime > 60000) {
+      windSpeed = Math.max(0, windSpeed - 5);
+      localStorage.setItem('windSpeed', windSpeed);
+      updateVoltage();
+    }
+  }
+  function updateGarbageDisplay() {
+    const now = Date.now();
+    const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
+    if (elapsedMinutes > 0) {
+      garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
+      lastGarbageUpdate = now;
+      localStorage.setItem('garbageLevel', garbageLevel);
+      localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
+      document.getElementById('garbageDisplay').textContent = garbageLevel;
+      if (garbageLevel > 80) {
+        alert("High garbage levels detected! The community is getting sick.");
+      }
+    }
+  }
+  function logPowerMessage(message) {
+    const logDiv = document.getElementById('minigameLog');
+    const timestamp = new Date().toLocaleTimeString();
+    logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
+  function toggleInstructions() {
+    const instrDiv = document.getElementById("instructions");
+    instrDiv.style.display = (instrDiv.style.display === "none" || instrDiv.style.display === "") ? "block" : "none";
+  }
+  function updateLastInteraction() {
+    lastInteractionTime = Date.now();
+    localStorage.setItem('lastInteractionTime', lastInteractionTime);
+  }
+
+  // ----------------------------
+  // Health Decline Due to High Garbage
+  // ----------------------------
+  function simulateHealthDecline() {
+    if (garbageLevel > 80) {
+      const playerEmail = localStorage.getItem('playerName');
+      if (!playerEmail) return;
+      const safePlayerName = sanitizePlayerName(playerEmail);
+      db.collection('players').doc(safePlayerName).get().then((doc) => {
+        if (doc.exists) {
+          let data = doc.data();
+          let currentHealth = data.health || 100;
+          let newHealth = Math.max(0, currentHealth - 1);
+          db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+          if (newHealth === 0) {
+            playerDied();
+          }
+        }
+      }).catch((error) => {
+        console.error("Error decreasing health: ", error);
+      });
+    }
+  }
+  function playerDied() {
+    alert("Your health has reached zero. You have died.");
+    clearGameState();
+    window.location.href = "index.html";
+  }
+
+  // ----------------------------
+  // Season Simulation
+  // ----------------------------
+  let currentSeason = "Spring";
+  function updateSeason() {
+    const seasons = ["Spring", "Summer", "Autumn", "Winter"];
+    let index = Math.floor((Date.now() / 120000)) % seasons.length;
+    currentSeason = seasons[index];
+    console.log("Current Season: " + currentSeason);
+  }
+  setInterval(updateSeason, 120000);
+
+  // ----------------------------
+  // Modal Panel Utilities
+  // ----------------------------
+  function hidePanel(panelId) {
+    document.getElementById(panelId).style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    if (panelId === 'minigame-panel') {
+      document.body.style.background = originalBackground;
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center center";
+    }
+  }
+
+  // ----------------------------
+  // Toggle Music Player Function
+  // ----------------------------
+  function toggleMusicPlayer() {
+    var player = document.getElementById("bgMusic");
+    if (player.style.display === "none" || player.style.display === "" || player.style.width === "0px") {
+      player.style.display = "block";
+      player.style.width = "300px";
+      player.style.height = "200px";
+      player.style.position = "relative";
+      player.style.left = "0";
+    } else {
+      player.style.display = "none";
+      player.style.width = "0";
+      player.style.height = "0";
+      player.style.position = "absolute";
+      player.style.left = "-9999px";
+    }
+  }
+
+  // ----------------------------
+  // Functions to Generate Seed and Mushroom Items in Grocery Stand
+  // ----------------------------
+  const seedTypes = [
+    "Sunflower Seed", "Pumpkin Seed", "Corn Seed", "Wheat Seed", "Rice Seed",
+    "Barley Seed", "Oat Seed", "Millet Seed", "Sorghum Seed", "Quinoa Seed",
+    "Flax Seed", "Sesame Seed", "Chia Seed", "Cumin Seed", "Mustard Seed",
+    "Fennel Seed", "Caraway Seed", "Anise Seed", "Poppy Seed", "Basil Seed"
+  ];
+  const mushroomTypes = [
+    "Button Mushroom", "Portobello Mushroom", "Shiitake Mushroom", "Oyster Mushroom", "Enoki Mushroom"
+  ];
+  function generateGroceryItems() {
+    let seedContainer = document.getElementById("seedList");
+    seedTypes.forEach(seed => {
+      let div = document.createElement("div");
+      div.className = "grocery-item";
+      div.innerHTML = `<p><strong>${seed}</strong> - $2<br><em>${seed} is ideal for growing nutrient-rich produce.</em></p>
+                       <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
+      seedContainer.appendChild(div);
+    });
+    let mushroomContainer = document.getElementById("mushroomList");
+    mushroomTypes.forEach(mushroom => {
+      let div = document.createElement("div");
+      div.className = "grocery-item";
+      div.innerHTML = `<p><strong>${mushroom}</strong> - $2<br><em>${mushroom} adds unique flavor and nutrients.</em></p>
+                       <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
+      mushroomContainer.appendChild(div);
+    });
+  }
+
+  // ----------------------------
+  // Clear Garbage Function with Logging
+  // ----------------------------
+  function clearGarbage() {
+    garbageLevel = 0;
+    localStorage.setItem('garbageLevel', garbageLevel);
+    document.getElementById('garbageDisplay').textContent = garbageLevel;
+    const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
+    const logDiv = document.getElementById('garbageLog');
+    const timestamp = new Date().toLocaleTimeString();
+    logDiv.innerHTML += `<p>[${timestamp}] ${characterName} cleared the garbage.</p>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
+
+  // ----------------------------
+  // Updated Cookbook: Include Recipe Ingredient Lists with Amounts
+  // ----------------------------
+  function showCookbook() {
+    const recipes = [
+      {
+        name: "Hearty Stew",
+        description: "A warming stew made with harvested seeds and vegetables.",
+        ingredients: [
+          { item: "Pumpkin Seed", amount: "10 units" },
+          { item: "Carrot", amount: "5 units" },
+          { item: "Wheat Seed", amount: "8 units" }
+        ]
+      },
+      {
+        name: "Garden Salad",
+        description: "A fresh salad featuring mixed greens and mushrooms.",
+        ingredients: [
+          { item: "Sunflower Seed", amount: "4 units" },
+          { item: "Button Mushroom", amount: "3 units" },
+          { item: "Basil Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Savory Soup",
+        description: "A rich soup enriched with seed broth and herbs.",
+        ingredients: [
+          { item: "Rice Seed", amount: "6 units" },
+          { item: "Flax Seed", amount: "3 units" },
+          { item: "Portobello Mushroom", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Grilled Mushrooms",
+        description: "Grilled mushrooms with a side of spiced seeds.",
+        ingredients: [
+          { item: "Shiitake Mushroom", amount: "4 units" },
+          { item: "Sesame Seed", amount: "5 units" }
+        ]
+      },
+      {
+        name: "Refreshing Smoothie",
+        description: "A cool seed smoothie with mint for a refreshing taste.",
+        ingredients: [
+          { item: "Chia Seed", amount: "3 units" },
+          { item: "Pumpkin Seed", amount: "3 units" },
+          { item: "Mint Leaf", amount: "5 units" }
+        ]
+      },
+      {
+        name: "Baked Crackers",
+        description: "Crunchy baked seed crackers for snacking.",
+        ingredients: [
+          { item: "Oat Seed", amount: "5 units" },
+          { item: "Flax Seed", amount: "4 units" }
+        ]
+      },
+      {
+        name: "Mushroom Risotto",
+        description: "Creamy risotto enriched with mushrooms and a seed infusion.",
+        ingredients: [
+          { item: "Oyster Mushroom", amount: "4 units" },
+          { item: "Quinoa Seed", amount: "6 units" }
+        ]
+      },
+      {
+        name: "Zesty Seed Dip",
+        description: "A tangy seed dip perfect for gatherings.",
+        ingredients: [
+          { item: "Millet Seed", amount: "4 units" },
+          { item: "Caraway Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Roasted Mushrooms",
+        description: "Mushrooms roasted with garlic and herbs.",
+        ingredients: [
+          { item: "Enoki Mushroom", amount: "4 units" },
+          { item: "Fennel Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Layered Parfait",
+        description: "A layered parfait with seeds and seasonal fruits.",
+        ingredients: [
+          { item: "Sesame Seed", amount: "3 units" },
+          { item: "Poppy Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Stir-Fried Medley",
+        description: "A stir-fry of vegetables with mushrooms and seeds.",
+        ingredients: [
+          { item: "Corn Seed", amount: "4 units" },
+          { item: "Portobello Mushroom", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Seed-Infused Bread",
+        description: "Freshly baked bread with a crispy seed crust.",
+        ingredients: [
+          { item: "Rice Seed", amount: "5 units" },
+          { item: "Chia Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Mushroom Pizza",
+        description: "A thin-crust pizza topped with mushrooms and seeds.",
+        ingredients: [
+          { item: "Button Mushroom", amount: "4 units" },
+          { item: "Flax Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Mixed Mushroom Salad",
+        description: "A refreshing salad with assorted mushrooms and crunchy seeds.",
+        ingredients: [
+          { item: "Oyster Mushroom", amount: "3 units" },
+          { item: "Quinoa Seed", amount: "4 units" }
+        ]
+      },
+      {
+        name: "Hearty Stew Deluxe",
+        description: "A robust stew featuring an assortment of seeds and mushrooms.",
+        ingredients: [
+          { item: "Pumpkin Seed", amount: "8 units" },
+          { item: "Portobello Mushroom", amount: "3 units" },
+          { item: "Sunflower Seed", amount: "4 units" }
+        ]
+      },
+      {
+        name: "Creamy Mushroom Pasta",
+        description: "Pasta in a light cream sauce with tender mushrooms.",
+        ingredients: [
+          { item: "Shiitake Mushroom", amount: "4 units" },
+          { item: "Millet Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Tangy Vinaigrette Salad",
+        description: "Fresh greens tossed in a seed-based tangy vinaigrette.",
+        ingredients: [
+          { item: "Basil Seed", amount: "2 units" },
+          { item: "Anise Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Roasted Seed Medley",
+        description: "A nutritious roasted medley of assorted seeds.",
+        ingredients: [
+          { item: "Oat Seed", amount: "3 units" },
+          { item: "Quinoa Seed", amount: "3 units" }
+        ]
+      },
+      {
+        name: "Spicy Mushroom Tacos",
+        description: "Tacos with mushrooms and a spicy seed garnish.",
+        ingredients: [
+          { item: "Portobello Mushroom", amount: "3 units" },
+          { item: "Cumin Seed", amount: "2 units" }
+        ]
+      },
+      {
+        name: "Fusion Seed & Mushroom Dish",
+        description: "A unique blend of seeds and mushrooms in a savory sauce.",
+        ingredients: [
+          { item: "Sorghum Seed", amount: "4 units" },
+          { item: "Enoki Mushroom", amount: "3 units" }
+        ]
+      }
+    ];
+    let cookbookText = "Cookbook Recipes:\n\n";
+    recipes.forEach(recipe => {
+      cookbookText += recipe.name + ":\n" + recipe.description + "\nIngredients:\n";
+      recipe.ingredients.forEach(ing => {
+        cookbookText += ` - ${ing.item}: ${ing.amount}\n`;
+      });
+      cookbookText += "\n";
+    });
+    alert(cookbookText);
+  }
+
+  // ----------------------------
+  // Water Supplies (Laundry) Chat & Washing Machine Functions
+  // ----------------------------
+  function sendLaundryChat() {
+    const msg = document.getElementById('laundryChatInput').value;
+    if (msg.trim() !== "") {
+      db.collection("messages").add({
+        room: "Water Supplies",
+        sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown",
+        content: msg,
+        chatType: "laundry",
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      document.getElementById('laundryChatInput').value = "";
+    }
+  }
+  function listenForLaundryChat() {
+    const chatLog = document.getElementById('laundryChatLog');
+    db.collection("messages")
+      .where("room", "==", "Water Supplies")
+      .where("chatType", "==", "laundry")
+      .orderBy("timestamp")
+      .onSnapshot((querySnapshot) => {
+        chatLog.innerHTML = "";
+        querySnapshot.forEach((doc) => {
+          const message = doc.data();
+          const p = document.createElement('p');
+          p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+          chatLog.appendChild(p);
+        });
+        chatLog.scrollTop = chatLog.scrollHeight;
+      });
+  }
+  function washClothes() {
+    alert("You washed your clothes. Your health improves slightly.");
+    updateMood(3);
+  }
+
+  // ----------------------------
+  // Room Interaction & Chat Functions
+  // ----------------------------
+  function openRoomInteraction(roomName) {
+    currentRoom = roomName;
+    db.collection("rooms").doc(roomName).get().then(doc => {
+      if (doc.exists) {
+        const roomData = doc.data();
+        const currentPlayer = localStorage.getItem("playerName");
+        if (currentPlayer === roomData.owner) {
+          openRoomChat(roomName);
+        } else {
+          showDoorModal(roomName);
+        }
+      } else {
+        alert("Room " + roomName + " does not exist. Please contact support.");
+      }
+    }).catch(error => {
+      console.error("Error fetching room data:", error);
+      alert("Error fetching room data for " + roomName);
+    });
+  }
+  function openRoomChat(roomName) {
+    doorChatMode = false;
+    document.getElementById('chatRoomTitle').textContent = roomName + " Chat (Inside)";
+    document.getElementById('chatLog').innerHTML = "";
+    document.getElementById('chatPanel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+    listenForMessages(roomName);
+  }
+  function openDoorChat(roomName) {
+    doorChatMode = true;
+    document.getElementById('chatRoomTitle').textContent = roomName + " Door Chat (Visitor)";
+    document.getElementById('chatLog').innerHTML = "";
+    document.getElementById('chatPanel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+    listenForMessages(roomName);
+  }
+  function listenForMessages(roomName) {
+    const chatLog = document.getElementById('chatLog');
+    const messagesRef = db.collection("messages");
+    messagesRef
+      .where("room", "==", roomName)
+      .where("chatType", "==", doorChatMode ? "door" : "room")
+      .orderBy("timestamp")
+      .onSnapshot((querySnapshot) => {
+        chatLog.innerHTML = "";
+        querySnapshot.forEach((doc) => {
+          const message = doc.data();
+          const p = document.createElement('p');
+          p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+          chatLog.appendChild(p);
+        });
+        chatLog.scrollTop = chatLog.scrollHeight;
+      });
+  }
+  function closeChat() {
+    document.getElementById('chatPanel').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    currentRoom = "";
+  }
+  async function sendChatMessage() {
+    const msg = document.getElementById('chatInput').value;
+    if (msg.trim() !== "") {
+      const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
+      try {
+        await db.collection("messages").add({
+          room: currentRoom,
+          sender: characterName,
+          content: msg,
+          chatType: doorChatMode ? "door" : "room",
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('chatInput').value = "";
+      } catch (error) {
+        console.error("Error sending message:", error);
+      }
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+      chatInput.addEventListener('keydown', function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          sendChatMessage();
+        }
+      });
+    }
+  });
+
+  // ----------------------------
+  // Door Modal Functions
+  // ----------------------------
+  function showDoorModal(roomName) {
+    currentRoom = roomName;
+    document.getElementById('doorTitle').textContent = "You are at the door of " + roomName;
+    document.getElementById('doorModal').style.display = 'block';
+    document.getElementById('passwordDiv').style.display = 'none';
+    document.getElementById('doorPassword').value = "";
+  }
+  function closeDoorModal() {
+    document.getElementById('doorModal').style.display = 'none';
+  }
+  function showPasswordInput() {
+    document.getElementById('passwordDiv').style.display = 'block';
+  }
+  function verifyPassword() {
+    const enteredPassword = document.getElementById('doorPassword').value;
+    const correctPassword = roomPasswords[currentRoom];
+    if (enteredPassword === correctPassword) {
+      alert("Password correct. You now enter the room.");
+      closeDoorModal();
+      openRoomChat(currentRoom);
+    } else {
+      alert("Incorrect password. Please try again or choose to knock.");
+    }
+  }
+  function handleKnock() {
+    alert("You knocked on the door. Please wait for the owner’s response.");
+    db.collection("rooms").doc(currentRoom).get().then(doc => {
+      if (doc.exists) {
+        const owner = doc.data().owner;
+        const visitor = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "A visitor";
+        db.collection("notifications").add({
+          owner: owner,
+          room: currentRoom,
+          message: `${visitor} knocked on your door of ${currentRoom}.`,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    }).catch(error => {
+      console.error("Error sending knock notification:", error);
+    });
+    closeDoorModal();
+    openDoorChat(currentRoom);
   }
 
   // ----------------------------
@@ -1567,15 +2644,12 @@
     setInterval(simulatePowerEvent, 60000);
     setInterval(updateGarbageDisplay, 60000);
     setInterval(updateVoltage, 5000);
-    // simulateRandomEvent and updateGardenUI functions need to be defined if used; otherwise, comment out.
-    // setInterval(simulateRandomEvent, 3600000);
-    // setInterval(updateGardenUI, 60000);
     setInterval(simulateHealthDecline, 60000);
     listenForKitchenChat();
     listenForLaundryChat();
   };
 
-  // Placeholder functions for planting seeds and mushrooms (ensure seeds can be planted in the community garden)
+  // Placeholder functions for planting seeds and mushrooms
   function openPlantSelectionModal(slotNumber) {
     alert("Select a seed to plant in Slot " + slotNumber + ". (Functionality to be implemented.)");
   }
