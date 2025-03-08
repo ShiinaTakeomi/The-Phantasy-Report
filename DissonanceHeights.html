@@ -823,7 +823,7 @@
     isEditing = false;
     updatePlayerStatus();
   }
-  // Updated biodata function: In view mode, show Core Stats by default with a toggle for Narrative details and Inventory.
+  // Updated biodata function: In view mode, show Core Stats (without inventory) by default with a toggle for Narrative details and a separate Inventory section.
   function updatePlayerStatus() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
@@ -843,7 +843,6 @@
             coreStatsHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
             coreStatsHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
             coreStatsHTML += `<p><strong>Room:</strong> ${data.roomNumber ? "Room " + data.roomNumber : "Not set"}</p>`;
-            coreStatsHTML += `<p><strong>Inventory:</strong> ${data.inventory ? data.inventory.join(", ") : "N/A"}</p>`;
             coreStatsHTML += `<p><strong>Reputation:</strong> ${data.reputation || 0}</p>`;
             
             let narrativeHTML = `<h4>Background</h4>`;
@@ -853,7 +852,7 @@
             narrativeHTML += `<p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>`;
             narrativeHTML += `<p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>`;
             
-            // Inventory Section (merged with biodata)
+            // Inventory Section (from harvestInventory)
             let inventoryHTML = `<h4>Inventory</h4>`;
             if (Object.keys(harvestInventory).length > 0) {
               for (let item in harvestInventory) {
@@ -877,7 +876,6 @@
             statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
             statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
             statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25"/></p>`;
-            statusHTML += `<p><strong>Inventory:</strong> <input type="text" id="editInventory" value="${data.inventory ? data.inventory.join(", ") : ""}" /></p>`;
             statusHTML += `<p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" /></p></div>`;
             statusHTML += `<div><strong>Background</strong><br>`;
             statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason}</textarea></p>`;
@@ -888,9 +886,8 @@
             statusHTML += `<button onclick="saveBiodata()">Save Changes</button>`;
             statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
           }
-          // Display Money and Harvest Inventory from localStorage
+          // Display Money and other basic info
           statusHTML += `<p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>`;
-          // Also display seeds if needed
           statusHTML += `<p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>`;
           statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
           document.getElementById('playerStatus').innerHTML = statusHTML;
@@ -917,7 +914,7 @@
   function updateHarvestInventoryUI() {
     // Update localStorage
     localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
-    // Update in biodata panel
+    // Update in biodata panel inventory display (if present)
     const displayDiv = document.getElementById('harvestInventoryDisplay');
     if (displayDiv) {
       let html = "";
