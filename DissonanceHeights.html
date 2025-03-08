@@ -547,7 +547,8 @@
   <div id="recipePanel" class="panel">
     <h2>Recipe Selection</h2>
     <div id="recipeListContainer" style="max-height:300px; overflow-y:auto;"></div>
-    <button onclick="hidePanel('recipePanel')">Cancel</button>
+    <!-- When Cancel is clicked here, return to the Community Kitchen panel -->
+    <button onclick="hidePanel('recipePanel'); openKitchenPanel();">Cancel</button>
   </div>
 
   <!-- Water Supplies (Laundry) Panel -->
