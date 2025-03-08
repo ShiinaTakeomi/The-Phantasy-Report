@@ -482,6 +482,9 @@
 </div>
 
 <script>
+  // Store original background settings
+  const originalBackground = "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed";
+
   // ----------------------------
   // Firebase Initialization & Config
   // ----------------------------
@@ -588,14 +591,14 @@
     document.getElementById('garbage-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
   }
-function showPowerPanel() {
-  // Change the background image and ensure it fits both PC and mobile screens.
-  document.body.style.backgroundImage = "url('https://i.pinimg.com/736x/2d/d9/76/2dd9762815138628d3c380fe097241d2.jpg')";
-  document.body.style.backgroundSize = "cover"; // Ensures the image covers the screen
-  document.body.style.backgroundPosition = "center center"; // Centers the image
-  document.getElementById('minigame-panel').style.display = 'block';
-  document.getElementById('main-screen').style.display = 'none';
-}
+  function showPowerPanel() {
+    // Change the background image and ensure it fits both PC and mobile screens.
+    document.body.style.backgroundImage = "url('https://i.pinimg.com/736x/2d/d9/76/2dd9762815138628d3c380fe097241d2.jpg')";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center center";
+    document.getElementById('minigame-panel').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+  }
   function openGroceryPanel() {
     document.getElementById('grocery-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
@@ -1215,7 +1218,6 @@ function showPowerPanel() {
       });
     }
   }
-
   function playerDied() {
     alert("Your health has reached zero. You have died.");
     // Clear game state and redirect to index.html (or you could redirect to a dedicated death screen)
@@ -1241,6 +1243,12 @@ function showPowerPanel() {
   function hidePanel(panelId) {
     document.getElementById(panelId).style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
+    // If hiding the power panel, revert the background to the original state.
+    if (panelId === 'minigame-panel') {
+      document.body.style.background = originalBackground;
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center center";
+    }
   }
 
   // ----------------------------
