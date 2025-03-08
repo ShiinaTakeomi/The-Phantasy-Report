@@ -276,6 +276,9 @@
 </head>
 <body>
 
+<!-- Hidden YouTube Player for Ambient Music -->
+<iframe id="bgMusic" width="0" height="0" src="https://www.youtube.com/embed/-gKkA9SIxKw?autoplay=1&loop=1&playlist=-gKkA9SIxKw" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute; left:-9999px;"></iframe>
+
 <!-- Login Panel -->
 <div id="loginPanel">
   <h3>Login / Register</h3>
@@ -322,6 +325,7 @@
   <div id="main-screen">
     <div class="container">
       <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
+      <!-- Updated Exit Button Calls signOutUser() -->
       <button class="exit-button" onclick="signOutUser()">Exit</button>
       <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
       <div class="grid">
@@ -555,6 +559,18 @@
   function clearGameState() {
     const keys = ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'brakeEngaged', 'powerOutputConfirmed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate', 'harvestInventory'];
     keys.forEach(key => localStorage.removeItem(key));
+  }
+
+  // ----------------------------
+  // Sign Out Function (Exit Button Fix)
+  // ----------------------------
+  function signOutUser() {
+    firebase.auth().signOut().then(() => {
+      clearGameState();
+      window.location.href = "index.html";
+    }).catch((error) => {
+      console.error("Error signing out: ", error);
+    });
   }
 
   // ----------------------------
