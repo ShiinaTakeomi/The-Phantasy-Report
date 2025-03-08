@@ -511,12 +511,14 @@
     <button onclick="hidePanel('garden-panel')">Return to Main Screen</button>
   </div>
 
-  <!-- Community Kitchen Panel with Cookbook and Cooking Process -->
+  <!-- Community Kitchen Panel with Cookbook, Stove & Cooking Process -->
   <div id="kitchen-panel" class="panel">
     <h2>Community Kitchen</h2>
-    <p>Access the cookbook to view 20 available recipes. Each recipe now lists the required plants, mushrooms, water amounts and detailed instructions.</p>
+    <p>Access the cookbook to view 20 available recipes. Each recipe has a single sentence description and is based on plants and mushrooms grown in the community garden.</p>
     <button onclick="showCookbook()">Cookbook</button>
-    <!-- Stove Availability Check for Cooking -->
+    <!-- New Stove Button -->
+    <button onclick="useStove()" style="margin-left:10px;">Stove</button>
+    <!-- Stove Status (shows if stove is available) -->
     <div id="stoveStatus" style="margin-top:10px; font-size:14px;">Stove: Available</div>
     <!-- Cooking Process Simulation (hidden by default) -->
     <div id="cookingProcess" style="display:none; margin-top:10px; font-size:14px;">
@@ -769,13 +771,11 @@
   function buyItem(item) {
     const prices = {
       'Food Staples': 10,
-      // Price for seeds and mushrooms will be defined in seed/mushroom list
       'Lubricant Oil': 5,
       'Alcohol': 3,
       'Cigarettes': 4
     };
-    // For seeds and mushrooms, prices are defined individually
-    let price = prices[item] || 2; // default price for seeds/mushrooms is $2
+    let price = prices[item] || 2;
     let money = parseInt(localStorage.getItem('money')) || 50;
     if (money >= price) {
       money -= price;
@@ -789,9 +789,7 @@
     }
   }
 
-  // Function to apply benefits and setbacks for each item
   function applyItemEffects(item) {
-    // Example effects (can be expanded):
     switch(item) {
       case "Food Staples":
         updateHunger(-5);
@@ -955,7 +953,6 @@
     isEditing = false;
     updatePlayerStatus();
   }
-  // Biodata Toggle: In view mode, show Core Stats (without inventory) and a separate Inventory section
   function togglePlayerStatus() {
     const biodataDiv = document.getElementById('playerStatus');
     if(biodataDiv.style.display === "none" || biodataDiv.style.display === "") {
@@ -1103,55 +1100,90 @@
         chatLog.scrollTop = chatLog.scrollHeight;
       });
   }
-  // Updated Cookbook function with detailed recipes and cooking process simulation
+  // Updated Cookbook function with detailed recipes (each with a single-sentence description)
   function showCookbook() {
-    // Define recipes as objects with details:
     let recipes = [
       {
-        title: "Hearty Stew",
-        description: "A hearty stew made with harvested seeds and fresh vegetables.",
+        title: "Garden Salad",
+        description: "A refreshing mix of greens and button mushrooms that boosts vitality.",
         ingredients: [
-          { name: "Sunflower Seed", amount: "3 units" },
-          { name: "Pumpkin Seed", amount: "2 units" },
-          { name: "Carrot", amount: "1 whole" }
+          { name: "Sunflower Seed", amount: 2 },
+          { name: "Button Mushroom", amount: 3 }
         ],
-        water: "200ml"
+        water: "100ml"
       },
       {
-        title: "Mushroom Risotto",
-        description: "Creamy risotto with a rich, mushroom flavor.",
+        title: "Mushroom Medley",
+        description: "A savory dish combining portobello mushrooms with a hint of herb flavor.",
         ingredients: [
-          { name: "Button Mushroom", amount: "5 units" },
-          { name: "Rice Seed", amount: "2 units" },
-          { name: "Herbs", amount: "A pinch" }
+          { name: "Portobello Mushroom", amount: 2 },
+          { name: "Pumpkin Seed", amount: 2 }
         ],
-        water: "150ml"
+        water: "120ml"
       }
-      // ... Add additional recipes as needed (total of 20)
+      // ... Additional recipes up to 20 can be added here
     ];
     let recipeText = recipes.map((r, index) => {
-      let ing = r.ingredients.map(i => `${i.name}: ${i.amount}`).join(", ");
-      return `Recipe ${index+1}: ${r.title}\nDescription: ${r.description}\nIngredients: ${ing}\nWater Needed: ${r.water}\n\nClick OK to cook this recipe.`;
-    }).join("\n");
-    
-    if(confirm("Cookbook Recipes:\n\n" + recipeText + "\n\nDo you want to cook the first recipe?")) {
-      cookRecipe(recipes[0]);
-    }
+      let ing = r.ingredients.map(i => `${i.name} (${i.amount})`).join(", ");
+      return `Recipe ${index+1}: ${r.title} - ${r.description}\nIngredients: ${ing}. Water: ${r.water}`;
+    }).join("\n\n");
+    alert("Cookbook Recipes:\n\n" + recipeText);
   }
-  // Cooking process: check for stove and simulate 1 minute cooking delay
-  function cookRecipe(recipe) {
-    // Check for stove availability (for now we assume the stove is available as shown in #stoveStatus)
-    const stoveStatus = document.getElementById("stoveStatus").textContent;
-    if(!stoveStatus.includes("Available")) {
-      alert("No stove available to cook!");
+  // New function: Use Stove to cook a recipe based on inventory
+  function useStove() {
+    let recipes = [
+      {
+        title: "Garden Salad",
+        description: "A refreshing mix of greens and button mushrooms that boosts vitality.",
+        ingredients: [
+          { name: "Sunflower Seed", amount: 2 },
+          { name: "Button Mushroom", amount: 3 }
+        ],
+        water: "100ml"
+      },
+      {
+        title: "Mushroom Medley",
+        description: "A savory dish combining portobello mushrooms with a hint of herb flavor.",
+        ingredients: [
+          { name: "Portobello Mushroom", amount: 2 },
+          { name: "Pumpkin Seed", amount: 2 }
+        ],
+        water: "120ml"
+      }
+    ];
+    // Let the player select a recipe (for simplicity, we prompt with a number)
+    let recipeList = recipes.map((r, index) => `${index+1}: ${r.title} - ${r.description}`).join("\n");
+    let choice = prompt("Select a recipe to cook:\n" + recipeList);
+    let index = parseInt(choice) - 1;
+    if (isNaN(index) || index < 0 || index >= recipes.length) {
+      alert("Invalid recipe selection.");
       return;
     }
-    // Show cooking process and wait 1 minute
+    let recipe = recipes[index];
+    // Check inventory for each ingredient
+    let missingIngredients = [];
+    recipe.ingredients.forEach(ing => {
+      if (!harvestInventory[ing.name] || harvestInventory[ing.name] < ing.amount) {
+        missingIngredients.push(`${ing.name} (need ${ing.amount}, have ${harvestInventory[ing.name] || 0})`);
+      }
+    });
+    if (missingIngredients.length > 0) {
+      alert("Cannot cook recipe. Missing ingredients:\n" + missingIngredients.join("\n"));
+      return;
+    }
+    // If ingredients are available, remove them from inventory
+    recipe.ingredients.forEach(ing => {
+      removeItem(ing.name, ing.amount);
+    });
+    // Optionally check water supply here (if water is tracked separately)
+    // Simulate cooking process with a 1-minute delay
     document.getElementById("cookingProcess").style.display = "block";
     setTimeout(() => {
       document.getElementById("cookingProcess").style.display = "none";
       alert("Cooking complete! You made: " + recipe.title);
-      // Here you could add effects to the player's stats or update inventory
+      // Add the cooked recipe to the inventory as a tradable/giftable/eatable item.
+      addItem("Cooked: " + recipe.title, 1);
+      // Optionally update player stats or provide further effects.
     }, 60000);
   }
 
@@ -1378,7 +1410,6 @@
     document.getElementById('voltageDisplay').textContent = voltage.toFixed(1);
     localStorage.setItem('voltage', voltage);
   }
-  // Enhanced evaluatePowerOutput: shows reduced services and suggestions if power is "Off"
   function evaluatePowerOutput() {
     if (windSpeed >= 40 && windSpeed <= 70 && powerOutputConfirmed) {
       powerStatus = "On";
