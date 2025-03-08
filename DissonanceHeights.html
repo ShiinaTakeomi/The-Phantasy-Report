@@ -553,47 +553,6 @@
 </div>
 
 <script>
-  // Dummy functions to fix missing function errors
-  function simulateRandomEvent() {
-    // Stub: Add logic for random events if needed
-    console.log("simulateRandomEvent called");
-  }
-  function updateHarvestInventoryUI() {
-    // Stub: Update the harvest inventory UI
-    console.log("updateHarvestInventoryUI called");
-  }
-  function clearGarbage() {
-    // Stub: Clear garbage functionality
-    console.log("clearGarbage called");
-    // For example, reset garbageLevel:
-    localStorage.setItem('garbageLevel', 0);
-    document.getElementById('garbageDisplay').textContent = 0;
-  }
-  function sellHarvest() {
-    // Stub: Sell harvest functionality
-    console.log("sellHarvest called");
-  }
-  function harvestProduce() {
-    // Stub: Harvest produce functionality
-    console.log("harvestProduce called");
-  }
-  function openPlantSelectionModal(slot) {
-    // Stub: Open plant selection modal functionality
-    console.log("openPlantSelectionModal called for slot " + slot);
-  }
-  function plantMushroomTree() {
-    // Stub: Plant mushroom tree functionality
-    console.log("plantMushroomTree called");
-  }
-  function simulateGardenUIUpdate() {
-    // Stub: Update garden UI functionality
-    console.log("simulateGardenUIUpdate called");
-  }
-  function updateGardenUI() {
-    // Alias for simulateGardenUIUpdate
-    simulateGardenUIUpdate();
-  }
-  
   // Store original background settings
   const originalBackground = "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed";
 
@@ -664,6 +623,7 @@
       }
     });
   }
+
   function updateHunger(delta) {
     const playerEmail = localStorage.getItem('playerName');
     if (!playerEmail) return;
@@ -688,6 +648,7 @@
     }
     updateHarvestInventoryUI();
   }
+
   function removeItem(item, qty = 1) {
     if (harvestInventory[item]) {
       harvestInventory[item] = Math.max(0, harvestInventory[item] - qty);
@@ -940,8 +901,7 @@
     isEditing = false;
     updatePlayerStatus();
   }
-  
-  // Updated Biodata Toggle & Display (only name, room number, reason, and backstory)
+  // Biodata Toggle: In view mode, show Core Stats (without inventory) and a separate Inventory section
   function togglePlayerStatus() {
     const biodataDiv = document.getElementById('playerStatus');
     if(biodataDiv.style.display === "none" || biodataDiv.style.display === "") {
@@ -961,23 +921,54 @@
           localStorage.setItem('characterName', data.name);
           let statusHTML = `<h3>Biodata</h3>`;
           if (!isEditing) {
-            // View mode: show only Name, Room Number, Reason and Backstory
-            statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
-            statusHTML += `<p><strong>Room Number:</strong> ${data.roomNumber ? data.roomNumber : "Not set"}</p>`;
-            statusHTML += `<p><strong>Reason:</strong> ${data.reason || "N/A"}</p>`;
-            statusHTML += `<p><strong>Backstory:</strong> ${data.backstory || "N/A"}</p>`;
-            statusHTML += `<button onclick="enableEdit()">Edit</button>`;
+            let coreStatsHTML = `<h4>Core Stats</h4>`;
+            coreStatsHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
+            coreStatsHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+            coreStatsHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+            coreStatsHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+            coreStatsHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+            coreStatsHTML += `<p><strong>Room:</strong> ${data.roomNumber ? "Room " + data.roomNumber : "Not set"}</p>`;
+            coreStatsHTML += `<p><strong>Reputation:</strong> ${data.reputation || 0}</p>`;
+            
+            let narrativeHTML = `<h4>Background</h4>`;
+            narrativeHTML += `<p><strong>Reason:</strong> ${data.reason || "N/A"}</p>`;
+            narrativeHTML += `<p><strong>Backstory:</strong> ${data.backstory || "N/A"}</p>`;
+            narrativeHTML += `<p><strong>Skills:</strong> ${data.skills ? data.skills.join(", ") : "N/A"}</p>`;
+            narrativeHTML += `<p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>`;
+            narrativeHTML += `<p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>`;
+            
+            let inventoryHTML = `<h4>Inventory</h4>`;
+            if (Object.keys(harvestInventory).length > 0) {
+              for (let item in harvestInventory) {
+                inventoryHTML += `<p>${item}: ${harvestInventory[item]}</p>`;
+              }
+            } else {
+              inventoryHTML += `<p>None</p>`;
+            }
+            
+            statusHTML += `<div id="coreStats">${coreStatsHTML}</div>`;
+            statusHTML += `<div id="narrativeStats" style="display:none;">${narrativeHTML}</div>`;
+            statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
+            statusHTML += inventoryHTML;
           } else {
-            // Edit mode: allow editing of Name, Room Number, Reason and Backstory
-            statusHTML += `<h3>Edit Biodata</h3>`;
+            statusHTML += `<h3>Edit Character</h3>`;
+            statusHTML += `<div><strong>Core Stats</strong><br>`;
             statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" /></p>`;
-            statusHTML += `<p><strong>Room Number:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25"/></p>`;
-            statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason || ""}</textarea></p>`;
+            statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+            statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+            statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+            statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+            statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25"/></p>`;
+            statusHTML += `<p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" /></p></div>`;
+            statusHTML += `<div><strong>Background</strong><br>`;
+            statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason}</textarea></p>`;
             statusHTML += `<p><strong>Backstory:</strong> <textarea id="editBackstory">${data.backstory || ""}</textarea></p>`;
+            statusHTML += `<p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" /></p>`;
+            statusHTML += `<p><strong>Alliances:</strong> <input type="text" id="editAlliances" value="${data.alliances ? data.alliances.join(", ") : ""}" /></p>`;
+            statusHTML += `<p><strong>Rivalries:</strong> <input type="text" id="editRivalries" value="${data.rivalries ? data.rivalries.join(", ") : ""}" /></p></div>`;
             statusHTML += `<button onclick="saveBiodata()">Save Changes</button>`;
             statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
           }
-          // Include additional non-editable data if desired.
           statusHTML += `<p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>`;
           statusHTML += `<p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>`;
           statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
@@ -988,29 +979,6 @@
         console.error("Error getting player status:", error);
       });
   }
-
-  // New saveBiodata function to update only Name, Room Number, Reason and Backstory.
-  function saveBiodata() {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    const updatedData = {
-      name: document.getElementById('editName').value,
-      roomNumber: document.getElementById('editRoomNumber').value,
-      reason: document.getElementById('editReason').value,
-      backstory: document.getElementById('editBackstory').value,
-      lastUpdated: Date.now()
-    };
-    db.collection('players').doc(safePlayerName).set(updatedData, { merge: true })
-      .then(() => {
-         isEditing = false;
-         updatePlayerStatus();
-      })
-      .catch(error => {
-         console.error("Error updating biodata:", error);
-      });
-  }
-
   function toggleNarrative() {
     const narrativeDiv = document.getElementById('narrativeStats');
     const toggleButton = document.getElementById('toggleNarrative');
@@ -1029,6 +997,7 @@
   function sendKitchenChat() {
     const msg = document.getElementById('kitchenChatInput').value;
     if (msg.trim() !== "") {
+      // For simplicity, we use Firebase messages collection (could be separated later)
       db.collection("messages").add({
         room: "Community Kitchen",
         sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown",
@@ -1039,6 +1008,7 @@
       document.getElementById('kitchenChatInput').value = "";
     }
   }
+  // Listen for Community Kitchen chat messages
   function listenForKitchenChat() {
     const chatLog = document.getElementById('kitchenChatLog');
     db.collection("messages")
@@ -1062,6 +1032,7 @@
     const instructions = document.getElementById('recipeInstructions').value;
     if(name && ingredients && instructions) {
       alert("Recipe '" + name + "' submitted! Cooking a recipe will reduce ingredient costs and improve health benefits.");
+      // Clear recipe inputs after submission.
       document.getElementById('recipeName').value = "";
       document.getElementById('recipeIngredients').value = "";
       document.getElementById('recipeInstructions').value = "";
@@ -1103,9 +1074,11 @@
         chatLog.scrollTop = chatLog.scrollHeight;
       });
   }
+  // Washing machine simulation
   function washClothes() {
     alert("You washed your clothes. Your health improves slightly.");
     updateMood(3);
+    // Reset a wash timer if you want to track real-life days (not fully implemented here).
   }
 
   // ----------------------------
@@ -1389,158 +1362,6 @@
     console.log("Current Season: " + currentSeason);
   }
   setInterval(updateSeason, 120000);
-
-  // ----------------------------
-  // NEW: Plants, Mushrooms, and Recipes Data & Cookbook Function
-  // ----------------------------
-  const plants = [
-    { name: "Tomatoes", description: "Juicy and versatile, they boost vitamin C and mood, but too many can cause acidity." },
-    { name: "Lettuce", description: "Crisp and refreshing, it hydrates and lightens your load, though its nutrients are low." },
-    { name: "Cucumbers", description: "Cooling and hydrating, they improve skin health, yet may act as a mild diuretic." },
-    { name: "Carrots", description: "Sweet and crunchy, they support eye health and energy, but high intake may lead to excess sugar." },
-    { name: "Bell Peppers", description: "Rich in vitamin C and flavor, they boost immunity and energy, with a slight chance of raw digestive upset." },
-    { name: "Zucchini", description: "Mild and low-calorie, it aids digestion and mood but offers fewer nutrients." },
-    { name: "Eggplant", description: "Full of fiber and antioxidants, it supports heart health, though it can taste bitter if not well cooked." },
-    { name: "Spinach", description: "Nutrient-dense and energizing, it boosts vitality but may interfere with iron absorption in excess." },
-    { name: "Kale", description: "A superfood powerhouse that uplifts energy and immunity, though its bitterness might be challenging." },
-    { name: "Broccoli", description: "Packed with vitamins and fiber, it improves digestion and immunity but can cause gas when raw." },
-    { name: "Cabbage", description: "Versatile and fiber-rich, it supports digestion and heart health, with potential bloating if overcooked." },
-    { name: "Radishes", description: "Peppery and crunchy, they aid detoxification but might be too sharp for some palates." },
-    { name: "Parsley", description: "Fresh and herbaceous, it enhances detox and mood, though overuse can stress the kidneys." },
-    { name: "Basil", description: "Fragrant and flavorful, it boosts cognitive function and mood, with a mild blood sugar-lowering effect." },
-    { name: "Cilantro", description: "Tangy and detoxifying, it aids in cleansing and mood, though its soapy taste isn’t for everyone." },
-    { name: "Mint", description: "Cooling and refreshing, it improves digestion and alertness, but may cause heartburn if overused." },
-    { name: "Onions", description: "Pungent and versatile, they boost immunity and flavor, though raw onions may irritate the stomach." },
-    { name: "Garlic", description: "Robust and medicinal, it supports heart health and immunity, yet can cause body odor." },
-    { name: "Celery", description: "Crisp and hydrating, it aids digestion and reduces bloating, but is low in protein." },
-    { name: "Corn", description: "Sweet and starchy, it provides energy and fiber, though its high carb content may spike blood sugar." }
-  ];
-  const mushrooms = [
-    { name: "Button Mushroom", description: "Mild and versatile, it adds savory flavor and antioxidants, though low in protein." },
-    { name: "Shiitake Mushroom", description: "Rich and meaty, it boosts immunity and heart health, but may trigger allergies." },
-    { name: "Oyster Mushroom", description: "Delicate and earthy, it improves digestion and reduces inflammation, though its texture may be polarizing." },
-    { name: "Portobello Mushroom", description: "Robust and meaty, it enhances satiety and supports heart health, but can feel heavy if overdone." },
-    { name: "Enoki Mushroom", description: "Crisp and delicate, it boosts immune function and metabolism, yet its slim texture isn’t for everyone." }
-  ];
-  const recipes = [
-    {
-      name: "Tomato Basil Soup",
-      ingredients: ["Tomatoes", "Basil", "Garlic", "Onions"],
-      description: "A warm, comforting soup that boosts immunity and mood, but may cause acidity if overeaten."
-    },
-    {
-      name: "Fresh Garden Salad",
-      ingredients: ["Lettuce", "Cucumbers", "Tomatoes", "Parsley"],
-      description: "A refreshing salad that hydrates and uplifts energy, though its lightness might leave you wanting more."
-    },
-    {
-      name: "Carrot Ginger Soup",
-      ingredients: ["Carrots", "Onions", "Garlic"],
-      description: "A sweet, energizing soup that supports eye health and vitality, with a slight risk of excess sweetness."
-    },
-    {
-      name: "Zucchini Fritters",
-      ingredients: ["Zucchini", "Onions", "Garlic"],
-      description: "Crispy fritters that aid digestion and enhance mood, but may be a bit greasy if not baked properly."
-    },
-    {
-      name: "Eggplant Parmesan",
-      ingredients: ["Eggplant", "Tomatoes", "Basil", "Garlic"],
-      description: "A hearty dish that supports heart health and mood, though its richness may be overwhelming for sensitive stomachs."
-    },
-    {
-      name: "Spinach & Mushroom Risotto",
-      ingredients: ["Spinach", "Button Mushroom", "Shiitake Mushroom", "Onions", "Garlic"],
-      description: "A creamy, antioxidant-rich risotto that increases energy and vitality, but its creaminess can be heavy."
-    },
-    {
-      name: "Kale Caesar Salad",
-      ingredients: ["Kale", "Onions", "Garlic"],
-      description: "A nutrient-packed salad that bolsters immunity and digestion, yet its bitterness might need a tangy dressing."
-    },
-    {
-      name: "Broccoli Cheddar Soup",
-      ingredients: ["Broccoli", "Onions", "Garlic"],
-      description: "A comforting soup that improves digestion and immunity, though it may cause gas if eaten raw."
-    },
-    {
-      name: "Cabbage Stir-Fry",
-      ingredients: ["Cabbage", "Carrots", "Onions"],
-      description: "A fiber-rich stir-fry that aids digestion and supports heart health, with a risk of blandness if not seasoned well."
-    },
-    {
-      name: "Radish Relish",
-      ingredients: ["Radishes", "Parsley"],
-      description: "A tangy relish that detoxifies and boosts energy, but its sharp flavor might be too intense for some."
-    },
-    {
-      name: "Celery & Corn Medley",
-      ingredients: ["Celery", "Corn"],
-      description: "A light and hydrating medley that provides energy and fiber, though its simplicity may be unsatisfying."
-    },
-    {
-      name: "Mushroom Medley Pasta",
-      ingredients: ["Button Mushroom", "Shiitake Mushroom", "Oyster Mushroom", "Portobello Mushroom", "Enoki Mushroom", "Onions", "Garlic"],
-      description: "A savory pasta dish that enhances satiety and immunity with a rich mushroom flavor, but its earthiness might not appeal to everyone."
-    },
-    {
-      name: "Stir-Fried Bell Peppers",
-      ingredients: ["Bell Peppers", "Onions", "Garlic"],
-      description: "A vibrant dish that delivers a vitamin C boost and energy, though its raw crunch might be off-putting if undercooked."
-    },
-    {
-      name: "Cucumber Mint Cooler",
-      ingredients: ["Cucumbers", "Mint"],
-      description: "A refreshing beverage that hydrates and cools you down, but its lightness means it won’t fill you up nutritionally."
-    },
-    {
-      name: "Tomato Corn Salad",
-      ingredients: ["Tomatoes", "Corn", "Basil"],
-      description: "A sweet and tangy salad that boosts energy and vitamin C, yet its high carb content might spike blood sugar."
-    },
-    {
-      name: "Garlic Herb Cornbread",
-      ingredients: ["Corn", "Garlic", "Basil", "Parsley"],
-      description: "A hearty cornbread that provides energy and flavor, though its density may be too filling in large portions."
-    },
-    {
-      name: "Cilantro Lime Rice Bowl",
-      ingredients: ["Cilantro", "Lime"],
-      description: "A zesty bowl that stimulates metabolism and improves mood, but its acidity may be too intense for sensitive stomachs."
-    },
-    {
-      name: "Mixed Vegetable Stir-Fry",
-      ingredients: ["Zucchini", "Bell Peppers", "Broccoli", "Carrots", "Onions"],
-      description: "A colorful stir-fry that supplies antioxidants and aids digestion, though it might lack protein for satiety."
-    },
-    {
-      name: "Herb-Marinated Veggie Skewers",
-      ingredients: ["Bell Peppers", "Zucchini", "Onions", "Button Mushroom", "Thyme", "Rosemary"],
-      description: "Delicious skewers that boost immune function and energy, yet can become tough if over-grilled."
-    },
-    {
-      name: "Creamy Mushroom Soup",
-      ingredients: ["Portobello Mushroom", "Enoki Mushroom", "Onions"],
-      description: "A rich, velvety soup that delivers antioxidants and improves satiety, but its creaminess may slow digestion if overconsumed."
-    }
-  ];
-
-  // The showCookbook function checks the player's inventory (harvestInventory)
-  // and alerts the player with a list of recipes they can cook based on the ingredients available.
-  function showCookbook() {
-    let availableRecipes = recipes.filter(recipe => {
-      return recipe.ingredients.every(ing => harvestInventory[ing] && harvestInventory[ing] > 0);
-    });
-    if (availableRecipes.length > 0) {
-      let recipeList = "Available Recipes based on your current ingredients:\n\n";
-      availableRecipes.forEach(recipe => {
-        recipeList += `• ${recipe.name} (Ingredients: ${recipe.ingredients.join(", ")})\n   ${recipe.description}\n\n`;
-      });
-      alert(recipeList);
-    } else {
-      alert("No recipes available with your current ingredients.");
-    }
-  }
 
   // ----------------------------
   // Modal Panel Utilities
