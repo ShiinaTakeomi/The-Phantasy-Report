@@ -165,6 +165,14 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
+    /* Enlarged editing fields for Biodata */
+    #playerStatus input,
+    #playerStatus textarea {
+      width: 100% !important;
+      font-size: 16px;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
     /* Modal Styles (for plant selection, kitchen, water, door interaction) */
     .modal, #doorModal {
       display: none;
@@ -384,7 +392,7 @@
     </div>
   </div>
 
-  <!-- Power Source Panel -->
+  <!-- Power Source Panel with Enhanced Service Info -->
   <div id="minigame-panel" class="panel">
     <h2>Wind Turbine Control Panel</h2>
     <p><strong>Objective:</strong> Ensure the turbine provides electricity, water heating, and lighting.</p>
@@ -418,6 +426,11 @@
       <label for="powerOutputConfirm">Power Output Confirm:</label>
       <button id="powerOutputConfirm" onclick="togglePowerOutput()">Confirm Output</button>
     </div>
+    <!-- New Power Suggestions Section -->
+    <div class="control">
+      <h4>Service Impact & Suggestions:</h4>
+      <div id="powerSuggestions" style="font-size:14px; background:rgba(255,255,255,0.1); padding:5px; border-radius:4px;"></div>
+    </div>
     <div class="control">
       <button onclick="hidePanel('minigame-panel')">Return to Main Screen</button>
     </div>
@@ -447,7 +460,7 @@
     <div id="garbageLog"></div>
   </div>
 
-  <!-- Grocery Store Panel -->
+  <!-- Grocery Store Panel (Room Decoration removed) -->
   <div id="grocery-panel" class="panel">
     <h2>Grocery Store</h2>
     <p>Purchase essential items. Prices may vary with electricity availability.</p>
@@ -466,20 +479,17 @@
       <h4>Mushrooms for Cultivation</h4>
       <!-- Dynamically generated mushroom items -->
     </div>
-    <!-- Lubricant Oil (replaces Maintenance Essentials) -->
+    <!-- Lubricant Oil -->
     <div class="grocery-item">
       <p><strong>Lubricant Oil</strong> - $5<br><em>Essential for keeping the power panel running smoothly. Consumed on use.</em></p>
       <button onclick="buyItem('Lubricant Oil')">Buy Lubricant Oil</button>
     </div>
-    <!-- Other items -->
-    <div class="grocery-item">
-      <p><strong>Room Decorations</strong> - $7<br><em>Add personality to your room.</em></p>
-      <button onclick="buyItem('Room Decoration')">Buy Decoration</button>
-    </div>
+    <!-- Alcohol -->
     <div class="grocery-item">
       <p><strong>Alcohol</strong> - $3<br><em>Boosts mood but may have minor setbacks on health.</em></p>
       <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
     </div>
+    <!-- Cigarettes -->
     <div class="grocery-item">
       <p><strong>Cigarettes</strong> - $4<br><em>Temporarily improves mood but reduces health over time.</em></p>
       <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
@@ -501,11 +511,17 @@
     <button onclick="hidePanel('garden-panel')">Return to Main Screen</button>
   </div>
 
-  <!-- Community Kitchen Panel -->
+  <!-- Community Kitchen Panel with Cookbook and Cooking Process -->
   <div id="kitchen-panel" class="panel">
     <h2>Community Kitchen</h2>
-    <p>Access the cookbook to view 20 available recipes. Each recipe has a brief description and uses ingredients from your harvest.</p>
+    <p>Access the cookbook to view 20 available recipes. Each recipe now lists the required plants, mushrooms, water amounts and detailed instructions.</p>
     <button onclick="showCookbook()">Cookbook</button>
+    <!-- Stove Availability Check for Cooking -->
+    <div id="stoveStatus" style="margin-top:10px; font-size:14px;">Stove: Available</div>
+    <!-- Cooking Process Simulation (hidden by default) -->
+    <div id="cookingProcess" style="display:none; margin-top:10px; font-size:14px;">
+      <p>Cooking in progress... Please wait 1 minute.</p>
+    </div>
     <!-- Chat area for Community Kitchen -->
     <div>
       <h4>Kitchen Chat</h4>
@@ -755,7 +771,6 @@
       'Food Staples': 10,
       // Price for seeds and mushrooms will be defined in seed/mushroom list
       'Lubricant Oil': 5,
-      'Room Decoration': 7,
       'Alcohol': 3,
       'Cigarettes': 4
     };
@@ -785,10 +800,9 @@
       case "Lubricant Oil":
         updateMood(1);
         break;
-      // For seeds, mushrooms, alcohol, cigarettes, etc.
       default:
         if(item.includes("Seed")) {
-          updateMood(2); // seeds improve mood (hope for growth)
+          updateMood(2);
         } else if(item.includes("Mushroom")) {
           updateMood(1);
           updateHunger(-1);
@@ -989,25 +1003,24 @@
             statusHTML += `<div id="coreStats">${coreStatsHTML}</div>`;
             statusHTML += `<div id="narrativeStats" style="display:none;">${narrativeHTML}</div>`;
             statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
-            // Add an Edit button here to allow updating character info
             statusHTML += `<button onclick="enableEdit()">Edit Biodata</button>`;
             statusHTML += inventoryHTML;
           } else {
             statusHTML += `<h3>Edit Character</h3>`;
             statusHTML += `<div><strong>Core Stats</strong><br>`;
-            statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" /></p>`;
+            statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" style="height:40px; font-size:16px;" /></p>`;
             statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
             statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
             statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
             statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
-            statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25"/></p>`;
-            statusHTML += `<p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" /></p></div>`;
+            statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25" style="height:40px; font-size:16px;" /></p>`;
+            statusHTML += `<p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" style="height:40px; font-size:16px;" /></p></div>`;
             statusHTML += `<div><strong>Background</strong><br>`;
-            statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason}</textarea></p>`;
-            statusHTML += `<p><strong>Backstory:</strong> <textarea id="editBackstory">${data.backstory || ""}</textarea></p>`;
-            statusHTML += `<p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" /></p>`;
-            statusHTML += `<p><strong>Alliances:</strong> <input type="text" id="editAlliances" value="${data.alliances ? data.alliances.join(", ") : ""}" /></p>`;
-            statusHTML += `<p><strong>Rivalries:</strong> <input type="text" id="editRivalries" value="${data.rivalries ? data.rivalries.join(", ") : ""}" /></p></div>`;
+            statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason" style="height:80px; font-size:16px;">${data.reason}</textarea></p>`;
+            statusHTML += `<p><strong>Backstory:</strong> <textarea id="editBackstory" style="height:80px; font-size:16px;">${data.backstory || ""}</textarea></p>`;
+            statusHTML += `<p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>`;
+            statusHTML += `<p><strong>Alliances:</strong> <input type="text" id="editAlliances" value="${data.alliances ? data.alliances.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>`;
+            statusHTML += `<p><strong>Rivalries:</strong> <input type="text" id="editRivalries" value="${data.rivalries ? data.rivalries.join(", ") : ""}" style="height:40px; font-size:16px;" /></p></div>`;
             statusHTML += `<button onclick="saveBiodata()">Save Changes</button>`;
             statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
           }
@@ -1090,31 +1103,56 @@
         chatLog.scrollTop = chatLog.scrollHeight;
       });
   }
-  // Cookbook function to show 20 recipes
+  // Updated Cookbook function with detailed recipes and cooking process simulation
   function showCookbook() {
+    // Define recipes as objects with details:
     let recipes = [
-      "Recipe 1: A hearty stew made with harvested seeds and fresh vegetables.",
-      "Recipe 2: A light salad featuring a mix of garden greens and mushrooms.",
-      "Recipe 3: A savory soup enriched with seed broth and herbs.",
-      "Recipe 4: Grilled mushrooms served with a side of spiced seeds.",
-      "Recipe 5: A refreshing seed smoothie with hints of mint.",
-      "Recipe 6: Baked seed crackers for a crunchy snack.",
-      "Recipe 7: Mushroom risotto with a rich, creamy texture.",
-      "Recipe 8: A zesty seed dip perfect for gatherings.",
-      "Recipe 9: Roasted mushrooms with garlic and herbs.",
-      "Recipe 10: A layered seed parfait with seasonal fruits.",
-      "Recipe 11: Stir-fried vegetables tossed with mushrooms and seeds.",
-      "Recipe 12: A seed-infused bread with a crispy crust.",
-      "Recipe 13: Mushroom pizza with a thin, flavorful crust.",
-      "Recipe 14: A refreshing salad with mixed mushrooms and crunchy seeds.",
-      "Recipe 15: A warming stew featuring seeds and earthy mushrooms.",
-      "Recipe 16: Mushroom pasta in a light cream sauce.",
-      "Recipe 17: A tangy seed vinaigrette over fresh greens.",
-      "Recipe 18: Roasted seed medley as a nutritious side.",
-      "Recipe 19: Mushroom tacos with a hint of spice and seed garnish.",
-      "Recipe 20: A fusion dish blending seeds and mushrooms in a savory sauce."
+      {
+        title: "Hearty Stew",
+        description: "A hearty stew made with harvested seeds and fresh vegetables.",
+        ingredients: [
+          { name: "Sunflower Seed", amount: "3 units" },
+          { name: "Pumpkin Seed", amount: "2 units" },
+          { name: "Carrot", amount: "1 whole" }
+        ],
+        water: "200ml"
+      },
+      {
+        title: "Mushroom Risotto",
+        description: "Creamy risotto with a rich, mushroom flavor.",
+        ingredients: [
+          { name: "Button Mushroom", amount: "5 units" },
+          { name: "Rice Seed", amount: "2 units" },
+          { name: "Herbs", amount: "A pinch" }
+        ],
+        water: "150ml"
+      }
+      // ... Add additional recipes as needed (total of 20)
     ];
-    alert("Cookbook Recipes:\n\n" + recipes.join("\n"));
+    let recipeText = recipes.map((r, index) => {
+      let ing = r.ingredients.map(i => `${i.name}: ${i.amount}`).join(", ");
+      return `Recipe ${index+1}: ${r.title}\nDescription: ${r.description}\nIngredients: ${ing}\nWater Needed: ${r.water}\n\nClick OK to cook this recipe.`;
+    }).join("\n");
+    
+    if(confirm("Cookbook Recipes:\n\n" + recipeText + "\n\nDo you want to cook the first recipe?")) {
+      cookRecipe(recipes[0]);
+    }
+  }
+  // Cooking process: check for stove and simulate 1 minute cooking delay
+  function cookRecipe(recipe) {
+    // Check for stove availability (for now we assume the stove is available as shown in #stoveStatus)
+    const stoveStatus = document.getElementById("stoveStatus").textContent;
+    if(!stoveStatus.includes("Available")) {
+      alert("No stove available to cook!");
+      return;
+    }
+    // Show cooking process and wait 1 minute
+    document.getElementById("cookingProcess").style.display = "block";
+    setTimeout(() => {
+      document.getElementById("cookingProcess").style.display = "none";
+      alert("Cooking complete! You made: " + recipe.title);
+      // Here you could add effects to the player's stats or update inventory
+    }, 60000);
   }
 
   // ----------------------------
@@ -1324,7 +1362,6 @@
     evaluatePowerOutput();
     updateLastInteraction();
   }
-  // Updated lubricate function to check for Lubricant Oil in inventory
   function lubricate() {
     if (harvestInventory["Lubricant Oil"] && harvestInventory["Lubricant Oil"] > 0) {
       removeItem("Lubricant Oil", 1);
@@ -1341,6 +1378,7 @@
     document.getElementById('voltageDisplay').textContent = voltage.toFixed(1);
     localStorage.setItem('voltage', voltage);
   }
+  // Enhanced evaluatePowerOutput: shows reduced services and suggestions if power is "Off"
   function evaluatePowerOutput() {
     if (windSpeed >= 40 && windSpeed <= 70 && powerOutputConfirmed) {
       powerStatus = "On";
@@ -1350,9 +1388,17 @@
     document.getElementById('powerStatusDisplay').textContent = powerStatus;
     if (powerStatus === "Off") {
       document.getElementById('powerAlert').style.display = "inline";
+      let suggestionText = "Reduced services in flats:\n";
+      suggestionText += "- Water Supplies (lower water pressure)\n";
+      suggestionText += "- Lighting (dimmer lights)\n";
+      suggestionText += "- Heating (reduced warmth)\n\n";
+      suggestionText += "This may affect your biodata (health and mood).\n";
+      suggestionText += "Suggestions: Increase wind speed, engage the brake appropriately, or apply Lubricant Oil.";
+      document.getElementById('powerSuggestions').textContent = suggestionText;
       alert("Power is insufficient! Flats will experience reduced services.");
     } else {
       document.getElementById('powerAlert').style.display = "none";
+      document.getElementById('powerSuggestions').textContent = "";
     }
   }
   function simulatePowerEvent() {
@@ -1500,17 +1546,14 @@
   // Clear Garbage Function with Logging
   // ----------------------------
   function clearGarbage() {
-    // Reset garbage level
     garbageLevel = 0;
     localStorage.setItem('garbageLevel', garbageLevel);
     document.getElementById('garbageDisplay').textContent = garbageLevel;
-    // Log the action with character name
     const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
     const logDiv = document.getElementById('garbageLog');
     const timestamp = new Date().toLocaleTimeString();
     logDiv.innerHTML += `<p>[${timestamp}] ${characterName} cleared the garbage.</p>`;
     logDiv.scrollTop = logDiv.scrollHeight;
-    // Notify others (if desired, add a Firebase notification here)
   }
 
   // ----------------------------
@@ -1567,15 +1610,12 @@
     setInterval(simulatePowerEvent, 60000);
     setInterval(updateGarbageDisplay, 60000);
     setInterval(updateVoltage, 5000);
-    // simulateRandomEvent and updateGardenUI functions need to be defined if used; otherwise, comment out.
-    // setInterval(simulateRandomEvent, 3600000);
-    // setInterval(updateGardenUI, 60000);
     setInterval(simulateHealthDecline, 60000);
     listenForKitchenChat();
     listenForLaundryChat();
   };
 
-  // Placeholder functions for planting seeds and mushrooms (ensure seeds can be planted in the community garden)
+  // Placeholder functions for planting seeds and mushrooms
   function openPlantSelectionModal(slotNumber) {
     alert("Select a seed to plant in Slot " + slotNumber + ". (Functionality to be implemented.)");
   }
