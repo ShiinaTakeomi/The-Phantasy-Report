@@ -409,10 +409,11 @@
     <button id="instructionsButton" onclick="toggleInstructions()">Instructions</button>
     <div id="instructions" style="display: none;">
       <p>
-        <strong>Step 1:</strong> Adjust the wind speed using the slider.<br>
+        <strong>Step 1:</strong> Adjust the wind speed using the slider (optimal range: 40–70).<br>
         <strong>Step 2:</strong> Engage or release the brake as needed.<br>
         <strong>Step 3:</strong> Apply Lubricant Oil (if available) to maintain smooth operation.<br>
-        <strong>Step 4:</strong> Confirm power output to ensure optimal performance.
+        <strong>Step 4:</strong> Confirm power output to ensure optimal performance.<br><br>
+        <em>Note:</em> Return to this panel at least every 1 minute to fix malfunctions or risk damage to your biodata!
       </p>
     </div>
     <div class="control">
@@ -1441,11 +1442,33 @@
       document.getElementById('powerSuggestions').textContent = "";
     }
   }
+  // Updated simulatePowerEvent to enforce a return to the power panel every 1 minute:
   function simulatePowerEvent() {
     if (Date.now() - lastInteractionTime > 60000) {
-      windSpeed = Math.max(0, windSpeed - 5);
-      localStorage.setItem('windSpeed', windSpeed);
-      updateVoltage();
+      // If the power panel is not open, penalize the player:
+      if (document.getElementById('minigame-panel').style.display !== 'block') {
+        alert("Warning: Your power panel is malfunctioning! Return now to fix it or suffer severe consequences.");
+        const playerEmail = localStorage.getItem('playerName');
+        if (playerEmail) {
+          const safePlayerName = sanitizePlayerName(playerEmail);
+          db.collection('players').doc(safePlayerName).get().then(doc => {
+            if (doc.exists) {
+              let currentHealth = doc.data().health || 100;
+              let newHealth = Math.max(0, currentHealth - 5); // Penalize health by 5 points
+              db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+              if (newHealth === 0) {
+                playerDied();
+              }
+            }
+          });
+        }
+      } else {
+        // If they are on the power panel, allow normal adjustments
+        windSpeed = Math.max(0, windSpeed - 5);
+        localStorage.setItem('windSpeed', windSpeed);
+        updateVoltage();
+      }
+      updateLastInteraction();
     }
   }
   function updateGarbageDisplay() {
