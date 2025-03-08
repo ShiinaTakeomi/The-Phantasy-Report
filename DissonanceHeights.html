@@ -521,7 +521,7 @@
       <!-- Garden slots generated dynamically -->
     </div>
     <button onclick="harvestProduce()">Harvest Produce</button>
-    <button onclick="hidePanel('garden-panel')">Return to Main Screen</button>
+    <button onclick="hidePanel('garden-panel')">Return to Main Menu</button>
   </div>
 
   <!-- Community Kitchen Panel -->
@@ -539,7 +539,7 @@
       <input type="text" id="kitchenChatInput" placeholder="Type a message...">
       <button onclick="sendKitchenChat()">Send</button>
     </div>
-    <button onclick="hidePanel('kitchen-panel')">Return to Main Screen</button>
+    <button onclick="hidePanel('kitchen-panel')">Return to Main Menu</button>
   </div>
 
   <!-- Recipe Panel -->
@@ -565,7 +565,7 @@
       <input type="text" id="laundryChatInput" placeholder="Type a message...">
       <button onclick="sendLaundryChat()">Send</button>
     </div>
-    <button onclick="hidePanel('water-panel')">Return to Main Screen</button>
+    <button onclick="hidePanel('water-panel')">Return to Main Menu</button>
   </div>
 
   <!-- Chat Panel -->
@@ -1573,18 +1573,6 @@
   }
 
   // ----------------------------
-  // Season Simulation
-  // ----------------------------
-  let currentSeason = "Spring";
-  function updateSeason() {
-    const seasons = ["Spring", "Summer", "Autumn", "Winter"];
-    let index = Math.floor((Date.now() / 120000)) % seasons.length;
-    currentSeason = seasons[index];
-    console.log("Current Season: " + currentSeason);
-  }
-  setInterval(updateSeason, 120000);
-
-  // ----------------------------
   // Toggle Music Player Function
   // ----------------------------
   function toggleMusicPlayer() {
@@ -1752,7 +1740,6 @@
     document.getElementById('windSpeedValue').textContent = windSpeed;
     updateVoltage();
     updateGarbageDisplay();
-    updateSeason();
     if (localStorage.getItem('playerName')) {
       checkCharacterExistence();
     }
