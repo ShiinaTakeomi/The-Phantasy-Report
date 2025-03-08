@@ -336,7 +336,10 @@
       <div class="grid">
         <!-- Room buttons will be generated dynamically -->
       </div>
-      <button class="power-room" onclick="showPowerPanel()">Power Room</button>
+      <!-- Modified Power Room Button with Alert Symbol -->
+      <button class="power-room" onclick="showPowerPanel()">
+        Power Room <span id="powerAlert" style="display:none; font-size:1.2em; color:red;">!</span>
+      </button>
     </div>
     <div class="facilities">
       <button onclick="handleClick('Community Kitchen')">Community Kitchen</button>
@@ -1058,326 +1061,6 @@
   }
 
   // ----------------------------
-  // Garden & Planting Functions
-  // ----------------------------
-  let plantTypes = [
-    { name: "Tomato", description: "Juicy and tangy", price: 5 },
-    { name: "Lettuce", description: "Crisp leaves", price: 3 },
-    { name: "Carrot", description: "Crunchy roots", price: 4 },
-    { name: "Potato", description: "Starchy tubers", price: 6 },
-    { name: "Cucumber", description: "Refreshing", price: 4 },
-    { name: "Bell Pepper", description: "Vibrant and sweet", price: 5 },
-    { name: "Eggplant", description: "Creamy texture", price: 5 },
-    { name: "Spinach", description: "Tender leaves", price: 3 },
-    { name: "Zucchini", description: "Mild and versatile", price: 4 },
-    { name: "Herb Plant", description: "Aromatic", price: 2 }
-  ];
-  const mushroomTypes = [
-    { name: "Shiitake", description: "Rich umami", price: 10 },
-    { name: "Portobello", description: "Earthy taste", price: 7 },
-    { name: "Enoki", description: "Delicate flavor", price: 15 },
-    { name: "Oyster", description: "Sweet and woody", price: 12 },
-    { name: "Morel", description: "Nutty and earthy", price: 20 }
-  ];
-  let garden = {};
-  // Initialize garden slots 1-10 and a special slot 11 for mushroom tree.
-  for (let i = 1; i <= 10; i++) {
-    garden[i] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, produceType: null };
-  }
-  garden[11] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, mushrooms: 0, produceType: null };
-
-  // Update garden UI – note: maturity threshold changed from 60 to 30 minutes.
-  function updateGardenUI() {
-    for (let i = 1; i <= 10; i++) {
-      let slot = document.getElementById('slot' + i);
-      let statusSpan = slot.querySelector('.status');
-      if (garden[i].plantedTime === null) {
-        statusSpan.textContent = "Empty";
-      } else {
-        let elapsed = (Date.now() - garden[i].plantedTime) / 60000;
-        let produceName = garden[i].produceType ? garden[i].produceType.name : "";
-        if (elapsed >= 30 && !garden[i].mature) {  // maturity threshold is now 30 minutes
-          garden[i].mature = true;
-          statusSpan.textContent = "Mature: " + produceName;
-          let btn = slot.querySelector('button');
-          if (btn) btn.style.display = 'none';
-        } else if (!garden[i].mature) {
-          statusSpan.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
-          if (Date.now() - garden[i].wateredTime > 5 * 60000) {
-            if (!slot.querySelector('.waterBtn')) {
-              let waterBtn = document.createElement('button');
-              waterBtn.className = 'waterBtn';
-              waterBtn.textContent = "Water";
-              waterBtn.onclick = function() { waterPlant(i); };
-              slot.appendChild(waterBtn);
-            }
-          }
-          if (!garden[i].fertilized && !slot.querySelector('.fertilizeBtn')) {
-            let fertBtn = document.createElement('button');
-            fertBtn.className = 'fertilizeBtn';
-            fertBtn.textContent = "Fertilize";
-            fertBtn.onclick = function() { fertilizePlant(i); };
-            slot.appendChild(fertBtn);
-          }
-        }
-      }
-    }
-    let treeSlot = document.getElementById('mushroomTree');
-    let treeStatus = treeSlot.querySelector('.status');
-    if (garden[11].plantedTime === null) {
-      treeStatus.textContent = "Empty";
-    } else {
-      let elapsed = (Date.now() - garden[11].plantedTime) / 60000;
-      let produceName = garden[11].produceType ? garden[11].produceType.name : "";
-      if (elapsed >= 30 && !garden[11].mature) {
-        garden[11].mature = true;
-        garden[11].mushrooms = 5;
-        treeStatus.textContent = "Mature: " + produceName + " (" + garden[11].mushrooms + " mushrooms)";
-        let btn = treeSlot.querySelector('button');
-        if (btn) btn.style.display = 'none';
-      } else if (!garden[11].mature) {
-        treeStatus.textContent = "Growing (" + Math.floor(elapsed) + " min): " + produceName;
-      }
-    }
-  }
-
-  // ----------------------------
-  // Harvest Produce Functions
-  // ----------------------------
-  // Harvest the produce from any mature garden slot, and add to harvestInventory.
-  function harvestProduce() {
-    let harvested = false;
-    // Loop through garden slots 1-10
-    for (let i = 1; i <= 10; i++) {
-      if (garden[i].mature && garden[i].produceType) {
-        let produceName = garden[i].produceType.name;
-        // Add one unit per slot harvest (you can adjust logic as needed)
-        harvestInventory[produceName] = (harvestInventory[produceName] || 0) + 1;
-        // Reset slot
-        garden[i] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, produceType: null };
-        harvested = true;
-      }
-    }
-    // Check mushroom tree (slot 11)
-    if (garden[11].mature && garden[11].produceType) {
-      let produceName = garden[11].produceType.name;
-      // For mushroom tree, add the number of mushrooms available
-      harvestInventory[produceName] = (harvestInventory[produceName] || 0) + garden[11].mushrooms;
-      garden[11] = { plantedTime: null, wateredTime: null, fertilized: false, mature: false, mushrooms: 0, produceType: null };
-      harvested = true;
-    }
-    if (harvested) {
-      alert("Harvest successful! Check your Harvest Inventory in your biodata and at the Grocery Stand.");
-      updateGardenUI();
-      updateHarvestInventoryUI();
-      updatePlayerStatus();
-    } else {
-      alert("No mature produce to harvest.");
-    }
-  }
-
-  // ----------------------------
-  // Grocery Store: Sell Harvested Produce
-  // ----------------------------
-  function sellHarvest() {
-    let totalEarnings = 0;
-    // For each produce in harvestInventory, find its price from plantTypes or mushroomTypes arrays.
-    for (let produce in harvestInventory) {
-      let quantity = harvestInventory[produce];
-      let price = 0;
-      // Try to find in plantTypes
-      let plant = plantTypes.find(p => p.name === produce);
-      if (!plant) {
-        // Try in mushroomTypes if not found in plantTypes
-        plant = mushroomTypes.find(p => p.name === produce);
-      }
-      if (plant) {
-        price = plant.price;
-      }
-      totalEarnings += price * quantity;
-    }
-    if (totalEarnings > 0) {
-      let currentMoney = parseInt(localStorage.getItem('money')) || 50;
-      currentMoney += totalEarnings;
-      localStorage.setItem('money', currentMoney);
-      alert("You sold your harvest for $" + totalEarnings + ". Current money: $" + currentMoney);
-      // Clear harvest inventory
-      harvestInventory = {};
-      updateHarvestInventoryUI();
-      updatePlayerStatus();
-    } else {
-      alert("Nothing to sell in your harvest inventory.");
-    }
-  }
-
-  // ----------------------------
-  // Room Interaction & Chat Functions
-  // ----------------------------
-  function openRoomInteraction(roomName) {
-    currentRoom = roomName;
-    db.collection("rooms").doc(roomName).get().then(doc => {
-      if (doc.exists) {
-        const roomData = doc.data();
-        const currentPlayer = localStorage.getItem("playerName");
-        if (currentPlayer === roomData.owner) {
-          openRoomChat(roomName);
-        } else {
-          showDoorModal(roomName);
-        }
-      } else {
-        alert("Room " + roomName + " does not exist. Please contact support.");
-      }
-    }).catch(error => {
-      console.error("Error fetching room data:", error);
-      alert("Error fetching room data for " + roomName);
-    });
-  }
-  function openRoomChat(roomName) {
-    doorChatMode = false;
-    document.getElementById('chatRoomTitle').textContent = roomName + " Chat (Inside)";
-    document.getElementById('chatLog').innerHTML = "";
-    document.getElementById('chatPanel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-    listenForMessages(roomName);
-  }
-  function openDoorChat(roomName) {
-    doorChatMode = true;
-    document.getElementById('chatRoomTitle').textContent = roomName + " Door Chat (Visitor)";
-    document.getElementById('chatLog').innerHTML = "";
-    document.getElementById('chatPanel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-    listenForMessages(roomName);
-  }
-  function listenForMessages(roomName) {
-    const chatLog = document.getElementById('chatLog');
-    const messagesRef = db.collection("messages");
-    messagesRef
-      .where("room", "==", roomName)
-      .where("chatType", "==", doorChatMode ? "door" : "room")
-      .orderBy("timestamp")
-      .onSnapshot((querySnapshot) => {
-        chatLog.innerHTML = "";
-        querySnapshot.forEach((doc) => {
-          const message = doc.data();
-          const p = document.createElement('p');
-          p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
-          chatLog.appendChild(p);
-        });
-        chatLog.scrollTop = chatLog.scrollHeight;
-      });
-  }
-  function closeChat() {
-    document.getElementById('chatPanel').style.display = 'none';
-    document.getElementById('main-screen').style.display = 'block';
-    currentRoom = "";
-  }
-  async function sendChatMessage() {
-    const msg = document.getElementById('chatInput').value;
-    if (msg.trim() !== "") {
-      const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
-      try {
-        await db.collection("messages").add({
-          room: currentRoom,
-          sender: characterName,
-          content: msg,
-          chatType: doorChatMode ? "door" : "room",
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        document.getElementById('chatInput').value = "";
-      } catch (error) {
-        console.error("Error sending message:", error);
-      }
-    }
-  }
-  document.addEventListener('DOMContentLoaded', function() {
-    const chatInput = document.getElementById('chatInput');
-    if (chatInput) {
-      chatInput.addEventListener('keydown', function(event) {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          sendChatMessage();
-        }
-      });
-    }
-  });
-
-  // ----------------------------
-  // Door Modal Functions
-  // ----------------------------
-  function showDoorModal(roomName) {
-    currentRoom = roomName;
-    document.getElementById('doorTitle').textContent = "You are at the door of " + roomName;
-    document.getElementById('doorModal').style.display = 'block';
-    document.getElementById('passwordDiv').style.display = 'none';
-    document.getElementById('doorPassword').value = "";
-  }
-  function closeDoorModal() {
-    document.getElementById('doorModal').style.display = 'none';
-  }
-  function showPasswordInput() {
-    document.getElementById('passwordDiv').style.display = 'block';
-  }
-  function verifyPassword() {
-    const enteredPassword = document.getElementById('doorPassword').value;
-    const correctPassword = roomPasswords[currentRoom];
-    if (enteredPassword === correctPassword) {
-      alert("Password correct. You now enter the room.");
-      closeDoorModal();
-      openRoomChat(currentRoom);
-    } else {
-      alert("Incorrect password. Please try again or choose to knock.");
-    }
-  }
-  function handleKnock() {
-    alert("You knocked on the door. Please wait for the owner’s response.");
-    db.collection("rooms").doc(currentRoom).get().then(doc => {
-      if (doc.exists) {
-        const owner = doc.data().owner;
-        const visitor = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "A visitor";
-        db.collection("notifications").add({
-          owner: owner,
-          room: currentRoom,
-          message: `${visitor} knocked on your door of ${currentRoom}.`,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      }
-    }).catch(error => {
-      console.error("Error sending knock notification:", error);
-    });
-    closeDoorModal();
-    openDoorChat(currentRoom);
-  }
-
-  // ----------------------------
-  // Community Kitchen & Water Supplies Functions
-  // ----------------------------
-  function handleClick(facility) {
-    if (facility === "Community Kitchen") {
-      openKitchenPanel();
-    } else if (facility === "Water Supplies (Laundry)") {
-      openWaterPanel();
-    }
-  }
-  function openKitchenPanel() {
-    document.getElementById('kitchenPanel').style.display = 'block';
-  }
-  function closeKitchenPanel() {
-    document.getElementById('kitchenPanel').style.display = 'none';
-  }
-  function processFood() {
-    alert("Food processed for improved safety and efficiency.");
-  }
-  function openWaterPanel() {
-    document.getElementById('waterPanel').style.display = 'block';
-  }
-  function closeWaterPanel() {
-    document.getElementById('waterPanel').style.display = 'none';
-  }
-  function useWater() {
-    alert("Water distributed for gardening, cooking, and personal use.");
-  }
-
-  // ----------------------------
   // Power Source Simulation Functions
   // ----------------------------
   let windSpeed = localStorage.getItem('windSpeed') || 50;
@@ -1419,6 +1102,7 @@
     document.getElementById('voltageDisplay').textContent = voltage.toFixed(1);
     localStorage.setItem('voltage', voltage);
   }
+  // Modified evaluatePowerOutput to show/hide the critical alert (!) on the power button.
   function evaluatePowerOutput() {
     if (windSpeed >= 40 && windSpeed <= 70 && powerOutputConfirmed) {
       powerStatus = "On";
@@ -1427,7 +1111,10 @@
     }
     document.getElementById('powerStatusDisplay').textContent = powerStatus;
     if (powerStatus === "Off") {
+      document.getElementById('powerAlert').style.display = "inline";
       alert("Power is insufficient! Flats will experience reduced services.");
+    } else {
+      document.getElementById('powerAlert').style.display = "none";
     }
   }
   // New function: simulate a gradual power event every minute
