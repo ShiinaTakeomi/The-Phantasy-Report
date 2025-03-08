@@ -375,7 +375,6 @@
 <div id="mainGame" style="display: none;">
   <!-- Notification Panel for In-App Alerts -->
   <div id="notificationPanel"></div>
-
   <!-- Main Screen -->
   <div id="main-screen">
     <div class="container">
@@ -472,7 +471,7 @@
     <div id="garbageLog"></div>
   </div>
 
-  <!-- Grocery Store Panel (Room Decoration removed) -->
+  <!-- Grocery Store Panel -->
   <div id="grocery-panel" class="panel">
     <h2>Grocery Store</h2>
     <p>Purchase essential items. Prices may vary with electricity availability.</p>
@@ -481,15 +480,15 @@
       <p><strong>Food Staples</strong> - $10<br><em>Basic nourishment to reduce hunger.</em></p>
       <button onclick="buyItem('Food Staples')">Buy Food</button>
     </div>
-    <!-- 20 Types of Seeds -->
+    <!-- 20 Seed Types for Community Garden -->
     <div id="seedList">
       <h4>Seeds for Community Garden</h4>
-      <!-- Dynamically generated seed items will appear here -->
+      <!-- Seed items will be generated here -->
     </div>
-    <!-- 5 Types of Mushrooms -->
+    <!-- 5 Mushroom Types for Cultivation -->
     <div id="mushroomList">
       <h4>Mushrooms for Cultivation</h4>
-      <!-- Dynamically generated mushroom items will appear here -->
+      <!-- Mushroom items will be generated here -->
     </div>
     <!-- Lubricant Oil -->
     <div class="grocery-item">
@@ -523,7 +522,7 @@
     <button onclick="hidePanel('garden-panel')">Return to Main Screen</button>
   </div>
 
-  <!-- Community Kitchen Panel with Unified Cooking Process -->
+  <!-- Community Kitchen Panel -->
   <div id="kitchen-panel" class="panel">
     <h2>Community Kitchen</h2>
     <p>Access the cookbook to view 20 available recipes. Each recipe has a single-sentence description based on plants and mushrooms grown in the community garden, along with its benefits and setbacks.</p>
@@ -548,7 +547,7 @@
     <button onclick="hidePanel('recipePanel'); openKitchenPanel();">Cancel</button>
   </div>
 
-  <!-- Water Supplies (Laundry) Panel -->
+  <!-- Water Supplies Panel -->
   <div id="water-panel" class="panel">
     <h2>Water Supplies (Laundry)</h2>
     <p>Water pressure is directly linked to the performance of the power panel. Use the washing machine to clean clothes – remember, low power output may result in lower water pressure.</p>
@@ -567,7 +566,7 @@
     <button onclick="hidePanel('water-panel')">Return to Main Screen</button>
   </div>
 
-  <!-- Chat Panel (Room Chat / Door Chat) -->
+  <!-- Chat Panel -->
   <div id="chatPanel" class="panel">
     <h2 id="chatRoomTitle"></h2>
     <div id="chatLog"></div>
@@ -577,7 +576,7 @@
   </div>
 </div>
 
-<!-- Door Modal for Front Door Interactions -->
+<!-- Door Modal -->
 <div id="doorModal">
   <h2 id="doorTitle">Door Interaction</h2>
   <div id="doorOptions">
@@ -612,7 +611,7 @@
   const db = firebase.firestore();
 
   // ----------------------------
-  // Room Password Mapping (default values)
+  // Room Password Mapping
   // ----------------------------
   const roomPasswords = {
     "Room 1": "0001",
@@ -642,29 +641,39 @@
     "Room 25": "0025"
   };
 
-  // Global variables for current room and mode
+  // Global variables
   let currentRoom = "";
   let doorChatMode = false;
   let harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
-
-  // New global variable for water inventory
   let waterInventory = parseInt(localStorage.getItem('water')) || 0;
-
-  // Global garden slots array (for 10 slots)
+  // Global gardenSlots for 10 slots
   let gardenSlots = Array.from({length: 10}, (_, i) => ({
-    slot: i+1,
-    type: null,         // seed or mushroom type
-    watered: false,     // whether watered
-    timer: null         // timer for maturity
+    slot: i + 1,
+    type: null,     // seed or mushroom type
+    watered: false,
+    timer: null
   }));
 
   // ----------------------------
-  // Centralized Recipes Array (20 recipes)
+  // Grocery Items Arrays: 20 Seed Types and 5 Mushroom Types
+  // ----------------------------
+  const seedTypes = [
+    "Sunflower Seed", "Pumpkin Seed", "Corn Seed", "Wheat Seed", "Rice Seed",
+    "Barley Seed", "Oat Seed", "Millet Seed", "Sorghum Seed", "Quinoa Seed",
+    "Flax Seed", "Sesame Seed", "Chia Seed", "Cumin Seed", "Mustard Seed",
+    "Fennel Seed", "Caraway Seed", "Anise Seed", "Poppy Seed", "Basil Seed"
+  ];
+  const mushroomTypes = [
+    "Button Mushroom", "Portobello Mushroom", "Shiitake Mushroom", "Oyster Mushroom", "Enoki Mushroom"
+  ];
+
+  // ----------------------------
+  // Centralized Recipes Array
   // ----------------------------
   const recipes = [];
   for (let i = 0; i < 10; i++) {
     recipes.push({
-      title: "Garden Salad " + (i+1),
+      title: "Garden Salad " + (i + 1),
       description: "A refreshing mix of greens and button mushrooms that boosts vitality, though too much may slightly lower hunger.",
       ingredients: [
         { name: "Sunflower Seed", amount: 2 },
@@ -675,7 +684,7 @@
       setbacks: "Slightly decreases hunger."
     });
     recipes.push({
-      title: "Mushroom Medley " + (i+1),
+      title: "Mushroom Medley " + (i + 1),
       description: "A savory dish combining portobello mushrooms with pumpkin seeds that improves strength but may affect mood if overconsumed.",
       ingredients: [
         { name: "Portobello Mushroom", amount: 2 },
@@ -740,9 +749,7 @@
     updateHarvestInventoryUI();
   }
 
-  // Dummy function to update harvest inventory UI (implementation placeholder)
   function updateHarvestInventoryUI() {
-    // For simplicity, update the innerHTML of the harvestInventory div
     const invDiv = document.getElementById('harvestInventory');
     let html = "";
     for (let item in harvestInventory) {
@@ -778,7 +785,7 @@
   }
 
   // ----------------------------
-  // Utility: Clear All Game State from localStorage
+  // Utility: Clear All Game State
   // ----------------------------
   function clearGameState() {
     const keys = ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate', 'harvestInventory', 'water'];
@@ -798,7 +805,7 @@
   }
 
   // ----------------------------
-  // Exit Button, Garbage Chute, and Panel Toggles
+  // Panel Toggles and Navigation
   // ----------------------------
   function showGarbagePanel() {
     document.getElementById('garbage-panel').style.display = 'block';
@@ -828,7 +835,6 @@
   function openWaterPanel() {
     document.getElementById('water-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
-    // Calculate water pressure from voltage
     const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
     const pressure = Math.round(voltage * 0.8);
     document.getElementById('waterPressureDisplay').textContent = pressure;
@@ -836,7 +842,7 @@
   }
 
   // ----------------------------
-  // Buy Item Function (Grocery Store) with Benefits/Setbacks
+  // Buy Item Function
   // ----------------------------
   function buyItem(item) {
     const prices = {
@@ -1025,7 +1031,7 @@
   }
   function togglePlayerStatus() {
     const biodataDiv = document.getElementById('playerStatus');
-    if(biodataDiv.style.display === "none" || biodataDiv.style.display === "") {
+    if (biodataDiv.style.display === "none" || biodataDiv.style.display === "") {
       biodataDiv.style.display = "block";
     } else {
       biodataDiv.style.display = "none";
@@ -1104,7 +1110,7 @@
   function toggleNarrative() {
     const narrativeDiv = document.getElementById('narrativeStats');
     const toggleButton = document.getElementById('toggleNarrative');
-    if(narrativeDiv.style.display === "none"){
+    if (narrativeDiv.style.display === "none") {
       narrativeDiv.style.display = "block";
       toggleButton.textContent = "Hide Narrative";
     } else {
@@ -1138,7 +1144,7 @@
   }
 
   // ----------------------------
-  // Community Kitchen Chat & Unified Cooking Functions
+  // Community Kitchen Chat & Cooking Functions
   // ----------------------------
   function sendKitchenChat() {
     const msg = document.getElementById('kitchenChatInput').value;
@@ -1170,7 +1176,6 @@
         chatLog.scrollTop = chatLog.scrollHeight;
       });
   }
-  // New function to open the Recipe Panel instead of a popup
   function openRecipePanel() {
     const container = document.getElementById('recipeListContainer');
     container.innerHTML = "";
@@ -1216,7 +1221,7 @@
   }
 
   // ----------------------------
-  // Water Supplies (Laundry) Chat & Washing Machine Functions
+  // Water Supplies Chat & Washing Machine Functions
   // ----------------------------
   function sendLaundryChat() {
     const msg = document.getElementById('laundryChatInput').value;
@@ -1603,7 +1608,7 @@
     const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
     const pressure = Math.round(voltage * 0.8);
     if (pressure >= 90) {
-      waterInventory += 5; // add 5 units of water
+      waterInventory += 5;
       localStorage.setItem('water', waterInventory);
       alert("Collected 5 water units! Your water inventory is now " + waterInventory + ".");
     } else {
@@ -1635,16 +1640,17 @@
     });
   }
 
-  // openPlantSelectionModal now prompts for seed type (or mushroom)
   function openPlantSelectionModal(slotNumber) {
-    const seedType = prompt("Enter the seed type to plant (e.g., 'Sunflower Seed' or 'Button Mushroom'):");
+    const seedType = prompt("Enter the seed type to plant (choose one of the following seeds:\n" +
+      seedTypes.join(", ") +
+      "\nOR one of the mushroom types:\n" +
+      mushroomTypes.join(", ") +
+      ")");
     if (!seedType) return;
-    // Check if player has the seed in harvest inventory
     if (!harvestInventory[seedType] || harvestInventory[seedType] < 1) {
       alert("You do not have any " + seedType + " in your inventory.");
       return;
     }
-    // Remove one unit of seed from inventory and plant it
     removeItem(seedType, 1);
     gardenSlots[slotNumber - 1] = {
       slot: slotNumber,
@@ -1655,7 +1661,6 @@
     renderGardenSlots();
   }
 
-  // waterPlant uses water inventory to water the plant and start the growth timer
   function waterPlant(slotNumber) {
     if (waterInventory < 1) {
       alert("No water available. Please collect water from the Water Supplies panel.");
@@ -1666,32 +1671,21 @@
     document.getElementById('waterInventoryDisplay').textContent = waterInventory;
     gardenSlots[slotNumber - 1].watered = true;
     renderGardenSlots();
-    // Start a 5-minute timer to mature the plant
     gardenSlots[slotNumber - 1].timer = setTimeout(() => {
       const matureType = gardenSlots[slotNumber - 1].type;
       alert("Your " + matureType + " has matured!");
-      // Add the mature produce to harvest inventory (same name as seed)
       addItem(matureType, 1);
-      // Clear the slot
       gardenSlots[slotNumber - 1] = { slot: slotNumber, type: null, watered: false, timer: null };
       renderGardenSlots();
-    }, 300000); // 300,000ms = 5 minutes
+    }, 300000); // 5 minutes
   }
 
   // ----------------------------
-  // Functions to Generate Seed and Mushroom Items in Grocery Stand
+  // Generate Grocery Items for Seeds and Mushrooms
   // ----------------------------
-  const seedTypes = [
-    "Sunflower Seed", "Pumpkin Seed", "Corn Seed", "Wheat Seed", "Rice Seed",
-    "Barley Seed", "Oat Seed", "Millet Seed", "Sorghum Seed", "Quinoa Seed",
-    "Flax Seed", "Sesame Seed", "Chia Seed", "Cumin Seed", "Mustard Seed",
-    "Fennel Seed", "Caraway Seed", "Anise Seed", "Poppy Seed", "Basil Seed"
-  ];
-  const mushroomTypes = [
-    "Button Mushroom", "Portobello Mushroom", "Shiitake Mushroom", "Oyster Mushroom", "Enoki Mushroom"
-  ];
   function generateGroceryItems() {
     let seedContainer = document.getElementById("seedList");
+    seedContainer.innerHTML = "";
     seedTypes.forEach(seed => {
       let div = document.createElement("div");
       div.className = "grocery-item";
@@ -1700,6 +1694,7 @@
       seedContainer.appendChild(div);
     });
     let mushroomContainer = document.getElementById("mushroomList");
+    mushroomContainer.innerHTML = "";
     mushroomTypes.forEach(mushroom => {
       let div = document.createElement("div");
       div.className = "grocery-item";
@@ -1710,7 +1705,7 @@
   }
 
   // ----------------------------
-  // Clear Garbage Function with Logging
+  // Clear Garbage Function
   // ----------------------------
   function clearGarbage() {
     garbageLevel = 0;
@@ -1770,7 +1765,7 @@
   };
 
   // ----------------------------
-  // Placeholder functions for planting seeds and mushrooms (if not using the new system)
+  // Placeholder Functions for Harvesting & Selling
   // ----------------------------
   function plantMushroomTree() {
     alert("Planting a mushroom tree. (Functionality to be implemented similarly to seeds.)");
