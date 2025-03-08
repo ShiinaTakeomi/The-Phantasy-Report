@@ -588,12 +588,14 @@
     document.getElementById('garbage-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
   }
-  function showPowerPanel() {
-// Change the background image of the entire page to the new image.
-  document.body.style.backgroundImage = "url('https://i.pinimg.com/736x/2d/d9/76/2dd9762815138628d3c380fe097241d2.jpg')";
-    document.getElementById('minigame-panel').style.display = 'block';
-    document.getElementById('main-screen').style.display = 'none';
-  }
+function showPowerPanel() {
+  // Change the background image and ensure it fits both PC and mobile screens.
+  document.body.style.backgroundImage = "url('https://i.pinimg.com/736x/26/eb/ee/26ebee34e8067ddf087517457e549af7.jpg')";
+  document.body.style.backgroundSize = "cover"; // Ensures the image covers the screen
+  document.body.style.backgroundPosition = "center center"; // Centers the image
+  document.getElementById('minigame-panel').style.display = 'block';
+  document.getElementById('main-screen').style.display = 'none';
+}
   function openGroceryPanel() {
     document.getElementById('grocery-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
