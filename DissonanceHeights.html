@@ -33,7 +33,7 @@
       padding: 10px;
       border-radius: 8px;
     }
-    .panel {
+    .panel, .modal {
       display: none;
       border: 2px solid #444;
       padding: 20px;
@@ -173,13 +173,13 @@
       padding: 8px;
       margin-bottom: 10px;
     }
-    /* Modal Styles (for plant selection, kitchen, water, door interaction) */
-    .modal, #doorModal {
+    /* Modal Styles (for plant selection, kitchen, water, door interaction, and tutorial) */
+    .modal, #doorModal, #tutorialModal {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
-      width: 300px;
+      width: 500px;
       transform: translate(-50%, -50%);
       background: rgba(0,0,0,0.9);
       padding: 20px;
@@ -188,7 +188,8 @@
       z-index: 1000;
     }
     .modal button, .modal input, .modal select, .modal textarea,
-    #doorModal button, #doorModal input {
+    #doorModal button, #doorModal input,
+    #tutorialModal button {
       margin-top: 10px;
       padding: 5px 10px;
       font-size: 14px;
@@ -319,10 +320,6 @@
       border-radius: 4px;
     }
   </style>
-  <!-- Firebase SDKs: Auth and Firestore -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -409,32 +406,33 @@
     <button id="instructionsButton" onclick="toggleInstructions()">Instructions</button>
     <div id="instructions" style="display: none;">
       <p>
-        <strong>Step 1:</strong> Adjust the wind speed using the slider.<br>
-        <strong>Step 2:</strong> Engage or release the brake as needed.<br>
-        <strong>Step 3:</strong> Apply Lubricant Oil (if available) to maintain smooth operation.<br>
-        <strong>Step 4:</strong> Confirm power output to ensure optimal performance.
+        <strong>Step 1:</strong> Adjust the wind speed using the slider (Tooltip: "Changes turbine output").<br>
+        <strong>Step 2:</strong> Engage or release the brake as needed (Tooltip: "Temporarily dampens the output").<br>
+        <strong>Step 3:</strong> Apply Lubricant Oil if available (Tooltip: "Keeps moving parts running smoothly").<br>
+        <strong>Step 4:</strong> Confirm power output to lock in your settings.
       </p>
     </div>
+    <!-- Controls with tooltips -->
     <div class="control">
       <label for="windSpeedSlider">Wind Speed Regulator:</label>
-      <input type="range" id="windSpeedSlider" min="0" max="100" onchange="updateWindSpeed()">
+      <input type="range" id="windSpeedSlider" min="0" max="100" onchange="updateWindSpeed()" title="Adjust wind speed to control voltage">
       <span id="windSpeedValue"></span>
     </div>
     <div class="control">
       <label for="brakeButton">Brake System:</label>
-      <button id="brakeButton" onclick="toggleBrake()">Engage Brake</button>
+      <button id="brakeButton" onclick="toggleBrake()" title="Toggle brake to dampen or boost output">Engage Brake</button>
     </div>
     <div class="control">
       <label>Voltage Monitor:</label>
-      <span id="voltageDisplay"></span> V
+      <span id="voltageDisplay" title="Real-time voltage reading"></span> V
     </div>
     <div class="control">
       <label for="lubricateButton">Apply Lubricant Oil:</label>
-      <button id="lubricateButton" onclick="lubricate()">Apply Oil</button>
+      <button id="lubricateButton" onclick="lubricate()" title="Use lubricant oil to reduce friction">Apply Oil</button>
     </div>
     <div class="control">
       <label for="powerOutputConfirm">Power Output Confirm:</label>
-      <button id="powerOutputConfirm" onclick="togglePowerOutput()">Confirm Output</button>
+      <button id="powerOutputConfirm" onclick="togglePowerOutput()" title="Confirm and lock in your power settings">Confirm Output</button>
     </div>
     <!-- New Power Suggestions Section -->
     <div class="control">
@@ -450,6 +448,20 @@
       <label>Power Status:</label>
       <span id="powerStatusDisplay">Unknown</span>
     </div>
+  </div>
+
+  <!-- Tutorial Modal for Onboarding the Power Panel -->
+  <div id="tutorialModal" class="modal">
+    <h2>Power Panel Tutorial</h2>
+    <p>Welcome to the Wind Turbine Control Panel! Here's what you need to know:</p>
+    <ul>
+      <li><strong>Wind Speed Slider:</strong> Adjusts the turbine's output. Aim for a speed between 40-70 for optimal performance.</li>
+      <li><strong>Brake Button:</strong> Use to temporarily reduce the speed effect; helps stabilize voltage.</li>
+      <li><strong>Lubricant Oil:</strong> Apply when needed to keep the turbine running smoothly.</li>
+      <li><strong>Confirm Output:</strong> Lock in your settings for the current cycle.</li>
+    </ul>
+    <p>Keep an eye on the voltage monitor and suggestions for tips. You'll also receive hints if the settings aren’t optimal.</p>
+    <button onclick="closeTutorial()">Got it!</button>
   </div>
 
   <!-- Garbage Chute Panel -->
@@ -482,12 +494,10 @@
     <!-- 20 Types of Seeds -->
     <div id="seedList">
       <h4>Seeds for Community Garden</h4>
-      <!-- Dynamically generated seed items -->
     </div>
     <!-- 5 Types of Mushrooms -->
     <div id="mushroomList">
       <h4>Mushrooms for Cultivation</h4>
-      <!-- Dynamically generated mushroom items -->
     </div>
     <!-- Lubricant Oil -->
     <div class="grocery-item">
@@ -525,15 +535,11 @@
   <div id="kitchen-panel" class="panel">
     <h2>Community Kitchen</h2>
     <p>Access the cookbook to view 20 available recipes. Each recipe has a single-sentence description based on plants and mushrooms grown in the community garden, along with its benefits and setbacks.</p>
-    <!-- The Cook button now opens the Recipe Panel -->
     <button onclick="openRecipePanel()">Cook</button>
-    <!-- Display dynamic stove status -->
     <div id="stoveStatus" style="margin-top:10px; font-size:14px;">Stove: Available</div>
-    <!-- Cooking Process Simulation (hidden by default) -->
     <div id="cookingProcess" style="display:none; margin-top:10px; font-size:14px;">
       <p>Cooking in progress... Please wait 1 minute.</p>
     </div>
-    <!-- Chat area for Community Kitchen -->
     <div>
       <h4>Kitchen Chat</h4>
       <div class="chatArea" id="kitchenChatLog"></div>
@@ -547,7 +553,6 @@
   <div id="recipePanel" class="panel">
     <h2>Recipe Selection</h2>
     <div id="recipeListContainer" style="max-height:300px; overflow-y:auto;"></div>
-    <!-- When Cancel is clicked here, return to the Community Kitchen panel -->
     <button onclick="hidePanel('recipePanel'); openKitchenPanel();">Cancel</button>
   </div>
 
@@ -647,12 +652,12 @@
   let currentRoom = "";
   let doorChatMode = false;
   let harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
+  let tutorialShown = localStorage.getItem('tutorialShown') === 'true';
 
   // ----------------------------
   // Centralized Recipes Array (20 recipes)
   // ----------------------------
   const recipes = [];
-  // For demonstration, we create 20 recipes using two samples duplicated
   for (let i = 0; i < 10; i++) {
     recipes.push({
       title: "Garden Salad " + (i+1),
@@ -787,6 +792,10 @@
     document.body.style.backgroundPosition = "center center";
     document.getElementById('minigame-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
+    // Show tutorial modal if not shown before
+    if (!tutorialShown) {
+      document.getElementById('tutorialModal').style.display = 'block';
+    }
   }
   function openGroceryPanel() {
     document.getElementById('grocery-panel').style.display = 'block';
@@ -1142,7 +1151,6 @@
         chatLog.scrollTop = chatLog.scrollHeight;
       });
   }
-  // New function to open the Recipe Panel instead of a popup
   function openRecipePanel() {
     const container = document.getElementById('recipeListContainer');
     container.innerHTML = "";
@@ -1162,9 +1170,7 @@
     document.getElementById('kitchen-panel').style.display = 'none';
   }
   function cookRecipe(recipe) {
-    // Hide the recipe panel
     document.getElementById('recipePanel').style.display = 'none';
-    // Check inventory for each required ingredient
     let missingIngredients = [];
     recipe.ingredients.forEach(ing => {
       if (!harvestInventory[ing.name] || harvestInventory[ing.name] < ing.amount) {
@@ -1173,26 +1179,19 @@
     });
     if (missingIngredients.length > 0) {
       alert("Cannot cook recipe. Missing ingredients:\n" + missingIngredients.join("\n"));
-      // Redirect back to the Recipe Panel
       openRecipePanel();
       return;
     }
-    // Remove the required ingredients from inventory
     recipe.ingredients.forEach(ing => {
       removeItem(ing.name, ing.amount);
     });
-    // Update stove status to "In Use"
     document.getElementById("stoveStatus").textContent = "Stove: In Use";
-    // Show cooking process indicator
     document.getElementById("cookingProcess").style.display = "block";
-    // Simulate a 1-minute cooking delay
     setTimeout(() => {
       document.getElementById("cookingProcess").style.display = "none";
       document.getElementById("stoveStatus").textContent = "Stove: Available";
       alert("Cooking complete! You made: " + recipe.title);
-      // Add the cooked dish to inventory (as a tradable/giftable/eatable item)
       addItem("Cooked: " + recipe.title, 1);
-      // Optionally update player stats based on recipe benefits and setbacks
     }, 60000);
   }
 
@@ -1446,6 +1445,10 @@
       windSpeed = Math.max(0, windSpeed - 5);
       localStorage.setItem('windSpeed', windSpeed);
       updateVoltage();
+      // Provide a hint if wind speed drops too low
+      if (windSpeed < 40) {
+        alert("Hint: Wind speed is low. Try increasing the slider to boost power output.");
+      }
     }
   }
   function updateGarbageDisplay() {
@@ -1529,6 +1532,11 @@
       document.body.style.backgroundSize = "cover";
       document.body.style.backgroundPosition = "center center";
     }
+  }
+  function closeTutorial() {
+    document.getElementById('tutorialModal').style.display = 'none';
+    tutorialShown = true;
+    localStorage.setItem('tutorialShown', 'true');
   }
 
   // ----------------------------
