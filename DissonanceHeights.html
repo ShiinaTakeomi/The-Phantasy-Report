@@ -348,7 +348,7 @@
       <button onclick="togglePlayerStatus()">Biodata</button>
     </div>
     <div id="playerStatus">
-      <!-- Biodata updated dynamically; includes room info and harvest inventory -->
+      <!-- Biodata updated dynamically; includes room info, core stats, narrative details and inventory -->
     </div>
   </div>
 
@@ -540,6 +540,58 @@
   let harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
 
   // ----------------------------
+  // Helper Functions: Update Mood and Hunger
+  // ----------------------------
+  function updateMood(delta) {
+    const playerEmail = localStorage.getItem('playerName');
+    if (!playerEmail) return;
+    const safePlayerName = sanitizePlayerName(playerEmail);
+    db.collection('players').doc(safePlayerName).get().then(doc => {
+      if (doc.exists) {
+        let currentMood = doc.data().mood || 100;
+        let newMood = Math.max(0, currentMood + delta);
+        db.collection('players').doc(safePlayerName).set({ mood: newMood, lastUpdated: Date.now() }, { merge: true });
+      }
+    });
+  }
+
+  function updateHunger(delta) {
+    const playerEmail = localStorage.getItem('playerName');
+    if (!playerEmail) return;
+    const safePlayerName = sanitizePlayerName(playerEmail);
+    db.collection('players').doc(safePlayerName).get().then(doc => {
+      if (doc.exists) {
+        let currentHunger = doc.data().hunger || 0;
+        let newHunger = Math.max(0, currentHunger + delta);
+        db.collection('players').doc(safePlayerName).set({ hunger: newHunger, lastUpdated: Date.now() }, { merge: true });
+      }
+    });
+  }
+
+  // ----------------------------
+  // Inventory Functions
+  // ----------------------------
+  function addItem(item, qty = 1) {
+    // Add or update item quantity in harvestInventory.
+    if (harvestInventory[item]) {
+      harvestInventory[item] += qty;
+    } else {
+      harvestInventory[item] = qty;
+    }
+    updateHarvestInventoryUI();
+  }
+
+  function removeItem(item, qty = 1) {
+    if (harvestInventory[item]) {
+      harvestInventory[item] = Math.max(0, harvestInventory[item] - qty);
+      if (harvestInventory[item] === 0) {
+        delete harvestInventory[item];
+      }
+    }
+    updateHarvestInventoryUI();
+  }
+
+  // ----------------------------
   // In-App Notification Listener
   // ----------------------------
   function listenForNotifications() {
@@ -624,6 +676,8 @@
       money -= price;
       localStorage.setItem('money', money);
       alert("Purchased " + item + " for $" + price + ". Remaining money: $" + money);
+      // When purchasing, add the item to inventory.
+      addItem(item, 1);
       updatePlayerStatus();
     } else {
       alert("Not enough money to purchase " + item);
@@ -769,46 +823,7 @@
     isEditing = false;
     updatePlayerStatus();
   }
-  function saveBiodata() {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) return;
-    const safePlayerName = sanitizePlayerName(playerName);
-    const newName = document.getElementById('editName').value;
-    const newAge = document.getElementById('editAge').value;
-    const newReason = document.getElementById('editReason').value;
-    const newRoomNumber = document.getElementById('editRoomNumber').value;
-    const newBackstory = document.getElementById('editBackstory').value;
-    const newSkills = document.getElementById('editSkills').value;
-    const newInventory = document.getElementById('editInventory').value;
-    const newAlliances = document.getElementById('editAlliances').value;
-    const newRivalries = document.getElementById('editRivalries').value;
-    const newReputation = document.getElementById('editReputation').value;
-    db.collection('players').doc(safePlayerName).set({
-      name: newName,
-      age: newAge,
-      reason: newReason,
-      roomNumber: newRoomNumber,
-      backstory: newBackstory,
-      skills: newSkills.split(',').map(s => s.trim()),
-      inventory: newInventory.split(',').map(i => i.trim()),
-      alliances: newAlliances ? newAlliances.split(',').map(a => a.trim()) : [],
-      rivalries: newRivalries ? newRivalries.split(',').map(r => r.trim()) : [],
-      reputation: parseInt(newReputation) || 0,
-      lastUpdated: Date.now()
-    }, { merge: true })
-    .then(() => {
-      localStorage.setItem('characterName', newName);
-      isEditing = false;
-      alert('Biodata updated successfully.');
-      // Update room ownership if roomNumber changed.
-      db.collection('rooms').doc('Room ' + newRoomNumber).set({
-        owner: newName
-      }, { merge: true });
-    })
-    .catch((error) => {
-      console.error("Error updating biodata:", error);
-    });
-  }
+  // Updated biodata function: In view mode, show Core Stats by default with a toggle for Narrative details and Inventory.
   function updatePlayerStatus() {
     const playerName = localStorage.getItem('playerName');
     if (!playerName) return;
@@ -820,55 +835,64 @@
           localStorage.setItem('characterName', data.name);
           let statusHTML = `<h3>Biodata</h3>`;
           if (!isEditing) {
-            statusHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
-            statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
-            statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
-            statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
-            statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
-            statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
-            statusHTML += `<p><strong>Age:</strong> ${data.age}</p>`;
-            statusHTML += `<p><strong>Reason:</strong> ${data.reason}</p>`;
-            statusHTML += `<p><strong>Room:</strong> ${data.roomNumber ? "Room " + data.roomNumber : "Not set"}</p>`;
-            statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
-            statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
-            statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
-            statusHTML += `<p><strong>Backstory:</strong> ${data.backstory || "N/A"}</p>`;
-            statusHTML += `<p><strong>Skills:</strong> ${data.skills ? data.skills.join(", ") : "N/A"}</p>`;
-            statusHTML += `<p><strong>Inventory:</strong> ${data.inventory ? data.inventory.join(", ") : "N/A"}</p>`;
-            statusHTML += `<p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>`;
-            statusHTML += `<p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>`;
-            statusHTML += `<p><strong>Reputation:</strong> ${data.reputation || 0}</p>`;
-            statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
-            statusHTML += `<button onclick="enableEdit()">Edit</button>`;
+            // View mode: Show Core Stats and a toggle button to display Narrative details.
+            let coreStatsHTML = `<h4>Core Stats</h4>`;
+            coreStatsHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
+            coreStatsHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+            coreStatsHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+            coreStatsHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+            coreStatsHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+            coreStatsHTML += `<p><strong>Room:</strong> ${data.roomNumber ? "Room " + data.roomNumber : "Not set"}</p>`;
+            coreStatsHTML += `<p><strong>Inventory:</strong> ${data.inventory ? data.inventory.join(", ") : "N/A"}</p>`;
+            coreStatsHTML += `<p><strong>Reputation:</strong> ${data.reputation || 0}</p>`;
+            
+            let narrativeHTML = `<h4>Background</h4>`;
+            narrativeHTML += `<p><strong>Reason:</strong> ${data.reason || "N/A"}</p>`;
+            narrativeHTML += `<p><strong>Backstory:</strong> ${data.backstory || "N/A"}</p>`;
+            narrativeHTML += `<p><strong>Skills:</strong> ${data.skills ? data.skills.join(", ") : "N/A"}</p>`;
+            narrativeHTML += `<p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>`;
+            narrativeHTML += `<p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>`;
+            
+            // Inventory Section (merged with biodata)
+            let inventoryHTML = `<h4>Inventory</h4>`;
+            if (Object.keys(harvestInventory).length > 0) {
+              for (let item in harvestInventory) {
+                inventoryHTML += `<p>${item}: ${harvestInventory[item]}</p>`;
+              }
+            } else {
+              inventoryHTML += `<p>None</p>`;
+            }
+            
+            statusHTML += `<div id="coreStats">${coreStatsHTML}</div>`;
+            statusHTML += `<div id="narrativeStats" style="display:none;">${narrativeHTML}</div>`;
+            statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
+            statusHTML += inventoryHTML;
           } else {
+            // Edit mode: Show all fields in a grouped layout.
+            statusHTML += `<h3>Edit Character</h3>`;
+            statusHTML += `<div><strong>Core Stats</strong><br>`;
             statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" /></p>`;
             statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
             statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
             statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
             statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
-            statusHTML += `<p><strong>Gender:</strong> ${data.gender || "N/A"}</p>`;
-            statusHTML += `<p><strong>Age:</strong> <input type="number" id="editAge" value="${data.age}" /></p>`;
-            statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason}</textarea></p>`;
             statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25"/></p>`;
+            statusHTML += `<p><strong>Inventory:</strong> <input type="text" id="editInventory" value="${data.inventory ? data.inventory.join(", ") : ""}" /></p>`;
+            statusHTML += `<p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" /></p></div>`;
+            statusHTML += `<div><strong>Background</strong><br>`;
+            statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason">${data.reason}</textarea></p>`;
             statusHTML += `<p><strong>Backstory:</strong> <textarea id="editBackstory">${data.backstory || ""}</textarea></p>`;
             statusHTML += `<p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" /></p>`;
-            statusHTML += `<p><strong>Inventory:</strong> <input type="text" id="editInventory" value="${data.inventory ? data.inventory.join(", ") : ""}" /></p>`;
             statusHTML += `<p><strong>Alliances:</strong> <input type="text" id="editAlliances" value="${data.alliances ? data.alliances.join(", ") : ""}" /></p>`;
-            statusHTML += `<p><strong>Rivalries:</strong> <input type="text" id="editRivalries" value="${data.rivalries ? data.rivalries.join(", ") : ""}" /></p>`;
-            statusHTML += `<p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" /></p>`;
-            statusHTML += `<p><strong>Physical:</strong> ${data.conditions.physical}</p>`;
-            statusHTML += `<p><strong>Mental:</strong> ${data.conditions.mental}</p>`;
-            statusHTML += `<p><strong>Activity:</strong> ${data.conditions.activity}</p>`;
-            statusHTML += `<p><strong>Last Updated:</strong> ${new Date(data.lastUpdated).toLocaleString()}</p>`;
-            statusHTML += `<button onclick="saveBiodata()">Save Changes</button> `;
+            statusHTML += `<p><strong>Rivalries:</strong> <input type="text" id="editRivalries" value="${data.rivalries ? data.rivalries.join(", ") : ""}" /></p></div>`;
+            statusHTML += `<button onclick="saveBiodata()">Save Changes</button>`;
             statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
           }
           // Display Money and Harvest Inventory from localStorage
           statusHTML += `<p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>`;
+          // Also display seeds if needed
           statusHTML += `<p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>`;
           statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
-          // Display harvest inventory
-          statusHTML += `<h4>Harvest Inventory:</h4><div id="harvestInventoryDisplay"></div>`;
           document.getElementById('playerStatus').innerHTML = statusHTML;
           updateHarvestInventoryUI();
         }
@@ -876,6 +900,19 @@
         console.error("Error getting player status:", error);
       });
   }
+  // Function to toggle display of Narrative details in view mode
+  function toggleNarrative() {
+    const narrativeDiv = document.getElementById('narrativeStats');
+    const toggleButton = document.getElementById('toggleNarrative');
+    if(narrativeDiv.style.display === "none"){
+      narrativeDiv.style.display = "block";
+      toggleButton.textContent = "Hide Narrative";
+    } else {
+      narrativeDiv.style.display = "none";
+      toggleButton.textContent = "Show Narrative";
+    }
+  }
+
   // Function to update the harvest inventory display in the biodata panel and grocery store
   function updateHarvestInventoryUI() {
     // Update localStorage
@@ -889,7 +926,7 @@
       }
       displayDiv.innerHTML = html || "<p>None</p>";
     }
-    // Also update the grocery store panel inventory
+    // Also update the grocery store panel inventory if it exists
     const groceryInv = document.getElementById('harvestInventory');
     if (groceryInv) {
       let html = "";
@@ -1054,8 +1091,13 @@
   function closeKitchenPanel() {
     document.getElementById('kitchenPanel').style.display = 'none';
   }
+  // Process food in the kitchen: reduce hunger and boost mood.
   function processFood() {
     alert("Food processed for improved safety and efficiency.");
+    updateHunger(-10); // Reduce hunger by 10 points.
+    updateMood(5);     // Boost mood by 5 points.
+    // Optionally add food to inventory as a harvest item.
+    addItem("Food Staples", 1);
   }
   function openWaterPanel() {
     document.getElementById('waterPanel').style.display = 'block';
@@ -1063,8 +1105,11 @@
   function closeWaterPanel() {
     document.getElementById('waterPanel').style.display = 'none';
   }
+  // Use water: reduces hunger and slightly boosts mood.
   function useWater() {
     alert("Water distributed for gardening, cooking, and personal use.");
+    updateHunger(-5);  // Reduce hunger by 5 points.
+    updateMood(2);     // Boost mood by 2 points.
   }
 
   // ----------------------------
