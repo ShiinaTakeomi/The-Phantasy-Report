@@ -510,7 +510,7 @@
     "Room 9": "0009",
     "Room 10": "0010",
     "Room 11": "0011",
-    "Room 12": "0715",
+    "Room 12": "0715",  // Note: Room 12 uses a different password now.
     "Room 13": "0013",
     "Room 14": "0014",
     "Room 15": "0015",
@@ -1498,6 +1498,41 @@
   }
 
   // ----------------------------
+  // NEW: Health Decline Due to High Garbage
+  // ----------------------------
+  function simulateHealthDecline() {
+    // If garbage is high, decrease player's health
+    if (garbageLevel > 80) {
+      const playerEmail = localStorage.getItem('playerName');
+      if (!playerEmail) return;
+      const safePlayerName = sanitizePlayerName(playerEmail);
+      db.collection('players').doc(safePlayerName).get().then((doc) => {
+        if (doc.exists) {
+          let data = doc.data();
+          let currentHealth = data.health || 100;
+          // Decrease health by 1 point
+          let newHealth = Math.max(0, currentHealth - 1);
+          // Update the player's document with the new health value
+          db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+          // If health reaches zero, trigger death
+          if (newHealth === 0) {
+            playerDied();
+          }
+        }
+      }).catch((error) => {
+        console.error("Error decreasing health: ", error);
+      });
+    }
+  }
+
+  function playerDied() {
+    alert("Your health has reached zero. You have died.");
+    // Clear game state and redirect to index.html (or you could redirect to a dedicated death screen)
+    clearGameState();
+    window.location.href = "index.html";
+  }
+
+  // ----------------------------
   // Season Simulation
   // ----------------------------
   let currentSeason = "Spring";
@@ -1594,12 +1629,13 @@
     }
     // Initialize harvest inventory from localStorage if exists
     harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
-    // Set intervals: power event and garbage update every minute, plus existing intervals.
+    // Set intervals: power event, garbage update, health decline, and random events.
     setInterval(simulatePowerEvent, 60000);
     setInterval(updateGarbageDisplay, 60000);
     setInterval(updateVoltage, 5000);
     setInterval(simulateRandomEvent, 3600000);
     setInterval(updateGardenUI, 60000);
+    setInterval(simulateHealthDecline, 60000);  // Decrease health if garbage is high
   };
 </script>
 </body>
