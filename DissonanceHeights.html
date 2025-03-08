@@ -15,7 +15,9 @@
       padding: 0;
       font-family: Arial, sans-serif;
       /* Main menu background */
-      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
+      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+        url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')
+        no-repeat center center fixed;
       background-size: cover;
       color: #eee;
     }
@@ -437,7 +439,6 @@
     </div>
     <div class="control">
       <label>Voltage:</label>
-      <!-- Voltage display element added here -->
       <span id="voltageDisplay">0.0</span>
     </div>
     <div class="control">
@@ -445,7 +446,7 @@
       <div id="powerSuggestions" style="font-size:14px; background:rgba(255,255,255,0.1); padding:5px; border-radius:4px;"></div>
     </div>
     <div class="control">
-      <button onclick="hidePanel('minigame-panel')">Return to Main Screen</button>
+      <button onclick="hidePanel('minigame-panel')">Return to Main Menu</button>
     </div>
     <h3>System Log:</h3>
     <div id="minigameLog"></div>
@@ -467,7 +468,7 @@
       <button onclick="clearGarbage()">Clear Garbage</button>
     </div>
     <div class="control">
-      <button onclick="hidePanel('garbage-panel')">Return to Main Screen</button>
+      <button onclick="hidePanel('garbage-panel')">Return to Main Menu</button>
     </div>
     <h3>Garbage Log:</h3>
     <div id="garbageLog"></div>
@@ -477,32 +478,26 @@
   <div id="grocery-panel" class="panel">
     <h2>Grocery Store</h2>
     <p>Purchase essential items. Prices may vary with electricity availability.</p>
-    <!-- Food Staples -->
     <div class="grocery-item">
       <p><strong>Food Staples</strong> - $10<br><em>Basic nourishment to reduce hunger.</em></p>
       <button onclick="buyItem('Food Staples')">Buy Food</button>
     </div>
-    <!-- 20 Seed Types for Community Garden -->
     <div id="seedList">
       <h4>Seeds for Community Garden</h4>
       <!-- Seed items will be generated here -->
     </div>
-    <!-- 5 Mushroom Types for Cultivation -->
     <div id="mushroomList">
       <h4>Mushrooms for Cultivation</h4>
       <!-- Mushroom items will be generated here -->
     </div>
-    <!-- Lubricant Oil -->
     <div class="grocery-item">
       <p><strong>Lubricant Oil</strong> - $5<br><em>Essential for keeping the power panel running smoothly. Consumed on use.</em></p>
       <button onclick="buyItem('Lubricant Oil')">Buy Lubricant Oil</button>
     </div>
-    <!-- Alcohol -->
     <div class="grocery-item">
       <p><strong>Alcohol</strong> - $3<br><em>Boosts mood but may have minor setbacks on health.</em></p>
       <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
     </div>
-    <!-- Cigarettes -->
     <div class="grocery-item">
       <p><strong>Cigarettes</strong> - $4<br><em>Temporarily improves mood but reduces health over time.</em></p>
       <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
@@ -821,11 +816,11 @@
   function openGroceryPanel() {
     document.getElementById('grocery-panel').style.display = 'block';
     document.getElementById('main-screen').style.display = 'none';
-    generateGroceryItems(); // Regenerate items when panel is opened
+    generateGroceryItems();
     updateHarvestInventoryUI();
   }
   function openGardenPanel() {
-    // Set community garden background when opening garden panel
+    // Set community garden background (it will cover all devices because of background-size: cover)
     document.body.style.backgroundImage = "url('https://i.pinimg.com/736x/1a/97/af/1a97af089b326864a32ddb9f788c7c2d.jpg')";
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundPosition = "center center";
