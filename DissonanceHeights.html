@@ -277,7 +277,12 @@
 <body>
 
 <!-- Hidden YouTube Player for Ambient Music -->
-<iframe id="bgMusic" width="0" height="0" src="https://www.youtube.com/embed/-gKkA9SIxKw?autoplay=1&loop=1&playlist=-gKkA9SIxKw" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute; left:-9999px;"></iframe>
+<iframe id="bgMusic" width="0" height="0" src="https://www.youtube.com/embed/-gKkA9SIxKw?autoplay=1&loop=1&playlist=-gKkA9SIxKw&si=RHzSkbFheF50TT_9" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute; left:-9999px;"></iframe>
+
+<!-- Toggle Music Player Button (for Skip Ads if they appear) -->
+<div style="text-align:center; margin-top:10px;">
+  <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
+</div>
 
 <!-- Login Panel -->
 <div id="loginPanel">
@@ -325,7 +330,7 @@
   <div id="main-screen">
     <div class="container">
       <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
-      <!-- Updated Exit Button Calls signOutUser() -->
+      <!-- Exit Button -->
       <button class="exit-button" onclick="signOutUser()">Exit</button>
       <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
       <div class="grid">
@@ -505,7 +510,7 @@
     "Room 9": "0009",
     "Room 10": "0010",
     "Room 11": "0011",
-    "Room 12": "0012",
+    "Room 12": "0715",
     "Room 13": "0013",
     "Room 14": "0014",
     "Room 15": "0015",
@@ -1510,6 +1515,29 @@
   function hidePanel(panelId) {
     document.getElementById(panelId).style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
+  }
+
+  // ----------------------------
+  // Toggle Music Player Function
+  // ----------------------------
+  function toggleMusicPlayer() {
+    var player = document.getElementById("bgMusic");
+    // If the player is hidden (or off-screen), show it so the user can click on the skip ads button
+    if (player.style.display === "none" || player.style.display === "" || player.style.width === "0px") {
+      player.style.display = "block";
+      // Give it a small visible size for interaction (e.g., 300x200)
+      player.style.width = "300px";
+      player.style.height = "200px";
+      player.style.position = "relative";
+      player.style.left = "0";
+    } else {
+      // Otherwise, hide the player again
+      player.style.display = "none";
+      player.style.width = "0";
+      player.style.height = "0";
+      player.style.position = "absolute";
+      player.style.left = "-9999px";
+    }
   }
 
   // ----------------------------
