@@ -1480,20 +1480,23 @@
     }
   }
 
-  function updateGarbageDisplay() {
-    const now = Date.now();
-    const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
-    if (elapsedMinutes > 0) {
-      garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
-      lastGarbageUpdate = now;
-      localStorage.setItem('garbageLevel', garbageLevel);
-      localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
-      document.getElementById('garbageDisplay').textContent = garbageLevel;
-      if (garbageLevel > 80) {
-        alert("High garbage levels detected! The community is getting sick.");
-      }
+function updateGarbageDisplay() {
+  // Always update the display with the current garbageLevel
+  document.getElementById('garbageDisplay').textContent = garbageLevel;
+  const now = Date.now();
+  const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
+  if (elapsedMinutes > 0) {
+    garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
+    lastGarbageUpdate = now;
+    localStorage.setItem('garbageLevel', garbageLevel);
+    localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
+    // Update the display after increasing the value
+    document.getElementById('garbageDisplay').textContent = garbageLevel;
+    if (garbageLevel > 80) {
+      alert("High garbage levels detected! The community is getting sick.");
     }
   }
+}
 
   function logPowerMessage(message) {
     const logDiv = document.getElementById('minigameLog');
