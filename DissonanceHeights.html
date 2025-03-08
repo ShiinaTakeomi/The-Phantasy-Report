@@ -329,7 +329,7 @@
 <!-- Hidden YouTube Player for Ambient Music -->
 <iframe id="bgMusic" width="0" height="0" src="https://www.youtube.com/embed/-gKkA9SIxKw?autoplay=1&loop=1&playlist=-gKkA9SIxKw&si=RHzSkbFheF50TT_9" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute; left:-9999px;"></iframe>
 
-<!-- Toggle Music Player Button (for Skip Ads if they appear) -->
+<!-- Toggle Music Player Button -->
 <div style="text-align:center; margin-top:10px;">
   <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
 </div>
@@ -373,19 +373,17 @@
 
 <!-- Main Game Section -->
 <div id="mainGame" style="display: none;">
-  <!-- Notification Panel for In-App Alerts -->
+  <!-- Notification Panel -->
   <div id="notificationPanel"></div>
   <!-- Main Screen -->
   <div id="main-screen">
     <div class="container">
-      <!-- Garbage Chute and Exit Button (Exit below the chute) -->
       <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
       <button class="exit-button" onclick="signOutUser()">Exit</button>
       <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
       <div class="grid">
-        <!-- Room buttons will be generated dynamically -->
+        <!-- Room buttons generated dynamically -->
       </div>
-      <!-- Modified Power Room Button with Alert Symbol -->
       <button class="power-room" onclick="showPowerPanel()">
         Power Room <span id="powerAlert" style="display:none; font-size:1.2em; color:red;">!</span>
       </button>
@@ -397,11 +395,11 @@
       <button onclick="togglePlayerStatus()">Biodata</button>
     </div>
     <div id="playerStatus">
-      <!-- Biodata updated dynamically; toggle show/hide -->
+      <!-- Biodata dynamically updated -->
     </div>
   </div>
 
-  <!-- Power Source Panel with Enhanced Service Info -->
+  <!-- Power Panel -->
   <div id="minigame-panel" class="panel">
     <h2>Wind Turbine Control Panel</h2>
     <p><strong>Objective:</strong> Ensure the turbine provides electricity, water heating, and lighting.</p>
@@ -412,10 +410,9 @@
         <strong>Step 2:</strong> Pull the electrical output lever to toggle power supply.<br>
         <strong>Step 3:</strong> Check water pressure and heater levels by pressing the corresponding buttons.<br>
         <strong>Step 4:</strong> Ensure the overall light status is "On".<br><br>
-        <em>Note:</em> Every minute one of five malfunctions may occur. Follow the on-screen instructions (e.g., readjust the wind speed, toggle the lever, or check water/heater levels) to fix them. Failure to do so will negatively impact your biodata!
+        <em>Note:</em> Every minute one of five malfunctions may occur. Follow the on-screen instructions to fix them; failure will negatively affect your biodata.
       </p>
     </div>
-    <!-- New Controls Section -->
     <div class="control">
       <label for="windSpeedSlider">Wind Speed:</label>
       <input type="range" id="windSpeedSlider" min="0" max="100" onchange="updateWindSpeed()">
@@ -437,7 +434,6 @@
       <label>Light Status:</label>
       <span id="lightStatusDisplay">Unknown</span>
     </div>
-    <!-- Suggestions Section -->
     <div class="control">
       <h4>Service Impact & Suggestions:</h4>
       <div id="powerSuggestions" style="font-size:14px; background:rgba(255,255,255,0.1); padding:5px; border-radius:4px;"></div>
@@ -471,7 +467,7 @@
     <div id="garbageLog"></div>
   </div>
 
-  <!-- Grocery Store Panel -->
+  <!-- Grocery Stand Panel -->
   <div id="grocery-panel" class="panel">
     <h2>Grocery Store</h2>
     <p>Purchase essential items. Prices may vary with electricity availability.</p>
@@ -516,7 +512,7 @@
     <h2>Community Garden</h2>
     <p>Manage your rooftop garden. Plants (seeds or mushrooms) need water to mature. They require 5 minutes and sufficient water to grow.</p>
     <div id="plantSlots">
-      <!-- Garden slots will be generated dynamically -->
+      <!-- Garden slots generated dynamically -->
     </div>
     <button onclick="harvestProduce()">Harvest Produce</button>
     <button onclick="hidePanel('garden-panel')">Return to Main Screen</button>
@@ -540,7 +536,7 @@
     <button onclick="hidePanel('kitchen-panel')">Return to Main Screen</button>
   </div>
 
-  <!-- Recipe Panel for Cooking -->
+  <!-- Recipe Panel -->
   <div id="recipePanel" class="panel">
     <h2>Recipe Selection</h2>
     <div id="recipeListContainer" style="max-height:300px; overflow-y:auto;"></div>
@@ -649,14 +645,12 @@
   // Global gardenSlots for 10 slots
   let gardenSlots = Array.from({length: 10}, (_, i) => ({
     slot: i + 1,
-    type: null,     // seed or mushroom type
+    type: null,
     watered: false,
     timer: null
   }));
 
-  // ----------------------------
   // Grocery Items Arrays: 20 Seed Types and 5 Mushroom Types
-  // ----------------------------
   const seedTypes = [
     "Sunflower Seed", "Pumpkin Seed", "Corn Seed", "Wheat Seed", "Rice Seed",
     "Barley Seed", "Oat Seed", "Millet Seed", "Sorghum Seed", "Quinoa Seed",
@@ -1031,11 +1025,7 @@
   }
   function togglePlayerStatus() {
     const biodataDiv = document.getElementById('playerStatus');
-    if (biodataDiv.style.display === "none" || biodataDiv.style.display === "") {
-      biodataDiv.style.display = "block";
-    } else {
-      biodataDiv.style.display = "none";
-    }
+    biodataDiv.style.display = (biodataDiv.style.display === "none" || biodataDiv.style.display === "") ? "block" : "none";
   }
   function updatePlayerStatus() {
     const playerName = localStorage.getItem('playerName');
@@ -1056,23 +1046,17 @@
             coreStatsHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
             coreStatsHTML += `<p><strong>Room:</strong> ${data.roomNumber ? "Room " + data.roomNumber : "Not set"}</p>`;
             coreStatsHTML += `<p><strong>Reputation:</strong> ${data.reputation || 0}</p>`;
-            
             let narrativeHTML = `<h4>Background</h4>`;
             narrativeHTML += `<p><strong>Reason:</strong> ${data.reason || "N/A"}</p>`;
             narrativeHTML += `<p><strong>Backstory:</strong> ${data.backstory || "N/A"}</p>`;
             narrativeHTML += `<p><strong>Skills:</strong> ${data.skills ? data.skills.join(", ") : "N/A"}</p>`;
             narrativeHTML += `<p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>`;
             narrativeHTML += `<p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>`;
-            
             let inventoryHTML = `<h4>Inventory</h4>`;
-            if (Object.keys(harvestInventory).length > 0) {
-              for (let item in harvestInventory) {
-                inventoryHTML += `<p>${item}: ${harvestInventory[item]}</p>`;
-              }
-            } else {
-              inventoryHTML += `<p>None</p>`;
+            for (let item in harvestInventory) {
+              inventoryHTML += `<p>${item}: ${harvestInventory[item]}</p>`;
             }
-            
+            if (!inventoryHTML) inventoryHTML += `<p>None</p>`;
             statusHTML += `<div id="coreStats">${coreStatsHTML}</div>`;
             statusHTML += `<div id="narrativeStats" style="display:none;">${narrativeHTML}</div>`;
             statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
@@ -1602,7 +1586,7 @@
   }
 
   // ----------------------------
-  // New Water Collection Function for Water Supplies Panel
+  // New Water Collection Function
   // ----------------------------
   function collectWater() {
     const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
