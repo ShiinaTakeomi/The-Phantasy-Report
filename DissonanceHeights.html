@@ -689,6 +689,8 @@
         <input type="text" id="chatInput" placeholder="Type your message...">
         <button onclick="sendChatMessage()">Send</button>
         <button onclick="closeChat()">Close Chat</button>
+        <!-- Rest button will appear here for room owners -->
+        <div id="restContainer" style="margin-top:10px;"></div>
       </div>
     </div>
     <!-- Door Modal -->
@@ -1448,6 +1450,8 @@
       document.getElementById('chatPanel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
       listenForMessages(roomName);
+      // Add the Rest button for the room owner
+      document.getElementById('restContainer').innerHTML = '<button onclick="restInRoom()" id="restButton">Rest (Recover Health)</button>';
     }
     function openDoorChat(roomName) {
       doorChatMode = true;
@@ -1455,6 +1459,8 @@
       document.getElementById('chatLog').innerHTML = "";
       document.getElementById('chatPanel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
+      // Remove the rest button when not the owner
+      document.getElementById('restContainer').innerHTML = '';
       listenForMessages(roomName);
     }
     function listenForMessages(roomName) {
@@ -1720,6 +1726,37 @@
       alert("Your health has reached zero. You have died.");
       clearGameState();
       window.location.href = "index.html";
+    }
+  
+    // ----------------------------
+    // New Functionality: Rest in Room to Recover Health
+    // ----------------------------
+    function restInRoom() {
+      let restButton = document.getElementById("restButton");
+      if (!restButton) return;
+      restButton.disabled = true;
+      restButton.textContent = "Resting...";
+      const playerName = localStorage.getItem('playerName');
+      if (!playerName) return;
+      const safePlayerName = sanitizePlayerName(playerName);
+      let iterations = 12; // 12 iterations of 5 seconds = 60 seconds
+      let interval = setInterval(() => {
+        iterations--;
+        // Update player's health: increase by 2 points (max health is 100)
+        db.collection('players').doc(safePlayerName).get().then(doc => {
+          if (doc.exists) {
+            let currentHealth = doc.data().health || 100;
+            let newHealth = Math.min(100, currentHealth + 2);
+            db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+          }
+        });
+        if (iterations <= 0) {
+          clearInterval(interval);
+          restButton.disabled = false;
+          restButton.textContent = "Rest (Recover Health)";
+          alert("Rest complete! Your health has improved.");
+        }
+      }, 5000);
     }
   
     function toggleMusicPlayer() {
