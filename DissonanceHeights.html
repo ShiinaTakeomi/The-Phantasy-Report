@@ -178,6 +178,21 @@
       border-radius: 4px;
     }
     /* Enlarged editing fields for Biodata */
+    /* The biodata panel is now fixed so it is available anywhere */
+    #playerStatus {
+      position: fixed;
+      top: 60px;
+      right: 10px;
+      width: 300px;
+      border: 2px solid #444;
+      padding: 10px;
+      font-size: 14px;
+      color: #fff;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.7);
+      z-index: 2000;
+      display: none;
+    }
     #playerStatus input,
     #playerStatus textarea {
       width: 100% !important;
@@ -231,17 +246,6 @@
       color: #fff;
       border-radius: 4px;
     }
-    /* Biodata Panel */
-    #playerStatus {
-      margin: 20px auto;
-      max-width: 300px;
-      border: 2px solid #444;
-      padding: 10px;
-      font-size: 14px;
-      color: #fff;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
     /* Harvest Inventory Display */
     #harvestInventory {
       margin-top: 10px;
@@ -278,7 +282,7 @@
     #notificationPanel {
       position: fixed;
       top: 70px;
-      right: 20px;
+      right: 10px;
       background: rgba(0,0,0,0.8);
       color: #fff;
       padding: 10px;
@@ -405,13 +409,24 @@
       margin: 10px auto;
       max-width: 600px;
     }
+    /* Persistent Biodata Button */
+    #biodataButton {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px 15px;
+      background-color: #00bfff;
+      color: #222;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 2100;
+    }
   </style>
-  <!-- Firebase SDKs: Auth and Firestore -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
 </head>
 <body>
+  <!-- Persistent Biodata Button -->
+  <button id="biodataButton" onclick="togglePlayerStatus()">Biodata</button>
   <div class="wrapper">
     <!-- Hidden YouTube Player for Ambient Music -->
     <iframe id="bgMusic" width="0" height="0" src="https://www.youtube.com/embed/gSwi1Tk1gV8?autoplay=1&loop=1&playlist=gSwi1Tk1gV8" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute; left:-9999px;"></iframe>
@@ -475,13 +490,10 @@
           <button onclick="openKitchenPanel()">Community Kitchen</button>
           <button onclick="openGroceryPanel()">Groceries Stand</button>
           <button onclick="openWaterPanel()">Water Supplies (Laundry)</button>
-          <button onclick="togglePlayerStatus()">Biodata</button>
+          <!-- Note: The in-panel biodata button has been replaced by the persistent one -->
         </div>
         <!-- New Environmental Status Panel -->
         <div id="envStatus"></div>
-        <div id="playerStatus">
-          <!-- Biodata dynamically updated -->
-        </div>
       </div>
       <!-- Panels -->
       <!-- Power Panel -->
@@ -689,22 +701,9 @@
         <input type="text" id="chatInput" placeholder="Type your message...">
         <button onclick="sendChatMessage()">Send</button>
         <button onclick="closeChat()">Close Chat</button>
-        <!-- Rest button will appear here for room owners -->
+        <!-- For room owners, the Rest button is injected here in openRoomChat -->
         <div id="restContainer" style="margin-top:10px;"></div>
       </div>
-    </div>
-    <!-- Door Modal -->
-    <div id="doorModal">
-      <h2 id="doorTitle">Door Interaction</h2>
-      <div id="doorOptions">
-        <button onclick="handleKnock()">Knock</button>
-        <button onclick="showPasswordInput()">Enter Password</button>
-      </div>
-      <div id="passwordDiv" style="display:none;">
-        <input type="text" id="doorPassword" placeholder="Enter 4-digit password">
-        <button onclick="verifyPassword()">Submit Password</button>
-      </div>
-      <button onclick="closeDoorModal()">Cancel</button>
     </div>
   </div>
   <script>
@@ -1191,6 +1190,7 @@
       isEditing = false;
       updatePlayerStatus();
     }
+    // Toggle the biodata panel (accessible via the fixed biodata button)
     function togglePlayerStatus() {
       const biodataDiv = document.getElementById('playerStatus');
       biodataDiv.style.display = (biodataDiv.style.display === "none" || biodataDiv.style.display === "") ? "block" : "none";
@@ -1255,9 +1255,6 @@
               statusHTML += `<button onclick="saveBiodata()">Save Changes</button>`;
               statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
             }
-            statusHTML += `<p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>`;
-            statusHTML += `<p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>`;
-            statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
             document.getElementById('playerStatus').innerHTML = statusHTML;
             updateHarvestInventoryUI();
           }
@@ -1450,7 +1447,7 @@
       document.getElementById('chatPanel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
       listenForMessages(roomName);
-      // Add the Rest button for the room owner
+      // For room owners, inject the Rest button in the chat panel
       document.getElementById('restContainer').innerHTML = '<button onclick="restInRoom()" id="restButton">Rest (Recover Health)</button>';
     }
     function openDoorChat(roomName) {
@@ -1459,7 +1456,7 @@
       document.getElementById('chatLog').innerHTML = "";
       document.getElementById('chatPanel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
-      // Remove the rest button when not the owner
+      // Remove the Rest button when not the owner
       document.getElementById('restContainer').innerHTML = '';
       listenForMessages(roomName);
     }
@@ -1742,7 +1739,7 @@
       let iterations = 12; // 12 iterations of 5 seconds = 60 seconds
       let interval = setInterval(() => {
         iterations--;
-        // Update player's health: increase by 2 points (max health is 100)
+        // Increase player's health by 2 points (up to a maximum of 100)
         db.collection('players').doc(safePlayerName).get().then(doc => {
           if (doc.exists) {
             let currentHealth = doc.data().health || 100;
