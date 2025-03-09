@@ -566,47 +566,51 @@
         <!-- Tab Content -->
         <div id="buyTab" class="tab-content" style="display: block;">
           <div id="buySection" class="grocery-items-container">
-            <div class="grocery-item">
-              <p>
-                <strong>Food Staples</strong> - $10<br>
-                <em>Basic nourishment to reduce hunger.</em>
-              </p>
-              <button onclick="buyItem('Food Staples')">Buy Food</button>
+            <!-- Basic Food Group -->
+            <h4>Basic Food</h4>
+            <div id="basicFoodContainer" class="grocery-items-container">
+              <div class="grocery-item">
+                <p>
+                  <strong>Food Staples</strong> - $10<br>
+                  <em>Basic nourishment to reduce hunger.</em>
+                </p>
+                <button onclick="buyItem('Food Staples')">Buy Food</button>
+              </div>
             </div>
-            <!-- The following headers and containers have been fixed -->
+            <!-- Seeds Group -->
             <h4>Seeds for Community Garden</h4>
             <div id="seedList"></div>
+            <!-- Mushrooms Group -->
             <h4>Mushrooms for Cultivation</h4>
             <div id="mushroomList"></div>
-            <div class="grocery-item">
-              <p>
-                <strong>Lubricant Oil</strong> - $5<br>
-                <em>Essential for keeping the power panel running smoothly.</em>
-              </p>
-              <button onclick="buyItem('Lubricant Oil')">Buy Lubricant Oil</button>
+            <!-- Maintenance Items Group -->
+            <h4>Maintenance Items</h4>
+            <div id="maintenanceContainer" class="grocery-items-container">
+              <div class="grocery-item">
+                <p>
+                  <strong>Lubricant Oil</strong> - $5<br>
+                  <em>Essential for keeping the power panel running smoothly.</em>
+                </p>
+                <button onclick="buyItem('Lubricant Oil')">Buy Lubricant Oil</button>
+              </div>
+              <div class="grocery-item">
+                <p>
+                  <strong>Alcohol</strong> - $3<br>
+                  <em>Boosts mood but may have minor setbacks on health.</em>
+                </p>
+                <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
+              </div>
+              <div class="grocery-item">
+                <p>
+                  <strong>Cigarettes</strong> - $4<br>
+                  <em>Temporarily improves mood but reduces health over time.</em>
+                </p>
+                <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
+              </div>
             </div>
-            <div class="grocery-item">
-              <p>
-                <strong>Alcohol</strong> - $3<br>
-                <em>Boosts mood but may have minor setbacks on health.</em>
-              </p>
-              <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
-            </div>
-            <div class="grocery-item">
-              <p>
-                <strong>Cigarettes</strong> - $4<br>
-                <em>Temporarily improves mood but reduces health over time.</em>
-              </p>
-              <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
-            </div>
-            <!-- Health Items -->
-            <div id="healthItemList" class="grocery-item">
-              <p>
-                <strong>First Aid Kit</strong> - $8<br>
-                <em>Restores 20 health.</em>
-              </p>
-              <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>
-            </div>
+            <!-- Health Items Group -->
+            <h4>Health Items</h4>
+            <div id="healthItemList"></div>
           </div>
         </div>
         <div id="sellTab" class="tab-content" style="display: none;">
@@ -1851,7 +1855,9 @@
       }, 300000);
     }
   
+    // Updated generateGroceryItems() with grouped categories
     function generateGroceryItems() {
+      // Populate Seeds container
       let seedContainer = document.getElementById("seedList");
       seedContainer.innerHTML = "";
       seedTypes.forEach(seed => {
@@ -1861,6 +1867,7 @@
                          <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
         seedContainer.appendChild(div);
       });
+      // Populate Mushrooms container
       let mushroomContainer = document.getElementById("mushroomList");
       mushroomContainer.innerHTML = "";
       mushroomTypes.forEach(mushroom => {
@@ -1870,6 +1877,7 @@
                          <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
         mushroomContainer.appendChild(div);
       });
+      // Populate Health Items container
       let healthContainer = document.getElementById("healthItemList");
       if (!healthContainer) {
         healthContainer = document.createElement("div");
