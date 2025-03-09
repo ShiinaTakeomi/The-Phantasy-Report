@@ -573,14 +573,11 @@
               </p>
               <button onclick="buyItem('Food Staples')">Buy Food</button>
             </div>
-            <div id="seedList" class="grocery-item">
-              <h4>Seeds for Community Garden</h4>
-              <!-- Seed items will be generated here -->
-            </div>
-            <div id="mushroomList" class="grocery-item">
-              <h4>Mushrooms for Cultivation</h4>
-              <!-- Mushroom items will be generated here -->
-            </div>
+            <!-- The following headers and containers have been fixed -->
+            <h4>Seeds for Community Garden</h4>
+            <div id="seedList"></div>
+            <h4>Mushrooms for Cultivation</h4>
+            <div id="mushroomList"></div>
             <div class="grocery-item">
               <p>
                 <strong>Lubricant Oil</strong> - $5<br>
@@ -952,12 +949,10 @@
       document.getElementById('kitchen-panel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
     }
-    // Updated: openWaterPanel() now uses refined water pressure calculation
     function openWaterPanel() {
       document.getElementById('water-panel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
       const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
-      // Calculate efficiency based on garbage level (max garbage = 100, min efficiency = 0.5)
       const efficiency = Math.max(0.5, 1 - (garbageLevel / 200));
       const minVoltageThreshold = 20;
       const basePressure = voltage >= minVoltageThreshold ? voltage * 0.8 : 0;
@@ -966,7 +961,6 @@
       document.getElementById('waterInventoryDisplay').textContent = waterInventory;
     }
   
-    // Updated: collectWater() uses refined water pressure calculation
     function collectWater() {
       const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
       const efficiency = Math.max(0.5, 1 - (garbageLevel / 200));
@@ -983,13 +977,9 @@
       document.getElementById('waterInventoryDisplay').textContent = waterInventory;
     }
   
-    // ----------------------------
-    // Hide Panel Function (revert background)
-    // ----------------------------
     function hidePanel(panelId) {
       document.getElementById(panelId).style.display = 'none';
       document.getElementById('main-screen').style.display = 'block';
-      // Reset the background to the original settings
       document.body.style.backgroundImage = "url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
       document.body.style.backgroundRepeat = "no-repeat";
       document.body.style.backgroundAttachment = "fixed";
@@ -997,9 +987,6 @@
       document.body.style.backgroundPosition = "center center";
     }
   
-    // ----------------------------
-    // Buy Item Function
-    // ----------------------------
     function buyItem(item) {
       const prices = {
         'Food Staples': 10,
@@ -1047,9 +1034,6 @@
       }
     }
   
-    // ----------------------------
-    // New Function: Consume First Aid Kit
-    // ----------------------------
     function consumeFirstAidKit() {
       if (harvestInventory["First Aid Kit"] && harvestInventory["First Aid Kit"] > 0) {
         removeItem("First Aid Kit", 1);
@@ -1069,9 +1053,6 @@
       }
     }
   
-    // ----------------------------
-    // Authentication Functions
-    // ----------------------------
     function loginUser() {
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
@@ -1121,9 +1102,6 @@
       }
     });
   
-    // ----------------------------
-    // Character Creation & Management
-    // ----------------------------
     function sanitizePlayerName(name) {
       return name.replace(/[\/\\]/g, '_');
     }
@@ -1391,7 +1369,6 @@
         document.getElementById("stoveStatus").textContent = "Stove: Available";
         alert("Cooking complete! You made: " + recipe.title);
         addItem("Cooked: " + recipe.title, 1);
-        // Apply recipe benefits to player status
         applyRecipeBenefits(recipe);
       }, 60000);
     }
@@ -1758,14 +1735,10 @@
       }
     }
   
-    // ----------------------------
-    // Refined Environmental Status Update Function
-    // ----------------------------
     function updateEnvironmentStatus() {
       const envDiv = document.getElementById('envStatus');
       const currentWind = windSpeed;
       const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
-      // Use the refined water pressure calculation:
       const efficiency = Math.max(0.5, 1 - (garbageLevel / 200));
       const minVoltageThreshold = 20;
       const basePressure = voltage >= minVoltageThreshold ? voltage * 0.8 : 0;
@@ -1802,7 +1775,7 @@
       document.getElementById('windSpeedValue').textContent = windSpeed;
       updateVoltage();
       updateGarbageDisplay();
-      updateEnvironmentStatus(); // Update environment status at startup
+      updateEnvironmentStatus();
       if (localStorage.getItem('playerName')) {
         checkCharacterExistence();
       }
@@ -1813,17 +1786,106 @@
       setInterval(updateGarbageDisplay, 60000);
       setInterval(updateVoltage, 5000);
       setInterval(simulateHealthDecline, 60000);
-      setInterval(updateEnvironmentStatus, 5000); // Update environment every 5 seconds
+      setInterval(updateEnvironmentStatus, 5000);
       listenForKitchenChat();
       listenForLaundryChat();
     };
   
-    function plantMushroomTree() {
-      alert("Planting a mushroom tree. (Functionality to be implemented similarly to seeds.)");
+    function renderGardenSlots() {
+      const container = document.getElementById('plantSlots');
+      container.innerHTML = "";
+      gardenSlots.forEach(slot => {
+        let slotDiv = document.createElement("div");
+        slotDiv.className = "slot";
+        slotDiv.id = "slot" + slot.slot;
+        if (!slot.type) {
+          slotDiv.innerHTML = 'Slot ' + slot.slot + ': <span class="status">Empty</span> <button onclick="openPlantSelectionModal(' + slot.slot + ')">Plant Seed</button>';
+        } else {
+          let statusText = slot.watered ? "Watered, growing..." : "Planted: " + slot.type + " (needs water)";
+          slotDiv.innerHTML = 'Slot ' + slot.slot + ': <span class="status">' + statusText + '</span>';
+          if (!slot.watered) {
+            slotDiv.innerHTML += ' <button onclick="waterPlant(' + slot.slot + ')">Water Plant</button>';
+          }
+        }
+        container.appendChild(slotDiv);
+      });
     }
-    function harvestProduce() {
-      alert("Harvesting produce from the Community Garden. Mature produce will be harvested automatically once grown.");
+  
+    function openPlantSelectionModal(slotNumber) {
+      const seedType = prompt("Enter the seed type to plant (choose one of the following seeds:\n" +
+        seedTypes.join(", ") +
+        "\nOR one of the mushroom types:\n" +
+        mushroomTypes.join(", ") +
+        ")");
+      if (!seedType) return;
+      if (!harvestInventory[seedType] || harvestInventory[seedType] < 1) {
+        alert("You do not have any " + seedType + " in your inventory.");
+        return;
+      }
+      removeItem(seedType, 1);
+      gardenSlots[slotNumber - 1] = {
+        slot: slotNumber,
+        type: seedType,
+        watered: false,
+        timer: null
+      };
+      renderGardenSlots();
     }
+  
+    function waterPlant(slotNumber) {
+      if (waterInventory < 1) {
+        alert("No water available. Please collect water from the Water Supplies panel.");
+        return;
+      }
+      waterInventory -= 1;
+      localStorage.setItem('water', waterInventory);
+      document.getElementById('waterInventoryDisplay').textContent = waterInventory;
+      gardenSlots[slotNumber - 1].watered = true;
+      renderGardenSlots();
+      gardenSlots[slotNumber - 1].timer = setTimeout(() => {
+        const matureType = gardenSlots[slotNumber - 1].type;
+        alert("Your " + matureType + " has matured!");
+        addItem(matureType, 1);
+        gardenSlots[slotNumber - 1] = { slot: slotNumber, type: null, watered: false, timer: null };
+        renderGardenSlots();
+      }, 300000);
+    }
+  
+    function generateGroceryItems() {
+      let seedContainer = document.getElementById("seedList");
+      seedContainer.innerHTML = "";
+      seedTypes.forEach(seed => {
+        let div = document.createElement("div");
+        div.className = "grocery-item";
+        div.innerHTML = `<p><strong>${seed}</strong> - $2<br><em>${seed} is ideal for growing nutrient-rich produce.</em></p>
+                         <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
+        seedContainer.appendChild(div);
+      });
+      let mushroomContainer = document.getElementById("mushroomList");
+      mushroomContainer.innerHTML = "";
+      mushroomTypes.forEach(mushroom => {
+        let div = document.createElement("div");
+        div.className = "grocery-item";
+        div.innerHTML = `<p><strong>${mushroom}</strong> - $2<br><em>${mushroom} adds unique flavor and nutrients.</em></p>
+                         <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
+        mushroomContainer.appendChild(div);
+      });
+      let healthContainer = document.getElementById("healthItemList");
+      if (!healthContainer) {
+        healthContainer = document.createElement("div");
+        healthContainer.id = "healthItemList";
+        healthContainer.innerHTML = `<h4>Health Items</h4>`;
+        document.getElementById("grocery-panel").appendChild(healthContainer);
+      } else {
+        healthContainer.innerHTML = `<h4>Health Items</h4>`;
+      }
+      let div = document.createElement("div");
+      div.className = "grocery-item";
+      div.innerHTML = `<p><strong>First Aid Kit</strong> - $8<br><em>Restores 20 health.</em></p>
+                       <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>`;
+      healthContainer.appendChild(div);
+    }
+  
     function sellHarvest() {
       const checkboxes = document.querySelectorAll('.sell-checkbox:checked');
       if (checkboxes.length === 0) {
