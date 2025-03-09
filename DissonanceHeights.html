@@ -854,12 +854,17 @@
     // ----------------------------
     // Hide Panel Function (revert background)
     // ----------------------------
-    function hidePanel(panelId) {
-      document.getElementById(panelId).style.display = 'none';
-      document.getElementById('main-screen').style.display = 'block';
-      // Reset the background to original
-      document.body.style.background = originalBackground;
-    }
+function hidePanel(panelId) {
+  document.getElementById(panelId).style.display = 'none';
+  document.getElementById('main-screen').style.display = 'block';
+  // Reset the background to the original settings
+  document.body.style.backgroundImage = "url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+  document.body.style.backgroundRepeat = "no-repeat";
+  document.body.style.backgroundAttachment = "fixed";
+  document.body.style.backgroundSize = "cover";
+  document.body.style.backgroundPosition = "center center";
+}
+
   
     // ----------------------------
     // Buy Item Function
