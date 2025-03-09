@@ -8,367 +8,301 @@
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
   <!-- Favicon -->
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <style>
-    /* Set body background with full image */
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background: url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
-      background-size: cover;
-      color: #eee;
-      position: relative;
-    }
-    /* Apply full-page dark overlay using a pseudo-element */
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5));
-      z-index: -1;
-      pointer-events: none;
-    }
-    h1, h2, h3 {
-      font-family: 'Russo One', sans-serif;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-    }
-    .container, .panel, #characterCreation, .modal, #loginPanel {
-      background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');
-      background-color: rgba(0, 0, 0, 0.6);
-    }
-    .container {
-      position: relative;
-      width: 600px;
-      margin: 20px auto;
-      padding: 10px;
-      border-radius: 8px;
-    }
-    .panel {
-      display: none;
-      border: 2px solid #444;
-      padding: 20px;
-      width: 600px;
-      margin: 20px auto;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    .panel h2, .modal h2 {
-      text-align: center;
-      color: #fff;
-    }
-    /* Grid of Rooms */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(5, 100px);
-      grid-template-rows: repeat(5, 100px);
-      gap: 5px;
-      margin: 20px 0;
-      justify-content: center;
-    }
-    .grid button {
-      width: 100%;
-      height: 100%;
-      background-color: rgba(255,255,255,0.2);
-      border: 1px solid #777;
-      cursor: pointer;
-      font-size: 14px;
-      color: #eee;
-      border-radius: 4px;
-      transition: background-color 0.3s;
-    }
-    .grid button:hover {
-      background-color: rgba(255,255,255,0.4);
-    }
-    /* Buttons */
-    .garden-button {
-      position: absolute;
-      left: 210px;
-      top: 10px;
-      padding: 10px;
-      background-color: #5DADE2;
-      border: 2px solid #fff;
-      border-radius: 4px;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .garbage-chute {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 50px;
-      height: 520px;
-      background-color: rgba(211,211,211,0.3);
-      border: 2px solid #999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      writing-mode: vertical-rl;
-      cursor: pointer;
-      font-size: 12px;
-      padding: 5px;
-      border-radius: 4px;
-    }
-    .exit-button {
-      position: absolute;
-      left: 0;
-      top: 530px;
-      padding: 10px 15px;
-      background-color: #FF4136;
-      border: 2px solid #fff;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 4px;
-      color: #fff;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-      z-index: 1001;
-    }
-    .power-room {
-      position: absolute;
-      top: 210px;
-      left: calc(60px + 520px + 10px);
-      width: 100px;
-      height: 100px;
-      background-color: rgba(192,192,255,0.5);
-      border: 2px solid #666;
-      cursor: pointer;
-      font-size: 14px;
-      border-radius: 4px;
-    }
-    .facilities {
-      margin-top: 30px;
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-    }
-    .facilities button {
-      padding: 10px 20px;
-      background-color: rgba(200,150,130,0.7);
-      border: 1px solid #999;
-      cursor: pointer;
-      font-size: 16px;
-      margin: 5px;
-      border-radius: 4px;
-      color: #222;
-    }
-    /* Character Creation Section */
-    #characterCreation {
-      margin: 20px auto;
-      max-width: 300px;
-      border: 2px solid #444;
-      padding: 10px;
-      font-size: 14px;
-      display: none;
-      color: #fff;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    #characterCreation input,
-    #characterCreation select,
-    #characterCreation textarea {
-      width: 95%;
-      margin-bottom: 10px;
-      padding: 5px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    /* Enlarged editing fields for Biodata */
-    #playerStatus input,
-    #playerStatus textarea {
-      width: 100% !important;
-      font-size: 16px;
-      padding: 8px;
-      margin-bottom: 10px;
-    }
-    /* Modal Styles (for plant selection, kitchen, water, door interaction) */
-    .modal, #doorModal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      width: 300px;
-      transform: translate(-50%, -50%);
-      background: rgba(0,0,0,0.9);
-      padding: 20px;
-      border: 2px solid #444;
-      border-radius: 8px;
-      z-index: 1000;
-    }
-    .modal button, .modal input, .modal select, .modal textarea,
-    #doorModal button, #doorModal input {
-      margin-top: 10px;
-      padding: 5px 10px;
-      font-size: 14px;
-      border-radius: 4px;
-      border: none;
-      cursor: pointer;
-      width: 100%;
-    }
-    /* Responsive Chat Panel */
-    #chatPanel {
-      display: none;
-      border: 2px solid #444;
-      padding: 10px;
-      width: 90%;
-      max-width: 600px;
-      margin: 20px auto;
-      background: rgba(0, 0, 0, 0.8);
-      border-radius: 8px;
-    }
-    /* Responsive Chat Log */
-    #chatLog {
-      border: 1px solid #ccc;
-      padding: 10px;
-      height: 200px;
-      overflow-y: auto;
-      background: rgba(255, 255, 255, 0.1);
-      margin-bottom: 10px;
-      color: #fff;
-      border-radius: 4px;
-    }
-    /* Biodata Panel */
-    #playerStatus {
-      margin: 20px auto;
-      max-width: 300px;
-      border: 2px solid #444;
-      padding: 10px;
-      font-size: 14px;
-      color: #fff;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    /* Harvest Inventory Display */
-    #harvestInventory {
-      margin-top: 10px;
-      padding: 5px;
-      border: 1px solid #aaa;
-      border-radius: 4px;
-      background: rgba(255,255,255,0.1);
-    }
-    /* Garden Slots */
-    #garden-panel .slot {
-      margin: 10px 0;
-      padding: 5px;
-      border: 1px solid #777;
-      border-radius: 4px;
-    }
-    #garden-panel .slot button {
-      margin-left: 5px;
-      padding: 3px 6px;
-      font-size: 12px;
-    }
-    /* New panel for Login */
-    #loginPanel {
-      margin: 20px auto;
-      max-width: 300px;
-      border: 2px solid #444;
-      padding: 10px;
-      font-size: 14px;
-      color: #fff;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-      display: none;
-    }
-    /* In-App Notification Panel */
-    #notificationPanel {
-      position: fixed;
-      top: 70px;
-      right: 20px;
-      background: rgba(0,0,0,0.8);
-      color: #fff;
-      padding: 10px;
-      border: 1px solid #fff;
-      border-radius: 4px;
-      z-index: 1002;
-      display: none;
-      max-width: 300px;
-      font-size: 14px;
-    }
-    /* New Community Kitchen Panel */
-    #kitchen-panel {
-      display: none;
-      border: 2px solid #444;
-      padding: 20px;
-      width: 600px;
-      margin: 20px auto;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    /* Recipe Panel for Cooking (new) */
-    #recipePanel {
-      display: none;
-      border: 2px solid #444;
-      padding: 20px;
-      width: 600px;
-      margin: 20px auto;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    /* New Water Supplies Panel */
-    #water-panel {
-      display: none;
-      border: 2px solid #444;
-      padding: 20px;
-      width: 600px;
-      margin: 20px auto;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    /* Chat area within panels */
-    .panel .chatArea {
-      border: 1px solid #ccc;
-      padding: 10px;
-      height: 150px;
-      overflow-y: auto;
-      background: rgba(255,255,255,0.1);
-      margin-bottom: 10px;
-      color: #fff;
-      border-radius: 4px;
-    }
+<style>
+  /* ============================
+     Base & Global Styles
+     ============================ */
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
+    background-size: cover;
+    color: #eee;
+    position: relative;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5));
+    z-index: -1;
+    pointer-events: none;
+  }
+  h1, h2, h3 {
+    font-family: 'Russo One', sans-serif;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  }
+  .container, .panel, #characterCreation, .modal, #loginPanel {
+    background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+  .container {
+    position: relative;
+    width: 600px;
+    margin: 20px auto;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  .panel {
+    display: none;
+    border: 2px solid #444;
+    padding: 20px;
+    width: 600px;
+    margin: 20px auto;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.7);
+  }
+  .panel h2, .modal h2 {
+    text-align: center;
+    color: #fff;
+  }
 
-    /* NEW: Grocery Stand Styles - Option 2 with Tron Blue Neon Accents */
-    .grocery-items-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-    .grocery-item {
-      background: #222;
-      border: 1px solid #444;
-      border-radius: 8px;
-      padding: 15px;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      color: #e0e0e0;
-    }
-    .grocery-item:hover {
-      transform: scale(1.03);
-      box-shadow: 0 0 10px #00bfff;
-    }
-    .grocery-item p {
-      margin: 0 0 8px;
-      font-size: 15px;
-      font-weight: bold;
-    }
-    .grocery-item button {
-      background-color: #00bfff;
-      border: none;
-      border-radius: 5px;
-      padding: 8px;
-      color: #222;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.25s ease;
-    }
-    .grocery-item button:hover {
-      background-color: #009acd;
-    }
-  </style>
+  /* ============================
+     Layout & Global Buttons
+     ============================ */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(5, 100px);
+    grid-template-rows: repeat(5, 100px);
+    gap: 5px;
+    margin: 20px 0;
+    justify-content: center;
+  }
+  .grid button {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255,0.2);
+    border: 1px solid #777;
+    cursor: pointer;
+    font-size: 14px;
+    color: #eee;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }
+  .grid button:hover {
+    background-color: rgba(255,255,255,0.4);
+  }
+  .garden-button {
+    position: absolute;
+    left: 210px;
+    top: 10px;
+    padding: 10px;
+    background-color: #5DADE2;
+    border: 2px solid #fff;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .garbage-chute {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 50px;
+    height: 520px;
+    background-color: rgba(211,211,211,0.3);
+    border: 2px solid #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-rl;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 5px;
+    border-radius: 4px;
+  }
+  .exit-button {
+    position: absolute;
+    left: 0;
+    top: 530px;
+    padding: 10px 15px;
+    background-color: #FF4136;
+    border: 2px solid #fff;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 4px;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    z-index: 1001;
+  }
+  .power-room {
+    position: absolute;
+    top: 210px;
+    left: calc(60px + 520px + 10px);
+    width: 100px;
+    height: 100px;
+    background-color: rgba(192,192,255,0.5);
+    border: 2px solid #666;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+  }
+  .facilities {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+  .facilities button {
+    padding: 10px 20px;
+    background-color: rgba(200,150,130,0.7);
+    border: 1px solid #999;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 5px;
+    border-radius: 4px;
+    color: #222;
+  }
+
+  /* ============================
+     Character Creation & Modal Panels
+     ============================ */
+  #characterCreation, #loginPanel, #playerStatus {
+    margin: 20px auto;
+    max-width: 300px;
+    border: 2px solid #444;
+    padding: 10px;
+    font-size: 14px;
+    color: #fff;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.7);
+  }
+  #characterCreation input,
+  #characterCreation select,
+  #characterCreation textarea {
+    width: 95%;
+    margin-bottom: 10px;
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  #playerStatus input,
+  #playerStatus textarea {
+    width: 100% !important;
+    font-size: 16px;
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+  .modal, #doorModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.9);
+    padding: 20px;
+    border: 2px solid #444;
+    border-radius: 8px;
+    z-index: 1000;
+  }
+  .modal button, .modal input, .modal select, .modal textarea,
+  #doorModal button, #doorModal input {
+    margin-top: 10px;
+    padding: 5px 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+  }
+  #chatPanel {
+    display: none;
+    border: 2px solid #444;
+    padding: 10px;
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+  }
+  #chatLog {
+    border: 1px solid #ccc;
+    padding: 10px;
+    height: 200px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.1);
+    margin-bottom: 10px;
+    color: #fff;
+    border-radius: 4px;
+  }
+  #harvestInventory {
+    margin-top: 10px;
+    padding: 5px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.1);
+  }
+
+  /* ============================
+     Grocery Stand Panel - Option 2 (Clean Dark without Neon Accents)
+     ============================ */
+  /* Optional Tab Buttons for Buy/Sell Toggle (if needed) */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+  .tab-button {
+    background: #333;
+    color: #eee;
+    border: 1px solid #555;
+    padding: 8px 15px;
+    cursor: pointer;
+    margin: 0 5px;
+    border-radius: 4px;
+    transition: background 0.25s ease;
+  }
+  .tab-button:hover {
+    background: #444;
+  }
+  /* Scrollable container for items */
+  .grocery-items-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    max-height: 400px; /* Adjust this height as needed */
+    overflow-y: auto;
+    padding-right: 5px; /* To account for scrollbar */
+    margin-bottom: 15px;
+  }
+  /* Grocery Item Styling */
+  .grocery-item {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 10px;
+    color: #ccc;
+    transition: background 0.25s ease;
+  }
+  .grocery-item:hover {
+    background: #333;
+  }
+  .grocery-item p {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: normal;
+  }
+  .grocery-item button {
+    background-color: #5DADE2;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.25s ease;
+  }
+  .grocery-item button:hover {
+    background-color: #4a90d6;
+  }
+</style>
   <!-- Firebase SDKs: Auth and Firestore -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
@@ -522,56 +456,62 @@
         <div id="garbageLog"></div>
       </div>
   
-      <!-- Grocery Stand Panel (Updated with Buy/Sell Toggle & Neon Tron Blue Accent) -->
-      <div id="grocery-panel" class="panel">
-        <h2>Grocery Store</h2>
-        <p>Purchase essential items. Prices may vary with electricity availability.</p>
-        
-        <!-- Buy Section -->
-        <div id="buySection" class="grocery-items-container">
-          <div class="grocery-item">
-            <p><strong>Food Staples</strong> - $10<br><em>Basic nourishment to reduce hunger.</em></p>
-            <button onclick="buyItem('Food Staples')">Buy Food</button>
-          </div>
-          <div id="seedList" class="grocery-item">
-            <h4>Seeds for Community Garden</h4>
-            <!-- Seed items will be generated here -->
-          </div>
-          <div id="mushroomList" class="grocery-item">
-            <h4>Mushrooms for Cultivation</h4>
-            <!-- Mushroom items will be generated here -->
-          </div>
-          <div class="grocery-item">
-            <p><strong>Lubricant Oil</strong> - $5<br><em>Essential for keeping the power panel running smoothly.</em></p>
-            <button onclick="buyItem('Lubricant Oil')">Buy Lubricant Oil</button>
-          </div>
-          <div class="grocery-item">
-            <p><strong>Alcohol</strong> - $3<br><em>Boosts mood but may have minor setbacks on health.</em></p>
-            <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
-          </div>
-          <div class="grocery-item">
-            <p><strong>Cigarettes</strong> - $4<br><em>Temporarily improves mood but reduces health over time.</em></p>
-            <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
-          </div>
-          <!-- Additional items such as Health Items will be added dynamically if not present -->
+<!-- Grocery Stand Panel -->
+<div id="grocery-panel" class="panel">
+  <h2>Grocery Store</h2>
+  <p>Purchase essential items. Prices may vary with electricity availability.</p>
+  
+  <!-- Tab Buttons -->
+  <div class="tabs">
+    <button class="tab-button" onclick="toggleGroceryTab('buy')">Buy Items</button>
+    <button class="tab-button" onclick="toggleGroceryTab('sell')">Sell Items</button>
+  </div>
+  
+  <!-- Tab Content -->
+  <div id="grocery-content">
+    <!-- Buy Tab -->
+    <div id="buyTab" class="tab-content">
+      <div class="grocery-items-container">
+        <div class="grocery-item">
+          <p><strong>Food Staples</strong> - $10<br><em>Basic nourishment to reduce hunger.</em></p>
+          <button onclick="buyItem('Food Staples')">Buy Food</button>
         </div>
-        
-        <!-- Sell Section -->
-        <div id="sellSection" style="display:none;">
-          <h3>Sell Your Harvest</h3>
-          <div id="sellInventory">
-            <!-- Dynamically generated sell inventory list -->
-          </div>
-          <button onclick="sellHarvest()">Sell Selected Items</button>
+        <div id="seedList" class="grocery-item">
+          <h4>Seeds for Community Garden</h4>
+          <!-- Seed items will be generated here -->
         </div>
-        
-        <!-- Toggle Buy/Sell Buttons -->
-        <div class="buy-sell-toggle" style="margin-top: 20px;">
-          <button onclick="toggleBuySell('buy')">Buy Items</button>
-          <button onclick="toggleBuySell('sell')">Sell Items</button>
+        <div id="mushroomList" class="grocery-item">
+          <h4>Mushrooms for Cultivation</h4>
+          <!-- Mushroom items will be generated here -->
         </div>
-        <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
+        <div class="grocery-item">
+          <p><strong>Lubricant Oil</strong> - $5<br><em>Essential for keeping the power panel running smoothly.</em></p>
+          <button onclick="buyItem('Lubricant Oil')">Buy Lubricant Oil</button>
+        </div>
+        <div class="grocery-item">
+          <p><strong>Alcohol</strong> - $3<br><em>Boosts mood but may have minor setbacks on health.</em></p>
+          <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
+        </div>
+        <div class="grocery-item">
+          <p><strong>Cigarettes</strong> - $4<br><em>Temporarily improves mood but reduces health over time.</em></p>
+          <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
+        </div>
+        <!-- Additional items such as Health Items will be added dynamically -->
       </div>
+    </div>
+    
+    <!-- Sell Tab -->
+    <div id="sellTab" class="tab-content" style="display:none;">
+      <h3>Sell Your Harvest</h3>
+      <div id="sellInventory" class="grocery-items-container">
+        <!-- Dynamically generated sell inventory list -->
+      </div>
+      <button onclick="sellHarvest()">Sell Selected Items</button>
+    </div>
+  </div>
+  
+  <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
+</div>
   
       <!-- Community Garden Panel -->
       <div id="garden-panel" class="panel">
