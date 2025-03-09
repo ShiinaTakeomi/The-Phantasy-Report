@@ -19,7 +19,7 @@
       color: #eee;
       position: relative;
     }
-    /* Apply full-page dark overlay using a pseudo-element */
+    /* Full-page dark overlay */
     body::before {
       content: "";
       position: fixed;
@@ -177,16 +177,39 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    /* Enlarged editing fields for Biodata */
-    #playerStatus input,
-    #playerStatus textarea {
-      width: 100% !important;
-      font-size: 16px;
-      padding: 8px;
-      margin-bottom: 10px;
+    /* Biodata Panel */
+    #playerStatus {
+      margin: 20px auto;
+      max-width: 300px;
+      border: 2px solid #444;
+      padding: 10px;
+      font-size: 14px;
+      color: #fff;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.7);
     }
-    /* Modal Styles (for plant selection, kitchen, water, door interaction) */
-    .modal, #doorModal {
+    /* Harvest Inventory Display */
+    #harvestInventory {
+      margin-top: 10px;
+      padding: 5px;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.1);
+    }
+    /* Garden Slots (Community Garden) */
+    #garden-panel .slot {
+      margin: 10px 0;
+      padding: 5px;
+      border: 1px solid #777;
+      border-radius: 4px;
+    }
+    #garden-panel .slot button {
+      margin-left: 5px;
+      padding: 3px 6px;
+      font-size: 12px;
+    }
+    /* Modal Styles */
+    .modal, #doorModal, #seedModal {
       display: none;
       position: fixed;
       top: 50%;
@@ -200,7 +223,7 @@
       z-index: 1000;
     }
     .modal button, .modal input, .modal select, .modal textarea,
-    #doorModal button, #doorModal input {
+    #doorModal button, #doorModal input, #seedModal button, #seedModal select {
       margin-top: 10px;
       padding: 5px 10px;
       font-size: 14px;
@@ -231,106 +254,7 @@
       color: #fff;
       border-radius: 4px;
     }
-    /* Biodata Panel */
-    #playerStatus {
-      margin: 20px auto;
-      max-width: 300px;
-      border: 2px solid #444;
-      padding: 10px;
-      font-size: 14px;
-      color: #fff;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    /* Harvest Inventory Display */
-    #harvestInventory {
-      margin-top: 10px;
-      padding: 5px;
-      border: 1px solid #aaa;
-      border-radius: 4px;
-      background: rgba(255,255,255,0.1);
-    }
-    /* Garden Slots */
-    #garden-panel .slot {
-      margin: 10px 0;
-      padding: 5px;
-      border: 1px solid #777;
-      border-radius: 4px;
-    }
-    #garden-panel .slot button {
-      margin-left: 5px;
-      padding: 3px 6px;
-      font-size: 12px;
-    }
-    /* New panel for Login */
-    #loginPanel {
-      margin: 20px auto;
-      max-width: 300px;
-      border: 2px solid #444;
-      padding: 10px;
-      font-size: 14px;
-      color: #fff;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-      display: none;
-    }
-    /* In-App Notification Panel */
-    #notificationPanel {
-      position: fixed;
-      top: 70px;
-      right: 20px;
-      background: rgba(0,0,0,0.8);
-      color: #fff;
-      padding: 10px;
-      border: 1px solid #fff;
-      border-radius: 4px;
-      z-index: 1002;
-      display: none;
-      max-width: 300px;
-      font-size: 14px;
-    }
-    /* New Community Kitchen Panel */
-    #kitchen-panel {
-      display: none;
-      border: 2px solid #444;
-      padding: 20px;
-      width: 600px;
-      margin: 20px auto;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    /* Recipe Panel for Cooking (new) */
-    #recipePanel {
-      display: none;
-      border: 2px solid #444;
-      padding: 20px;
-      width: 600px;
-      margin: 20px auto;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    /* New Water Supplies Panel */
-    #water-panel {
-      display: none;
-      border: 2px solid #444;
-      padding: 20px;
-      width: 600px;
-      margin: 20px auto;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    /* Chat area within panels */
-    .panel .chatArea {
-      border: 1px solid #ccc;
-      padding: 10px;
-      height: 150px;
-      overflow-y: auto;
-      background: rgba(255,255,255,0.1);
-      margin-bottom: 10px;
-      color: #fff;
-      border-radius: 4px;
-    }
-    /* NEW: Grocery Stand Styles - Option 2 with Tron Blue Neon Accents */
+    /* Grocery Stand Styles */
     .grocery-items-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -367,7 +291,7 @@
     .grocery-item button:hover {
       background-color: #009acd;
     }
-    /* Grocery Stand Tabbed Section Specific Styles */
+    /* Tabbed Section Styles */
     .tab-headers {
       display: flex;
       justify-content: center;
@@ -395,7 +319,7 @@
     .tab-content.active {
       display: block;
     }
-    /* Environmental Status Panel – New! */
+    /* Environmental Status Panel */
     #envStatus {
       padding: 10px;
       text-align: center;
@@ -405,11 +329,21 @@
       margin: 10px auto;
       max-width: 600px;
     }
+    /* Progress Bar for Garden Slots */
+    .progress-bar {
+      width: 100%;
+      background: #333;
+      border-radius: 3px;
+      overflow: hidden;
+      height: 10px;
+      margin-top: 5px;
+    }
+    .progress {
+      height: 100%;
+      background: #4CAF50;
+      width: 0%;
+    }
   </style>
-  <!-- Firebase SDKs: Auth and Firestore -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <div class="wrapper">
@@ -477,8 +411,9 @@
           <button onclick="openWaterPanel()">Water Supplies (Laundry)</button>
           <button onclick="togglePlayerStatus()">Biodata</button>
         </div>
-        <!-- New Environmental Status Panel -->
+        <!-- Environmental Status Panel -->
         <div id="envStatus"></div>
+        <!-- Biodata Panel -->
         <div id="playerStatus">
           <!-- Biodata dynamically updated -->
         </div>
@@ -554,19 +489,16 @@
         <h3>Garbage Log:</h3>
         <div id="garbageLog"></div>
       </div>
-      <!-- Grocery Stand Tabbed Section Start -->
+      <!-- Grocery Stand Panel -->
       <div id="grocery-panel" class="panel">
         <h2>Grocery Store</h2>
         <p>Purchase essential items. Prices may vary with electricity availability.</p>
-        <!-- Tab Headers -->
         <div class="tab-headers">
           <button class="tab-button active" onclick="openTab(event, 'buyTab')">Buy Items</button>
           <button class="tab-button" onclick="openTab(event, 'sellTab')">Sell Items</button>
         </div>
-        <!-- Tab Content -->
         <div id="buyTab" class="tab-content" style="display: block;">
           <div id="buySection" class="grocery-items-container">
-            <!-- Basic Food Group -->
             <h4>Basic Food</h4>
             <div id="basicFoodContainer" class="grocery-items-container">
               <div class="grocery-item">
@@ -577,13 +509,10 @@
                 <button onclick="buyItem('Food Staples')">Buy Food</button>
               </div>
             </div>
-            <!-- Seeds Group -->
             <h4>Seeds for Community Garden</h4>
             <div id="seedList"></div>
-            <!-- Mushrooms Group -->
             <h4>Mushrooms for Cultivation</h4>
             <div id="mushroomList"></div>
-            <!-- Maintenance Items Group -->
             <h4>Maintenance Items</h4>
             <div id="maintenanceContainer" class="grocery-items-container">
               <div class="grocery-item">
@@ -608,7 +537,6 @@
                 <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
               </div>
             </div>
-            <!-- Health Items Group -->
             <h4>Health Items</h4>
             <div id="healthItemList"></div>
           </div>
@@ -624,11 +552,10 @@
         </div>
         <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
       </div>
-      <!-- Grocery Stand Tabbed Section End -->
       <!-- Community Garden Panel -->
       <div id="garden-panel" class="panel">
         <h2>Community Garden</h2>
-        <p>Manage your rooftop garden. Plants (seeds or mushrooms) need water to mature. They require 5 minutes and sufficient water to grow.</p>
+        <p>Manage your rooftop garden. Select a seed from the available options and plant it in a slot. Once planted, water the plant to start growth. A progress bar shows its growth (which takes 60 seconds to mature).</p>
         <div id="plantSlots">
           <!-- Garden slots generated dynamically -->
         </div>
@@ -638,7 +565,7 @@
       <!-- Community Kitchen Panel -->
       <div id="kitchen-panel" class="panel">
         <h2>Community Kitchen</h2>
-        <p>Access the cookbook to view 20 available recipes. Each recipe has a single-sentence description based on plants and mushrooms grown in the community garden, along with its benefits and setbacks.</p>
+        <p>Access the cookbook to view 20 available recipes. Each recipe has a description based on plants and mushrooms grown in the community garden, along with its benefits and setbacks.</p>
         <button onclick="openRecipePanel()">Cook</button>
         <div id="stoveStatus" style="margin-top:10px; font-size:14px;">Stove: Available</div>
         <div id="cookingProcess" style="display:none; margin-top:10px; font-size:14px;">
@@ -658,7 +585,7 @@
         <div id="recipeListContainer" style="max-height:300px; overflow-y:auto;"></div>
         <button onclick="hidePanel('recipePanel'); openKitchenPanel();">Cancel</button>
       </div>
-      <!-- Water Supplies Panel (with refined water pressure calculation) -->
+      <!-- Water Supplies Panel -->
       <div id="water-panel" class="panel">
         <h2>Water Supplies (Laundry)</h2>
         <p>Water pressure is directly linked to the performance of the power panel and the environmental efficiency (affected by garbage levels). Use the washing machine to clean clothes – remember, low power output or high garbage may result in lower water pressure.</p>
@@ -705,6 +632,14 @@
         <button onclick="verifyPassword()">Submit Password</button>
       </div>
       <button onclick="closeDoorModal()">Cancel</button>
+    </div>
+    <!-- Seed Selection Modal -->
+    <div id="seedModal" class="modal">
+      <h2>Select Seed to Plant</h2>
+      <div id="seedOptions">
+        <!-- Options will be dynamically populated -->
+      </div>
+      <button onclick="closeSeedModal()">Cancel</button>
     </div>
   </div>
   <script>
@@ -763,15 +698,17 @@
     let doorChatMode = false;
     let harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
     let waterInventory = parseInt(localStorage.getItem('water')) || 0;
-    // Global gardenSlots for 10 slots
+  
+    // Global gardenSlots for 10 slots (each slot now has a progress property)
     let gardenSlots = Array.from({length: 10}, (_, i) => ({
       slot: i + 1,
       type: null,
       watered: false,
+      progress: 0,
       timer: null
     }));
   
-    // Grocery Items Arrays: 20 Seed Types and 5 Mushroom Types
+    // Grocery Items Arrays
     const seedTypes = [
       "Sunflower Seed", "Pumpkin Seed", "Corn Seed", "Wheat Seed", "Rice Seed",
       "Barley Seed", "Oat Seed", "Millet Seed", "Sorghum Seed", "Quinoa Seed",
@@ -783,7 +720,7 @@
     ];
   
     // ----------------------------
-    // Centralized Recipes Array – now with numeric benefits!
+    // Centralized Recipes Array
     // ----------------------------
     const recipes = [];
     for (let i = 0; i < 10; i++) {
@@ -830,7 +767,6 @@
         }
       });
     }
-  
     function updateHunger(delta) {
       const playerEmail = localStorage.getItem('playerName');
       if (!playerEmail) return;
@@ -856,7 +792,6 @@
       localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
       updateHarvestInventoryUI();
     }
-  
     function removeItem(item, qty = 1) {
       if (harvestInventory[item]) {
         harvestInventory[item] = Math.max(0, harvestInventory[item] - qty);
@@ -867,7 +802,6 @@
       localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
       updateHarvestInventoryUI();
     }
-  
     function updateHarvestInventoryUI() {
       const invDiv = document.getElementById('harvestInventory');
       let html = "";
@@ -966,7 +900,6 @@
       document.getElementById('waterPressureDisplay').textContent = pressure;
       document.getElementById('waterInventoryDisplay').textContent = waterInventory;
     }
-  
     function collectWater() {
       const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
       const efficiency = Math.max(0.5, 1 - (garbageLevel / 200));
@@ -982,17 +915,15 @@
       }
       document.getElementById('waterInventoryDisplay').textContent = waterInventory;
     }
-  
     function hidePanel(panelId) {
       document.getElementById(panelId).style.display = 'none';
       document.getElementById('main-screen').style.display = 'block';
-      document.body.style.backgroundImage = "url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+      document.body.style.backgroundImage = originalBackground;
       document.body.style.backgroundRepeat = "no-repeat";
       document.body.style.backgroundAttachment = "fixed";
       document.body.style.backgroundSize = "cover";
       document.body.style.backgroundPosition = "center center";
     }
-  
     function buyItem(item) {
       const prices = {
         'Food Staples': 10,
@@ -1013,7 +944,6 @@
         alert("Not enough money to purchase " + item);
       }
     }
-  
     function applyItemEffects(item) {
       switch(item) {
         case "Food Staples":
@@ -1039,7 +969,6 @@
           break;
       }
     }
-  
     function consumeFirstAidKit() {
       if (harvestInventory["First Aid Kit"] && harvestInventory["First Aid Kit"] > 0) {
         removeItem("First Aid Kit", 1);
@@ -1058,7 +987,6 @@
         alert("You don't have any First Aid Kits to use.");
       }
     }
-  
     function loginUser() {
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
@@ -1107,7 +1035,6 @@
         document.getElementById('characterCreation').style.display = 'none';
       }
     });
-  
     function sanitizePlayerName(name) {
       return name.replace(/[\/\\]/g, '_');
     }
@@ -1450,7 +1377,7 @@
       document.getElementById('chatPanel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
       listenForMessages(roomName);
-      // Add the Rest button for the room owner
+      // Add the Rest button for room owner
       document.getElementById('restContainer').innerHTML = '<button onclick="restInRoom()" id="restButton">Rest (Recover Health)</button>';
     }
     function openDoorChat(roomName) {
@@ -1459,7 +1386,6 @@
       document.getElementById('chatLog').innerHTML = "";
       document.getElementById('chatPanel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
-      // Remove the rest button when not the owner
       document.getElementById('restContainer').innerHTML = '';
       listenForMessages(roomName);
     }
@@ -1572,7 +1498,6 @@
     let garbageLevel = localStorage.getItem('garbageLevel') || 0;
     let lastGarbageUpdate = localStorage.getItem('lastGarbageUpdate') || Date.now();
     let powerStatus = "Unknown";
-  
     function updateWindSpeed() {
       windSpeed = document.getElementById('windSpeedSlider').value;
       document.getElementById('windSpeedValue').textContent = windSpeed;
@@ -1581,28 +1506,24 @@
       updateLastInteraction();
       updateElectricalStatus();
     }
-  
     function toggleElectricalOutput() {
       electricalOutput = !electricalOutput;
       document.getElementById('outputLeverButton').textContent = electricalOutput ? "Output On" : "Output Off";
       updateLastInteraction();
       updateElectricalStatus();
     }
-  
     function checkWaterPressure() {
       const pressure = Math.floor(Math.random() * 41) + 80;
       alert("Current Water Pressure: " + pressure + " PSI.\nOptimal is above 90 PSI.");
       updateLastInteraction();
       updateElectricalStatus();
     }
-  
     function checkHeaterLevel() {
       const heater = Math.floor(Math.random() * 41) + 80;
       alert("Current Heater Level: " + heater + ".\nOptimal is above 90.");
       updateLastInteraction();
       updateElectricalStatus();
     }
-  
     function updateElectricalStatus() {
       if (windSpeed >= 40 && windSpeed <= 70 && electricalOutput) {
         powerStatus = "On";
@@ -1613,7 +1534,6 @@
       }
       document.getElementById('powerStatusDisplay').textContent = powerStatus;
     }
-  
     function updateVoltage() {
       let factor = electricalOutput ? 1.0 : 0.5;
       let voltage = Math.round(windSpeed * factor + (Math.random() * 10 - 5));
@@ -1624,7 +1544,6 @@
       }
       localStorage.setItem('voltage', voltage);
     }
-  
     function simulatePowerEvent() {
       if (Date.now() - lastInteractionTime > 60000) {
         const malfunctionType = Math.floor(Math.random() * 5);
@@ -1664,7 +1583,6 @@
         updateLastInteraction();
       }
     }
-  
     function updateGarbageDisplay() {
       document.getElementById('garbageDisplay').textContent = garbageLevel;
       const now = Date.now();
@@ -1680,24 +1598,20 @@
         }
       }
     }
-  
     function logPowerMessage(message) {
       const logDiv = document.getElementById('minigameLog');
       const timestamp = new Date().toLocaleTimeString();
       logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
       logDiv.scrollTop = logDiv.scrollHeight;
     }
-  
     function toggleInstructions() {
       const instrDiv = document.getElementById("instructions");
       instrDiv.style.display = (instrDiv.style.display === "none" || instrDiv.style.display === "") ? "block" : "none";
     }
-  
     function updateLastInteraction() {
       lastInteractionTime = Date.now();
       localStorage.setItem('lastInteractionTime', lastInteractionTime);
     }
-  
     function simulateHealthDecline() {
       if (garbageLevel > 80) {
         const playerEmail = localStorage.getItem('playerName');
@@ -1721,7 +1635,6 @@
         });
       }
     }
-  
     function playerDied() {
       alert("Your health has reached zero. You have died.");
       clearGameState();
@@ -1739,10 +1652,9 @@
       const playerName = localStorage.getItem('playerName');
       if (!playerName) return;
       const safePlayerName = sanitizePlayerName(playerName);
-      let iterations = 12; // 12 iterations of 5 seconds = 60 seconds
+      let iterations = 12; // 12 iterations of 5 sec = 60 sec total
       let interval = setInterval(() => {
         iterations--;
-        // Update player's health: increase by 2 points (max health is 100)
         db.collection('players').doc(safePlayerName).get().then(doc => {
           if (doc.exists) {
             let currentHealth = doc.data().health || 100;
@@ -1832,6 +1744,9 @@
       listenForLaundryChat();
     };
   
+    // ----------------------------
+    // Community Garden Functions & Improvements
+    // ----------------------------
     function renderGardenSlots() {
       const container = document.getElementById('plantSlots');
       container.innerHTML = "";
@@ -1840,39 +1755,62 @@
         slotDiv.className = "slot";
         slotDiv.id = "slot" + slot.slot;
         if (!slot.type) {
-          slotDiv.innerHTML = 'Slot ' + slot.slot + ': <span class="status">Empty</span> <button onclick="openPlantSelectionModal(' + slot.slot + ')">Plant Seed</button>';
+          slotDiv.innerHTML = `Slot ${slot.slot}: <span class="status">Empty</span> <button onclick="openSeedModal(${slot.slot})">Plant Seed</button>`;
         } else {
           let statusText = slot.watered ? "Watered, growing..." : "Planted: " + slot.type + " (needs water)";
-          slotDiv.innerHTML = 'Slot ' + slot.slot + ': <span class="status">' + statusText + '</span>';
-          if (!slot.watered) {
-            slotDiv.innerHTML += ' <button onclick="waterPlant(' + slot.slot + ')">Water Plant</button>';
+          slotDiv.innerHTML = `Slot ${slot.slot}: <span class="status">${statusText}</span>`;
+          if (slot.watered) {
+            // Show progress bar
+            slotDiv.innerHTML += `<div class="progress-bar"><div class="progress" id="progress-${slot.slot}" style="width: ${slot.progress}%"></div></div>`;
+          } else {
+            slotDiv.innerHTML += ` <button onclick="waterPlant(${slot.slot})">Water Plant</button>`;
           }
         }
         container.appendChild(slotDiv);
       });
     }
   
-    function openPlantSelectionModal(slotNumber) {
-      const seedType = prompt("Enter the seed type to plant (choose one of the following seeds:\n" +
-        seedTypes.join(", ") +
-        "\nOR one of the mushroom types:\n" +
-        mushroomTypes.join(", ") +
-        ")");
-      if (!seedType) return;
-      if (!harvestInventory[seedType] || harvestInventory[seedType] < 1) {
-        alert("You do not have any " + seedType + " in your inventory.");
-        return;
+    // New: Open Seed Modal instead of using prompt
+    function openSeedModal(slotNumber) {
+      // Populate modal with seeds from inventory that are in seedTypes or mushroomTypes
+      const modal = document.getElementById('seedModal');
+      const seedOptionsDiv = document.getElementById('seedOptions');
+      seedOptionsDiv.innerHTML = "";
+      let available = false;
+      [...seedTypes, ...mushroomTypes].forEach(seed => {
+        if (harvestInventory[seed] && harvestInventory[seed] > 0) {
+          available = true;
+          let btn = document.createElement("button");
+          btn.textContent = seed + " (" + harvestInventory[seed] + ")";
+          btn.onclick = () => {
+            plantSeed(slotNumber, seed);
+          };
+          seedOptionsDiv.appendChild(btn);
+        }
+      });
+      if (!available) {
+        seedOptionsDiv.innerHTML = "<p>No seeds available.</p>";
       }
+      modal.style.display = "block";
+    }
+    function closeSeedModal() {
+      document.getElementById('seedModal').style.display = "none";
+    }
+    // Plant the selected seed in the given slot
+    function plantSeed(slotNumber, seedType) {
       removeItem(seedType, 1);
       gardenSlots[slotNumber - 1] = {
         slot: slotNumber,
         type: seedType,
         watered: false,
+        progress: 0,
         timer: null
       };
+      closeSeedModal();
       renderGardenSlots();
     }
   
+    // Updated waterPlant: start a progress timer if watered
     function waterPlant(slotNumber) {
       if (waterInventory < 1) {
         alert("No water available. Please collect water from the Water Supplies panel.");
@@ -1881,18 +1819,33 @@
       waterInventory -= 1;
       localStorage.setItem('water', waterInventory);
       document.getElementById('waterInventoryDisplay').textContent = waterInventory;
-      gardenSlots[slotNumber - 1].watered = true;
+      let slot = gardenSlots[slotNumber - 1];
+      if (!slot.watered) {
+        slot.watered = true;
+        // Start growth progress timer – update every second until 60 seconds (progress 100%)
+        slot.progress = 0;
+        let progressInterval = setInterval(() => {
+          slot.progress += (100 / 60);
+          if (slot.progress >= 100) {
+            slot.progress = 100;
+            clearInterval(progressInterval);
+            alert("Your " + slot.type + " has matured!");
+            addItem(slot.type, 1);
+            // Reset the slot
+            gardenSlots[slotNumber - 1] = { slot: slotNumber, type: null, watered: false, progress: 0, timer: null };
+            renderGardenSlots();
+          } else {
+            // Update the progress bar visually
+            document.getElementById("progress-" + slotNumber).style.width = slot.progress + "%";
+          }
+        }, 1000);
+      }
       renderGardenSlots();
-      gardenSlots[slotNumber - 1].timer = setTimeout(() => {
-        const matureType = gardenSlots[slotNumber - 1].type;
-        alert("Your " + matureType + " has matured!");
-        addItem(matureType, 1);
-        gardenSlots[slotNumber - 1] = { slot: slotNumber, type: null, watered: false, timer: null };
-        renderGardenSlots();
-      }, 300000);
     }
   
-    // Updated generateGroceryItems() with grouped categories
+    // ----------------------------
+    // Grocery Stand Functions
+    // ----------------------------
     function generateGroceryItems() {
       // Populate Seeds container
       let seedContainer = document.getElementById("seedList");
@@ -1930,7 +1883,6 @@
                        <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>`;
       healthContainer.appendChild(div);
     }
-  
     function sellHarvest() {
       const checkboxes = document.querySelectorAll('.sell-checkbox:checked');
       if (checkboxes.length === 0) {
@@ -1956,7 +1908,6 @@
       updateSellInventory();
       updatePlayerStatus();
     }
-  
     function toggleBuySell(mode) {
       if (mode === 'buy') {
         document.getElementById('buySection').style.display = 'grid';
@@ -1967,7 +1918,6 @@
         updateSellInventory();
       }
     }
-  
     function updateSellInventory() {
       const sellDiv = document.getElementById('sellInventory');
       sellDiv.innerHTML = "";
@@ -1989,7 +1939,6 @@
         sellDiv.innerHTML = "<p>You have no items to sell.</p>";
       }
     }
-  
     function openTab(evt, tabName) {
       var i, tabcontent, tabbuttons;
       tabcontent = document.getElementsByClassName("tab-content");
