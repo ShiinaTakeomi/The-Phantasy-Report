@@ -522,56 +522,94 @@
         <div id="garbageLog"></div>
       </div>
   
-      <!-- Grocery Stand Panel (Updated with Buy/Sell Toggle & Neon Tron Blue Accent) -->
-      <div id="grocery-panel" class="panel">
-        <h2>Grocery Store</h2>
-        <p>Purchase essential items. Prices may vary with electricity availability.</p>
-        
-        <!-- Buy Section -->
-        <div id="buySection" class="grocery-items-container">
-          <div class="grocery-item">
-            <p><strong>Food Staples</strong> - $10<br><em>Basic nourishment to reduce hunger.</em></p>
-            <button onclick="buyItem('Food Staples')">Buy Food</button>
-          </div>
-          <div id="seedList" class="grocery-item">
-            <h4>Seeds for Community Garden</h4>
-            <!-- Seed items will be generated here -->
-          </div>
-          <div id="mushroomList" class="grocery-item">
-            <h4>Mushrooms for Cultivation</h4>
-            <!-- Mushroom items will be generated here -->
-          </div>
-          <div class="grocery-item">
-            <p><strong>Lubricant Oil</strong> - $5<br><em>Essential for keeping the power panel running smoothly.</em></p>
-            <button onclick="buyItem('Lubricant Oil')">Buy Lubricant Oil</button>
-          </div>
-          <div class="grocery-item">
-            <p><strong>Alcohol</strong> - $3<br><em>Boosts mood but may have minor setbacks on health.</em></p>
-            <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
-          </div>
-          <div class="grocery-item">
-            <p><strong>Cigarettes</strong> - $4<br><em>Temporarily improves mood but reduces health over time.</em></p>
-            <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
-          </div>
-          <!-- Additional items such as Health Items will be added dynamically if not present -->
-        </div>
-        
-        <!-- Sell Section -->
-        <div id="sellSection" style="display:none;">
-          <h3>Sell Your Harvest</h3>
-          <div id="sellInventory">
-            <!-- Dynamically generated sell inventory list -->
-          </div>
-          <button onclick="sellHarvest()">Sell Selected Items</button>
-        </div>
-        
-        <!-- Toggle Buy/Sell Buttons -->
-        <div class="buy-sell-toggle" style="margin-top: 20px;">
-          <button onclick="toggleBuySell('buy')">Buy Items</button>
-          <button onclick="toggleBuySell('sell')">Sell Items</button>
-        </div>
-        <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
+<!-- Grocery Stand Tabbed Section Start -->
+<div id="grocery-panel" class="panel">
+  <h2>Grocery Store</h2>
+  <p>Purchase essential items. Prices may vary with electricity availability.</p>
+  
+  <!-- Tab Headers -->
+  <div class="tab-headers" style="display: flex; justify-content: center; margin-bottom: 10px;">
+    <button class="tab-button active" onclick="openTab(event, 'buyTab')" style="padding: 10px; margin: 0 5px;">Buy Items</button>
+    <button class="tab-button" onclick="openTab(event, 'sellTab')" style="padding: 10px; margin: 0 5px;">Sell Items</button>
+  </div>
+  
+  <!-- Tab Content -->
+  <div id="buyTab" class="tab-content" style="display: block;">
+    <div id="buySection" class="grocery-items-container">
+      <div class="grocery-item">
+        <p><strong>Food Staples</strong> - $10<br><em>Basic nourishment to reduce hunger.</em></p>
+        <button onclick="buyItem('Food Staples')">Buy Food</button>
       </div>
+      <div id="seedList" class="grocery-item">
+        <h4>Seeds for Community Garden</h4>
+        <!-- Seed items will be generated here -->
+      </div>
+      <div id="mushroomList" class="grocery-item">
+        <h4>Mushrooms for Cultivation</h4>
+        <!-- Mushroom items will be generated here -->
+      </div>
+      <div class="grocery-item">
+        <p><strong>Lubricant Oil</strong> - $5<br><em>Essential for keeping the power panel running smoothly.</em></p>
+        <button onclick="buyItem('Lubricant Oil')">Buy Lubricant Oil</button>
+      </div>
+      <div class="grocery-item">
+        <p><strong>Alcohol</strong> - $3<br><em>Boosts mood but may have minor setbacks on health.</em></p>
+        <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
+      </div>
+      <div class="grocery-item">
+        <p><strong>Cigarettes</strong> - $4<br><em>Temporarily improves mood but reduces health over time.</em></p>
+        <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
+      </div>
+      <!-- Additional items such as Health Items will be added dynamically if not present -->
+    </div>
+  </div>
+  
+  <div id="sellTab" class="tab-content" style="display: none;">
+    <div id="sellSection">
+      <h3>Sell Your Harvest</h3>
+      <div id="sellInventory">
+        <!-- Dynamically generated sell inventory list -->
+      </div>
+      <button onclick="sellHarvest()">Sell Selected Items</button>
+    </div>
+  </div>
+  
+  <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
+</div>
+
+<script>
+  function openTab(evt, tabName) {
+    var i, tabcontent, tabbuttons;
+    tabcontent = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+    tabbuttons = document.getElementsByClassName("tab-button");
+    for (i = 0; i < tabbuttons.length; i++) {
+      tabbuttons[i].classList.remove("active");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.classList.add("active");
+  }
+</script>
+
+<style>
+  .tab-button {
+    background-color: #444;
+    border: 1px solid #999;
+    border-radius: 4px;
+    color: #eee;
+    cursor: pointer;
+  }
+  .tab-button:hover {
+    background-color: #555;
+  }
+  .tab-button.active {
+    background-color: #00bfff;
+    color: #222;
+  }
+</style>
+<!-- Grocery Stand Tabbed Section End -->
   
       <!-- Community Garden Panel -->
       <div id="garden-panel" class="panel">
