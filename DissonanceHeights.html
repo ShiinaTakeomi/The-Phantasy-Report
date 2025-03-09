@@ -1072,6 +1072,9 @@ function hidePanel(panelId) {
               let coreStatsHTML = `<h4>Core Stats</h4>`;
               coreStatsHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
               coreStatsHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+              coreStatsHTML += `<div style="background:#444; border:1px solid #222; width:100%; height:20px; border-radius:5px; margin:5px 0;">
+                   <div style="background:#4CAF50; width:${data.health}%; height:100%; border-radius:5px;"></div>
+                  </div>`;
               coreStatsHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
               coreStatsHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
               coreStatsHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
@@ -1546,26 +1549,30 @@ function hidePanel(panelId) {
       localStorage.setItem('lastInteractionTime', lastInteractionTime);
     }
   
-    function simulateHealthDecline() {
-      if (garbageLevel > 80) {
-        const playerEmail = localStorage.getItem('playerName');
-        if (!playerEmail) return;
-        const safePlayerName = sanitizePlayerName(playerEmail);
-        db.collection('players').doc(safePlayerName).get().then((doc) => {
-          if (doc.exists) {
-            let data = doc.data();
-            let currentHealth = data.health || 100;
-            let newHealth = Math.max(0, currentHealth - 1);
-            db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
-            if (newHealth === 0) {
-              playerDied();
-            }
-          }
-        }).catch((error) => {
-          console.error("Error decreasing health: ", error);
-        });
+function simulateHealthDecline() {
+  if (garbageLevel > 80) {
+    const playerEmail = localStorage.getItem('playerName');
+    if (!playerEmail) return;
+    const safePlayerName = sanitizePlayerName(playerEmail);
+    db.collection('players').doc(safePlayerName).get().then((doc) => {
+      if (doc.exists) {
+        let data = doc.data();
+        let currentHealth = data.health || 100;
+        let extraDecline = 0;
+        if (data.hunger > 70) extraDecline += 1;  // extra decline if hunger is high
+        if (data.mood < 30) extraDecline += 1;      // extra decline if mood is low
+        let newHealth = Math.max(0, currentHealth - 1 - extraDecline);
+        db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+        if (newHealth === 0) {
+          playerDied();
+        }
       }
-    }
+    }).catch((error) => {
+      console.error("Error decreasing health: ", error);
+    });
+  }
+}
+
     function playerDied() {
       alert("Your health has reached zero. You have died.");
       clearGameState();
@@ -1662,26 +1669,40 @@ function hidePanel(panelId) {
       }, 300000);
     }
   
-    function generateGroceryItems() {
-      let seedContainer = document.getElementById("seedList");
-      seedContainer.innerHTML = "";
-      seedTypes.forEach(seed => {
-        let div = document.createElement("div");
-        div.className = "grocery-item";
-        div.innerHTML = `<p><strong>${seed}</strong> - $2<br><em>${seed} is ideal for growing nutrient-rich produce.</em></p>
-                         <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
-        seedContainer.appendChild(div);
-      });
-      let mushroomContainer = document.getElementById("mushroomList");
-      mushroomContainer.innerHTML = "";
-      mushroomTypes.forEach(mushroom => {
-        let div = document.createElement("div");
-        div.className = "grocery-item";
-        div.innerHTML = `<p><strong>${mushroom}</strong> - $2<br><em>${mushroom} adds unique flavor and nutrients.</em></p>
-                         <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
-        mushroomContainer.appendChild(div);
-      });
-    }
+function generateGroceryItems() {
+  let seedContainer = document.getElementById("seedList");
+  seedContainer.innerHTML = "";
+  seedTypes.forEach(seed => {
+    let div = document.createElement("div");
+    div.className = "grocery-item";
+    div.innerHTML = `<p><strong>${seed}</strong> - $2<br><em>${seed} is ideal for growing nutrient-rich produce.</em></p>
+                     <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
+    seedContainer.appendChild(div);
+  });
+  let mushroomContainer = document.getElementById("mushroomList");
+  mushroomContainer.innerHTML = "";
+  mushroomTypes.forEach(mushroom => {
+    let div = document.createElement("div");
+    div.className = "grocery-item";
+    div.innerHTML = `<p><strong>${mushroom}</strong> - $2<br><em>${mushroom} adds unique flavor and nutrients.</em></p>
+                     <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
+    mushroomContainer.appendChild(div);
+  });
+  // NEW: Add Health Items (First Aid Kit)
+  let healthContainer = document.getElementById("healthItemList");
+  if (!healthContainer) {
+    healthContainer = document.createElement("div");
+    healthContainer.id = "healthItemList";
+    healthContainer.innerHTML = `<h4>Health Items</h4>`;
+    document.getElementById("grocery-panel").appendChild(healthContainer);
+  }
+  let div = document.createElement("div");
+  div.className = "grocery-item";
+  div.innerHTML = `<p><strong>First Aid Kit</strong> - $8<br><em>Restores 20 health.</em></p>
+                   <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>`;
+  healthContainer.appendChild(div);
+}
+
   
     function clearGarbage() {
       garbageLevel = 0;
