@@ -530,7 +530,9 @@
 <div id="grocery-panel" class="panel">
   <h2>Grocery Store</h2>
   <p>Purchase essential items. Prices may vary with electricity availability.</p>
-  <div class="grocery-items-container">
+  
+  <!-- Buy Section -->
+  <div id="buySection" class="grocery-items-container">
     <div class="grocery-item">
       <p><strong>Food Staples</strong> - $10<br><em>Basic nourishment to reduce hunger.</em></p>
       <button onclick="buyItem('Food Staples')">Buy Food</button>
@@ -555,13 +557,93 @@
       <p><strong>Cigarettes</strong> - $4<br><em>Temporarily improves mood but reduces health over time.</em></p>
       <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
     </div>
-    <!-- Health Items will be appended dynamically if not present -->
+    <!-- Additional items such as Health Items will be added dynamically if not present -->
   </div>
-  <h3>Your Harvest Inventory</h3>
-  <div id="harvestInventory"></div>
-  <button onclick="sellHarvest()">Sell Harvest</button>
+  
+  <!-- Sell Section -->
+  <div id="sellSection" style="display:none;">
+    <h3>Sell Your Harvest</h3>
+    <div id="sellInventory">
+      <!-- Dynamically generated sell inventory list -->
+    </div>
+    <button onclick="sellHarvest()">Sell Selected Items</button>
+  </div>
+  
+  <!-- Toggle Buy/Sell Buttons -->
+  <div class="buy-sell-toggle" style="margin-top: 20px;">
+    <button onclick="toggleBuySell('buy')">Buy Items</button>
+    <button onclick="toggleBuySell('sell')">Sell Items</button>
+  </div>
   <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
 </div>
+
+<script>
+  // Toggle between Buy and Sell sections
+  function toggleBuySell(mode) {
+    if (mode === 'buy') {
+      document.getElementById('buySection').style.display = 'grid';
+      document.getElementById('sellSection').style.display = 'none';
+    } else if (mode === 'sell') {
+      document.getElementById('buySection').style.display = 'none';
+      document.getElementById('sellSection').style.display = 'block';
+      updateSellInventory();
+    }
+  }
+
+  // Populate the sell inventory based on what the player has in their inventory
+  function updateSellInventory() {
+    const sellDiv = document.getElementById('sellInventory');
+    sellDiv.innerHTML = "";
+    for (const item in harvestInventory) {
+      const qty = harvestInventory[item];
+      if (qty > 0) {
+        // Create a checkbox for each sellable item
+        const div = document.createElement('div');
+        div.className = "sell-item";
+        div.innerHTML = `
+          <label>
+            <input type="checkbox" class="sell-checkbox" data-item="${item}" data-qty="${qty}">
+            ${item} - Quantity: ${qty}
+          </label>
+        `;
+        sellDiv.appendChild(div);
+      }
+    }
+    if (sellDiv.innerHTML === "") {
+      sellDiv.innerHTML = "<p>You have no items to sell.</p>";
+    }
+  }
+
+  // Sell the selected items. This example uses fixed sell rates (half the buy price).
+  // Adjust the pricing logic as needed.
+  function sellHarvest() {
+    const checkboxes = document.querySelectorAll('.sell-checkbox:checked');
+    if (checkboxes.length === 0) {
+      alert("Please select at least one item to sell.");
+      return;
+    }
+    // Define sell prices (example: half the buy price)
+    const sellPrices = {
+      'Food Staples': 5,
+      'Lubricant Oil': 2.5,
+      'Alcohol': 1.5,
+      'Cigarettes': 2
+      // For seeds and mushrooms, you can use a default sell price of $1 each
+    };
+    checkboxes.forEach(checkbox => {
+      const item = checkbox.getAttribute('data-item');
+      const qty = harvestInventory[item];
+      const price = sellPrices[item] || 1;
+      let money = parseInt(localStorage.getItem('money')) || 50;
+      money += price * qty;
+      localStorage.setItem('money', money);
+      removeItem(item, qty);
+      alert(`Sold ${qty} ${item}(s) for $${price * qty}.`);
+    });
+    updateSellInventory();
+    updatePlayerStatus();
+  }
+</script>
 
   
       <!-- Community Garden Panel -->
