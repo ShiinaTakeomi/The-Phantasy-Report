@@ -330,7 +330,6 @@
       color: #fff;
       border-radius: 4px;
     }
-    
     /* NEW: Grocery Stand Styles - Option 2 with Tron Blue Neon Accents */
     .grocery-items-container {
       display: grid;
@@ -368,7 +367,6 @@
     .grocery-item button:hover {
       background-color: #009acd;
     }
-    
     /* Grocery Stand Tabbed Section Specific Styles */
     .tab-headers {
       display: flex;
@@ -396,6 +394,16 @@
     }
     .tab-content.active {
       display: block;
+    }
+    /* Environmental Status Panel – New! */
+    #envStatus {
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 4px;
+      margin: 10px auto;
+      max-width: 600px;
     }
   </style>
   <!-- Firebase SDKs: Auth and Firestore -->
@@ -474,6 +482,8 @@
           <button onclick="openWaterPanel()">Water Supplies (Laundry)</button>
           <button onclick="togglePlayerStatus()">Biodata</button>
         </div>
+        <!-- New Environmental Status Panel -->
+        <div id="envStatus"></div>
         <div id="playerStatus">
           <!-- Biodata dynamically updated -->
         </div>
@@ -552,97 +562,80 @@
         <div id="garbageLog"></div>
       </div>
   
-<!-- Grocery Stand Tabbed Section Start -->
-<div id="grocery-panel" class="panel">
-  <h2>Grocery Store</h2>
-  <p>Purchase essential items. Prices may vary with electricity availability.</p>
+      <!-- Grocery Stand Tabbed Section Start -->
+      <div id="grocery-panel" class="panel">
+        <h2>Grocery Store</h2>
+        <p>Purchase essential items. Prices may vary with electricity availability.</p>
   
-  <!-- Tab Headers -->
-  <div class="tab-headers">
-    <button class="tab-button active" onclick="openTab(event, 'buyTab')">Buy Items</button>
-    <button class="tab-button" onclick="openTab(event, 'sellTab')">Sell Items</button>
-  </div>
+        <!-- Tab Headers -->
+        <div class="tab-headers">
+          <button class="tab-button active" onclick="openTab(event, 'buyTab')">Buy Items</button>
+          <button class="tab-button" onclick="openTab(event, 'sellTab')">Sell Items</button>
+        </div>
   
-  <!-- Tab Content -->
-  <div id="buyTab" class="tab-content" style="display: block;">
-    <div id="buySection" class="grocery-items-container">
-      <div class="grocery-item">
-        <p>
-          <strong>Food Staples</strong> - $10<br>
-          <em>Basic nourishment to reduce hunger.</em>
-        </p>
-        <button onclick="buyItem('Food Staples')">Buy Food</button>
-      </div>
-      <div id="seedList" class="grocery-item">
-        <h4>Seeds for Community Garden</h4>
-        <!-- Seed items will be generated here -->
-      </div>
-      <div id="mushroomList" class="grocery-item">
-        <h4>Mushrooms for Cultivation</h4>
-        <!-- Mushroom items will be generated here -->
-      </div>
-      <div class="grocery-item">
-        <p>
-          <strong>Lubricant Oil</strong> - $5<br>
-          <em>Essential for keeping the power panel running smoothly.</em>
-        </p>
-        <button onclick="buyItem('Lubricant Oil')">Buy Lubricant Oil</button>
-      </div>
-      <div class="grocery-item">
-        <p>
-          <strong>Alcohol</strong> - $3<br>
-          <em>Boosts mood but may have minor setbacks on health.</em>
-        </p>
-        <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
-      </div>
-      <div class="grocery-item">
-        <p>
-          <strong>Cigarettes</strong> - $4<br>
-          <em>Temporarily improves mood but reduces health over time.</em>
-        </p>
-        <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
-      </div>
-      <!-- Health Items -->
-      <div id="healthItemList" class="grocery-item">
-        <p>
-          <strong>First Aid Kit</strong> - $8<br>
-          <em>Restores 20 health.</em>
-        </p>
-        <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>
-      </div>
-    </div>
-  </div>
+        <!-- Tab Content -->
+        <div id="buyTab" class="tab-content" style="display: block;">
+          <div id="buySection" class="grocery-items-container">
+            <div class="grocery-item">
+              <p>
+                <strong>Food Staples</strong> - $10<br>
+                <em>Basic nourishment to reduce hunger.</em>
+              </p>
+              <button onclick="buyItem('Food Staples')">Buy Food</button>
+            </div>
+            <div id="seedList" class="grocery-item">
+              <h4>Seeds for Community Garden</h4>
+              <!-- Seed items will be generated here -->
+            </div>
+            <div id="mushroomList" class="grocery-item">
+              <h4>Mushrooms for Cultivation</h4>
+              <!-- Mushroom items will be generated here -->
+            </div>
+            <div class="grocery-item">
+              <p>
+                <strong>Lubricant Oil</strong> - $5<br>
+                <em>Essential for keeping the power panel running smoothly.</em>
+              </p>
+              <button onclick="buyItem('Lubricant Oil')">Buy Lubricant Oil</button>
+            </div>
+            <div class="grocery-item">
+              <p>
+                <strong>Alcohol</strong> - $3<br>
+                <em>Boosts mood but may have minor setbacks on health.</em>
+              </p>
+              <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
+            </div>
+            <div class="grocery-item">
+              <p>
+                <strong>Cigarettes</strong> - $4<br>
+                <em>Temporarily improves mood but reduces health over time.</em>
+              </p>
+              <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
+            </div>
+            <!-- Health Items -->
+            <div id="healthItemList" class="grocery-item">
+              <p>
+                <strong>First Aid Kit</strong> - $8<br>
+                <em>Restores 20 health.</em>
+              </p>
+              <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>
+            </div>
+          </div>
+        </div>
   
-  <div id="sellTab" class="tab-content" style="display: none;">
-    <div id="sellSection">
-      <h3>Sell Your Harvest</h3>
-      <div id="sellInventory">
-        <!-- Dynamically generated sell inventory list -->
-      </div>
-      <button onclick="sellHarvest()">Sell Selected Items</button>
-    </div>
-  </div>
+        <div id="sellTab" class="tab-content" style="display: none;">
+          <div id="sellSection">
+            <h3>Sell Your Harvest</h3>
+            <div id="sellInventory">
+              <!-- Dynamically generated sell inventory list -->
+            </div>
+            <button onclick="sellHarvest()">Sell Selected Items</button>
+          </div>
+        </div>
   
-  <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
-</div>
-<!-- Grocery Stand Tabbed Section End -->
-
-<script>
-  function openTab(evt, tabName) {
-    var i, tabcontent, tabbuttons;
-    tabcontent = document.getElementsByClassName("tab-content");
-    for (i = 0; i < tabcontent.length; i++) {
-      tabcontent[i].style.display = "none";
-    }
-    tabbuttons = document.getElementsByClassName("tab-button");
-    for (i = 0; i < tabbuttons.length; i++) {
-      tabbuttons[i].classList.remove("active");
-    }
-    document.getElementById(tabName).style.display = "block";
-    evt.currentTarget.classList.add("active");
-  }
-</script>
-
+        <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
+      </div>
+      <!-- Grocery Stand Tabbed Section End -->
   
       <!-- Community Garden Panel -->
       <div id="garden-panel" class="panel">
@@ -800,7 +793,7 @@
     ];
   
     // ----------------------------
-    // Centralized Recipes Array
+    // Centralized Recipes Array – now with numeric benefits!
     // ----------------------------
     const recipes = [];
     for (let i = 0; i < 10; i++) {
@@ -813,7 +806,9 @@
         ],
         water: "100ml",
         benefits: "Boosts energy and mood.",
-        setbacks: "Slightly decreases hunger."
+        setbacks: "Slightly decreases hunger.",
+        hungerReduction: 10,
+        moodIncrease: 5
       });
       recipes.push({
         title: "Mushroom Medley " + (i + 1),
@@ -824,7 +819,9 @@
         ],
         water: "120ml",
         benefits: "Improves strength.",
-        setbacks: "May lower mood if eaten in excess."
+        setbacks: "May lower mood if eaten in excess.",
+        hungerReduction: 5,
+        moodIncrease: 3
       });
     }
   
@@ -1042,6 +1039,30 @@
     }
   
     // ----------------------------
+    // New Function: Consume First Aid Kit
+    // ----------------------------
+    function consumeFirstAidKit() {
+      if (harvestInventory["First Aid Kit"] && harvestInventory["First Aid Kit"] > 0) {
+        // Remove one First Aid Kit from inventory
+        removeItem("First Aid Kit", 1);
+        // Increase player's health by 20 (max 100)
+        const playerName = localStorage.getItem('playerName');
+        if (!playerName) return;
+        const safePlayerName = sanitizePlayerName(playerName);
+        db.collection('players').doc(safePlayerName).get().then(doc => {
+          if (doc.exists) {
+            let currentHealth = doc.data().health || 100;
+            let newHealth = Math.min(100, currentHealth + 20);
+            db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+            alert("You used a First Aid Kit. Your health is now " + newHealth + ".");
+          }
+        });
+      } else {
+        alert("You don't have any First Aid Kits to use.");
+      }
+    }
+  
+    // ----------------------------
     // Authentication Functions
     // ----------------------------
     function loginUser() {
@@ -1221,6 +1242,10 @@
               statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
               statusHTML += `<button onclick="enableEdit()">Edit Biodata</button>`;
               statusHTML += inventoryHTML;
+              // NEW: If player has First Aid Kit, add a "Use First Aid Kit" button
+              if (harvestInventory["First Aid Kit"] && harvestInventory["First Aid Kit"] > 0) {
+                statusHTML += `<button onclick="consumeFirstAidKit()">Use First Aid Kit</button>`;
+              }
             } else {
               statusHTML += `<h3>Edit Character</h3>`;
               statusHTML += `<div><strong>Core Stats</strong><br>`;
@@ -1360,7 +1385,15 @@
         document.getElementById("stoveStatus").textContent = "Stove: Available";
         alert("Cooking complete! You made: " + recipe.title);
         addItem("Cooked: " + recipe.title, 1);
+        // Apply recipe benefits to player status (e.g., reduce hunger and boost mood)
+        applyRecipeBenefits(recipe);
       }, 60000);
+    }
+    // New function to apply recipe benefits
+    function applyRecipeBenefits(recipe) {
+      // For example, reduce hunger and increase mood by the recipe's defined values
+      updateHunger(-recipe.hungerReduction);
+      updateMood(recipe.moodIncrease);
     }
   
     // ----------------------------
@@ -1841,6 +1874,16 @@
       logDiv.scrollTop = logDiv.scrollHeight;
     }
   
+    // New: Environmental Status Update Function
+    function updateEnvironmentStatus() {
+      const envDiv = document.getElementById('envStatus');
+      const currentWind = windSpeed;
+      const currentVoltage = localStorage.getItem('voltage') || 0;
+      const waterPressure = Math.round(currentVoltage * 0.8);
+      const currentGarbage = garbageLevel;
+      envDiv.innerHTML = `Wind Speed: ${currentWind} | Voltage: ${currentVoltage}V | Water Pressure: ${waterPressure} PSI | Garbage Level: ${currentGarbage}/100`;
+    }
+  
     window.onload = function() {
       var roomSelect = document.getElementById('roomNumber');
       if (roomSelect) {
@@ -1869,6 +1912,7 @@
       document.getElementById('windSpeedValue').textContent = windSpeed;
       updateVoltage();
       updateGarbageDisplay();
+      updateEnvironmentStatus(); // Update environment status at startup
       if (localStorage.getItem('playerName')) {
         checkCharacterExistence();
       }
@@ -1879,6 +1923,7 @@
       setInterval(updateGarbageDisplay, 60000);
       setInterval(updateVoltage, 5000);
       setInterval(simulateHealthDecline, 60000);
+      setInterval(updateEnvironmentStatus, 5000); // Update environment every 5 seconds
       listenForKitchenChat();
       listenForLaundryChat();
     };
