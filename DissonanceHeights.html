@@ -405,6 +405,35 @@
       margin: 10px auto;
       max-width: 600px;
     }
+    /* NEW: Spelunking Game Styles */
+    #spelunkingGame {
+      display: none; /* Hidden until triggered */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000; /* Black background for cave feel */
+      z-index: 1100;
+    }
+    #spelunkingCanvas {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, #444 0%, #000 70%);
+    }
+    #exitSpelunking {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 10px 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      background-color: #FF4136;
+      color: #fff;
+      cursor: pointer;
+      z-index: 1200;
+    }
   </style>
   <!-- Firebase SDKs: Auth and Firestore -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
@@ -706,11 +735,16 @@
       </div>
       <button onclick="closeDoorModal()">Cancel</button>
     </div>
+    <!-- NEW: Spelunking Game Container (triggered in Room 5) -->
+    <div id="spelunkingGame">
+      <canvas id="spelunkingCanvas"></canvas>
+      <button id="exitSpelunking" onclick="exitSpelunkingGame()">Exit Cave</button>
+    </div>
   </div>
   <script>
     // Store original background settings (main menu background)
     const originalBackground = "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed";
-  
+
     // ----------------------------
     // Firebase Initialization & Config
     // ----------------------------
@@ -726,7 +760,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-  
+
     // ----------------------------
     // Room Password Mapping
     // ----------------------------
@@ -757,7 +791,7 @@
       "Room 24": "0024",
       "Room 25": "0025"
     };
-  
+
     // Global variables
     let currentRoom = "";
     let doorChatMode = false;
@@ -770,7 +804,7 @@
       watered: false,
       timer: null
     }));
-  
+
     // Grocery Items Arrays: 20 Seed Types and 5 Mushroom Types
     const seedTypes = [
       "Sunflower Seed", "Pumpkin Seed", "Corn Seed", "Wheat Seed", "Rice Seed",
@@ -781,7 +815,7 @@
     const mushroomTypes = [
       "Button Mushroom", "Portobello Mushroom", "Shiitake Mushroom", "Oyster Mushroom", "Enoki Mushroom"
     ];
-  
+
     // ----------------------------
     // Centralized Recipes Array – now with numeric benefits!
     // ----------------------------
@@ -814,7 +848,7 @@
         moodIncrease: 3
       });
     }
-  
+
     // ----------------------------
     // Helper Functions: Update Mood and Hunger
     // ----------------------------
@@ -830,7 +864,7 @@
         }
       });
     }
-  
+
     function updateHunger(delta) {
       const playerEmail = localStorage.getItem('playerName');
       if (!playerEmail) return;
@@ -843,7 +877,7 @@
         }
       });
     }
-  
+
     // ----------------------------
     // Inventory Functions
     // ----------------------------
@@ -856,7 +890,7 @@
       localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
       updateHarvestInventoryUI();
     }
-  
+
     function removeItem(item, qty = 1) {
       if (harvestInventory[item]) {
         harvestInventory[item] = Math.max(0, harvestInventory[item] - qty);
@@ -867,7 +901,7 @@
       localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
       updateHarvestInventoryUI();
     }
-  
+
     function updateHarvestInventoryUI() {
       const invDiv = document.getElementById('harvestInventory');
       let html = "";
@@ -877,7 +911,7 @@
       if (!html) html = "<p>None</p>";
       invDiv.innerHTML = html;
     }
-  
+
     // ----------------------------
     // In-App Notification Listener
     // ----------------------------
@@ -902,7 +936,7 @@
           }
         });
     }
-  
+
     // ----------------------------
     // Utility: Clear All Game State
     // ----------------------------
@@ -910,7 +944,7 @@
       const keys = ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate', 'harvestInventory', 'water'];
       keys.forEach(key => localStorage.removeItem(key));
     }
-  
+
     // ----------------------------
     // Sign Out Function
     // ----------------------------
@@ -922,7 +956,7 @@
         console.error("Error signing out: ", error);
       });
     }
-  
+
     // ----------------------------
     // Panel Toggles and Navigation
     // ----------------------------
@@ -966,7 +1000,7 @@
       document.getElementById('waterPressureDisplay').textContent = pressure;
       document.getElementById('waterInventoryDisplay').textContent = waterInventory;
     }
-  
+
     function collectWater() {
       const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
       const efficiency = Math.max(0.5, 1 - (garbageLevel / 200));
@@ -982,7 +1016,7 @@
       }
       document.getElementById('waterInventoryDisplay').textContent = waterInventory;
     }
-  
+
     function hidePanel(panelId) {
       document.getElementById(panelId).style.display = 'none';
       document.getElementById('main-screen').style.display = 'block';
@@ -992,7 +1026,7 @@
       document.body.style.backgroundSize = "cover";
       document.body.style.backgroundPosition = "center center";
     }
-  
+
     function buyItem(item) {
       const prices = {
         'Food Staples': 10,
@@ -1013,7 +1047,7 @@
         alert("Not enough money to purchase " + item);
       }
     }
-  
+
     function applyItemEffects(item) {
       switch(item) {
         case "Food Staples":
@@ -1039,7 +1073,7 @@
           break;
       }
     }
-  
+
     function consumeFirstAidKit() {
       if (harvestInventory["First Aid Kit"] && harvestInventory["First Aid Kit"] > 0) {
         removeItem("First Aid Kit", 1);
@@ -1058,7 +1092,7 @@
         alert("You don't have any First Aid Kits to use.");
       }
     }
-  
+
     function loginUser() {
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
@@ -1107,7 +1141,7 @@
         document.getElementById('characterCreation').style.display = 'none';
       }
     });
-  
+
     function sanitizePlayerName(name) {
       return name.replace(/[\/\\]/g, '_');
     }
@@ -1300,7 +1334,7 @@
           console.error("Error saving biodata:", error);
         });
     }
-  
+
     // ----------------------------
     // Community Kitchen Chat & Cooking Functions
     // ----------------------------
@@ -1382,7 +1416,7 @@
       updateHunger(-recipe.hungerReduction);
       updateMood(recipe.moodIncrease);
     }
-  
+
     // ----------------------------
     // Water Supplies Chat & Washing Machine Functions
     // ----------------------------
@@ -1420,12 +1454,17 @@
       alert("You washed your clothes. Your health improves slightly.");
       updateMood(3);
     }
-  
+
     // ----------------------------
     // Room Interaction & Chat Functions
     // ----------------------------
     function openRoomInteraction(roomName) {
       currentRoom = roomName;
+      // If the player enters Room 5, start the spelunking minigame
+      if (roomName === "Room 5") {
+        initSpelunkingGame();
+        return;
+      }
       db.collection("rooms").doc(roomName).get().then(doc => {
         if (doc.exists) {
           const roomData = doc.data();
@@ -1515,7 +1554,7 @@
         });
       }
     });
-  
+
     // ----------------------------
     // Door Modal Functions
     // ----------------------------
@@ -1562,7 +1601,7 @@
       closeDoorModal();
       openDoorChat(currentRoom);
     }
-  
+
     // ----------------------------
     // New Power Panel Simulation Functions & Controls
     // ----------------------------
@@ -1572,7 +1611,7 @@
     let garbageLevel = localStorage.getItem('garbageLevel') || 0;
     let lastGarbageUpdate = localStorage.getItem('lastGarbageUpdate') || Date.now();
     let powerStatus = "Unknown";
-  
+
     function updateWindSpeed() {
       windSpeed = document.getElementById('windSpeedSlider').value;
       document.getElementById('windSpeedValue').textContent = windSpeed;
@@ -1581,28 +1620,28 @@
       updateLastInteraction();
       updateElectricalStatus();
     }
-  
+
     function toggleElectricalOutput() {
       electricalOutput = !electricalOutput;
       document.getElementById('outputLeverButton').textContent = electricalOutput ? "Output On" : "Output Off";
       updateLastInteraction();
       updateElectricalStatus();
     }
-  
+
     function checkWaterPressure() {
       const pressure = Math.floor(Math.random() * 41) + 80;
       alert("Current Water Pressure: " + pressure + " PSI.\nOptimal is above 90 PSI.");
       updateLastInteraction();
       updateElectricalStatus();
     }
-  
+
     function checkHeaterLevel() {
       const heater = Math.floor(Math.random() * 41) + 80;
       alert("Current Heater Level: " + heater + ".\nOptimal is above 90.");
       updateLastInteraction();
       updateElectricalStatus();
     }
-  
+
     function updateElectricalStatus() {
       if (windSpeed >= 40 && windSpeed <= 70 && electricalOutput) {
         powerStatus = "On";
@@ -1613,7 +1652,7 @@
       }
       document.getElementById('powerStatusDisplay').textContent = powerStatus;
     }
-  
+
     function updateVoltage() {
       let factor = electricalOutput ? 1.0 : 0.5;
       let voltage = Math.round(windSpeed * factor + (Math.random() * 10 - 5));
@@ -1624,7 +1663,7 @@
       }
       localStorage.setItem('voltage', voltage);
     }
-  
+
     function simulatePowerEvent() {
       if (Date.now() - lastInteractionTime > 60000) {
         const malfunctionType = Math.floor(Math.random() * 5);
@@ -1664,7 +1703,7 @@
         updateLastInteraction();
       }
     }
-  
+
     function updateGarbageDisplay() {
       document.getElementById('garbageDisplay').textContent = garbageLevel;
       const now = Date.now();
@@ -1680,24 +1719,24 @@
         }
       }
     }
-  
+
     function logPowerMessage(message) {
       const logDiv = document.getElementById('minigameLog');
       const timestamp = new Date().toLocaleTimeString();
       logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
       logDiv.scrollTop = logDiv.scrollHeight;
     }
-  
+
     function toggleInstructions() {
       const instrDiv = document.getElementById("instructions");
       instrDiv.style.display = (instrDiv.style.display === "none" || instrDiv.style.display === "") ? "block" : "none";
     }
-  
+
     function updateLastInteraction() {
       lastInteractionTime = Date.now();
       localStorage.setItem('lastInteractionTime', lastInteractionTime);
     }
-  
+
     function simulateHealthDecline() {
       if (garbageLevel > 80) {
         const playerEmail = localStorage.getItem('playerName');
@@ -1721,13 +1760,13 @@
         });
       }
     }
-  
+
     function playerDied() {
       alert("Your health has reached zero. You have died.");
       clearGameState();
       window.location.href = "index.html";
     }
-  
+
     // ----------------------------
     // New Functionality: Rest in Room to Recover Health
     // ----------------------------
@@ -1758,7 +1797,7 @@
         }
       }, 5000);
     }
-  
+
     function toggleMusicPlayer() {
       var player = document.getElementById("bgMusic");
       if (player.style.display === "none" || player.style.display === "" || player.style.width === "0px") {
@@ -1775,7 +1814,7 @@
         player.style.left = "-9999px";
       }
     }
-  
+
     function updateEnvironmentStatus() {
       const envDiv = document.getElementById('envStatus');
       const currentWind = windSpeed;
@@ -1787,7 +1826,106 @@
       const currentGarbage = garbageLevel;
       envDiv.innerHTML = `Wind Speed: ${currentWind} | Voltage: ${voltage}V | Water Pressure: ${waterPressure} PSI | Garbage Level: ${currentGarbage}/100`;
     }
-  
+
+    // ----------------------------
+    // New Spelunking Minigame Functions
+    // ----------------------------
+    function initSpelunkingGame() {
+      // Hide main game and show spelunking container
+      document.getElementById('mainGame').style.display = 'none';
+      document.getElementById('spelunkingGame').style.display = 'block';
+
+      const canvas = document.getElementById('spelunkingCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // Initialize game state for spelunking
+      const gameState = {
+        player: { x: canvas.width / 2, y: canvas.height - 60, width: 30, height: 30, speed: 4 },
+        cave: generateCaveLayout(canvas.width, canvas.height),
+        enemies: [] // Can add enemy objects later
+      };
+
+      // Set up keyboard controls for the spelunking game
+      setupSpelunkingControls(gameState);
+
+      // Start the game loop
+      function gameLoop() {
+        updateGameState(gameState);
+        renderGame(ctx, gameState);
+        requestAnimationFrame(gameLoop);
+      }
+      gameLoop();
+    }
+
+    function generateCaveLayout(width, height) {
+      const rows = 20;
+      const cols = 20;
+      const cellWidth = width / cols;
+      const cellHeight = height / rows;
+      const cave = [];
+      for (let i = 0; i < rows; i++) {
+        cave[i] = [];
+        for (let j = 0; j < cols; j++) {
+          // 0: open space, 1: wall; adjust probability as needed for jagged cave walls.
+          cave[i][j] = Math.random() < 0.2 ? 1 : 0;
+        }
+      }
+      return { grid: cave, rows, cols, cellWidth, cellHeight };
+    }
+
+    function updateGameState(gameState) {
+      // You can add collision detection and enemy updates here
+      // Currently, the player movement is handled by keyboard events
+    }
+
+    function renderGame(ctx, gameState) {
+      // Clear the canvas
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      // Draw cave layout
+      const cave = gameState.cave;
+      for (let i = 0; i < cave.rows; i++) {
+        for (let j = 0; j < cave.cols; j++) {
+          if (cave.grid[i][j] === 1) {
+            ctx.fillStyle = '#222'; // Wall color
+            ctx.fillRect(j * cave.cellWidth, i * cave.cellHeight, cave.cellWidth, cave.cellHeight);
+          }
+        }
+      }
+      // Draw player as a rectangle
+      ctx.fillStyle = '#FFD700';
+      ctx.fillRect(gameState.player.x, gameState.player.y, gameState.player.width, gameState.player.height);
+    }
+
+    function setupSpelunkingControls(gameState) {
+      document.addEventListener('keydown', function(e) {
+        switch(e.key) {
+          case "ArrowUp":
+            gameState.player.y -= gameState.player.speed;
+            break;
+          case "ArrowDown":
+            gameState.player.y += gameState.player.speed;
+            break;
+          case "ArrowLeft":
+            gameState.player.x -= gameState.player.speed;
+            break;
+          case "ArrowRight":
+            gameState.player.x += gameState.player.speed;
+            break;
+        }
+      });
+    }
+
+    function exitSpelunkingGame() {
+      document.getElementById('spelunkingGame').style.display = 'none';
+      document.getElementById('mainGame').style.display = 'block';
+    }
+
+    // ----------------------------
+    // End of Spelunking Functions
+    // ----------------------------
+
     window.onload = function() {
       var roomSelect = document.getElementById('roomNumber');
       if (roomSelect) {
@@ -1831,7 +1969,7 @@
       listenForKitchenChat();
       listenForLaundryChat();
     };
-  
+
     function renderGardenSlots() {
       const container = document.getElementById('plantSlots');
       container.innerHTML = "";
@@ -1851,7 +1989,7 @@
         container.appendChild(slotDiv);
       });
     }
-  
+
     function openPlantSelectionModal(slotNumber) {
       const seedType = prompt("Enter the seed type to plant (choose one of the following seeds:\n" +
         seedTypes.join(", ") +
@@ -1872,7 +2010,7 @@
       };
       renderGardenSlots();
     }
-  
+
     function waterPlant(slotNumber) {
       if (waterInventory < 1) {
         alert("No water available. Please collect water from the Water Supplies panel.");
@@ -1891,7 +2029,7 @@
         renderGardenSlots();
       }, 300000);
     }
-  
+
     // Updated generateGroceryItems() with grouped categories
     function generateGroceryItems() {
       // Populate Seeds container
@@ -1930,7 +2068,7 @@
                        <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>`;
       healthContainer.appendChild(div);
     }
-  
+
     function sellHarvest() {
       const checkboxes = document.querySelectorAll('.sell-checkbox:checked');
       if (checkboxes.length === 0) {
@@ -1956,7 +2094,7 @@
       updateSellInventory();
       updatePlayerStatus();
     }
-  
+
     function toggleBuySell(mode) {
       if (mode === 'buy') {
         document.getElementById('buySection').style.display = 'grid';
@@ -1967,7 +2105,7 @@
         updateSellInventory();
       }
     }
-  
+
     function updateSellInventory() {
       const sellDiv = document.getElementById('sellInventory');
       sellDiv.innerHTML = "";
@@ -1989,7 +2127,7 @@
         sellDiv.innerHTML = "<p>You have no items to sell.</p>";
       }
     }
-  
+
     function openTab(evt, tabName) {
       var i, tabcontent, tabbuttons;
       tabcontent = document.getElementsByClassName("tab-content");
