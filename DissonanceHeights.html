@@ -435,10 +435,11 @@
       z-index: 1200;
     }
   </style>
-  <!-- Firebase SDKs: Auth and Firestore -->
+  <!-- Firebase SDKs: Auth, Firestore, and Storage -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-storage-compat.js"></script>
 </head>
 <body>
   <div class="wrapper">
@@ -760,6 +761,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const storage = firebase.storage();
 
     // ----------------------------
     // Room Password Mapping
@@ -941,7 +943,7 @@
     // Utility: Clear All Game State
     // ----------------------------
     function clearGameState() {
-      const keys = ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate', 'harvestInventory', 'water'];
+      const keys = ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate', 'harvestInventory', 'water', 'profilePic'];
       keys.forEach(key => localStorage.removeItem(key));
     }
 
@@ -955,6 +957,15 @@
       }).catch((error) => {
         console.error("Error signing out: ", error);
       });
+    }
+
+    // ----------------------------
+    // Profile Picture Upload Function
+    // ----------------------------
+    function uploadProfilePicture(file, playerId) {
+      const storageRef = storage.ref();
+      const profilePicRef = storageRef.child('profilePictures/' + playerId);
+      return profilePicRef.put(file).then(() => profilePicRef.getDownloadURL());
     }
 
     // ----------------------------
@@ -1020,7 +1031,7 @@
     function hidePanel(panelId) {
       document.getElementById(panelId).style.display = 'none';
       document.getElementById('main-screen').style.display = 'block';
-      document.body.style.backgroundImage = "url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+      document.body.style.backgroundImage = originalBackground;
       document.body.style.backgroundRepeat = "no-repeat";
       document.body.style.backgroundAttachment = "fixed";
       document.body.style.backgroundSize = "cover";
@@ -1237,8 +1248,16 @@
         .onSnapshot((doc) => {
           if (doc.exists) {
             const data = doc.data();
+            // Save profile picture URL locally
+            if(data.profilePic) {
+              localStorage.setItem('profilePic', data.profilePic);
+            }
             localStorage.setItem('characterName', data.name);
             let statusHTML = `<h3>Biodata</h3>`;
+            // Display profile picture if available in non-edit mode
+            if (!isEditing && data.profilePic) {
+              statusHTML += `<img src="${data.profilePic}" alt="Profile Picture" style="width:100px;height:100px;border-radius:50%;display:block;margin:0 auto;">`;
+            }
             if (!isEditing) {
               let coreStatsHTML = `<h4>Core Stats</h4>`;
               coreStatsHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
@@ -1271,7 +1290,13 @@
                 statusHTML += `<button onclick="consumeFirstAidKit()">Use First Aid Kit</button>`;
               }
             } else {
+              // In edit mode, include a file input for profile picture change
               statusHTML += `<h3>Edit Character</h3>`;
+              if(data.profilePic) {
+                statusHTML += `<p>Current Profile Picture:<br><img src="${data.profilePic}" alt="Profile Picture" style="width:100px;height:100px;border-radius:50%;"></p>`;
+              }
+              statusHTML += `<p><strong>Change Profile Picture:</strong></p>`;
+              statusHTML += `<input type="file" id="editProfilePic" accept="image/*">`;
               statusHTML += `<div><strong>Core Stats</strong><br>`;
               statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" style="height:40px; font-size:16px;" /></p>`;
               statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
@@ -1325,14 +1350,33 @@
         rivalries: document.getElementById('editRivalries').value.split(',').map(r => r.trim()),
         lastUpdated: Date.now()
       };
-      db.collection('players').doc(safePlayerName).set(updatedData, { merge: true })
-        .then(() => {
-          isEditing = false;
-          updatePlayerStatus();
-        })
-        .catch(error => {
-          console.error("Error saving biodata:", error);
+      // Check if a new profile picture was selected
+      const fileInput = document.getElementById('editProfilePic');
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        const file = fileInput.files[0];
+        uploadProfilePicture(file, safePlayerName).then(url => {
+          updatedData.profilePic = url;
+          db.collection('players').doc(safePlayerName).set(updatedData, { merge: true })
+            .then(() => {
+              isEditing = false;
+              updatePlayerStatus();
+            })
+            .catch(error => {
+              console.error("Error saving biodata:", error);
+            });
+        }).catch(error => {
+          console.error("Error uploading profile picture:", error);
         });
+      } else {
+        db.collection('players').doc(safePlayerName).set(updatedData, { merge: true })
+          .then(() => {
+            isEditing = false;
+            updatePlayerStatus();
+          })
+          .catch(error => {
+            console.error("Error saving biodata:", error);
+          });
+      }
     }
 
     // ----------------------------
@@ -1346,6 +1390,7 @@
           sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown",
           content: msg,
           chatType: "kitchen",
+          profilePic: localStorage.getItem('profilePic') || "",
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
         document.getElementById('kitchenChatInput').value = "";
@@ -1362,7 +1407,11 @@
           querySnapshot.forEach((doc) => {
             const message = doc.data();
             const p = document.createElement('p');
-            p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+            if(message.profilePic) {
+              p.innerHTML = `<img src="${message.profilePic}" alt="profile" style="width:30px;height:30px;border-radius:50%;vertical-align:middle;margin-right:5px;"><strong>${message.sender}</strong>: ${message.content}`;
+            } else {
+              p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+            }
             chatLog.appendChild(p);
           });
           chatLog.scrollTop = chatLog.scrollHeight;
@@ -1428,6 +1477,7 @@
           sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown",
           content: msg,
           chatType: "laundry",
+          profilePic: localStorage.getItem('profilePic') || "",
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
         document.getElementById('laundryChatInput').value = "";
@@ -1444,7 +1494,11 @@
           querySnapshot.forEach((doc) => {
             const message = doc.data();
             const p = document.createElement('p');
-            p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+            if(message.profilePic) {
+              p.innerHTML = `<img src="${message.profilePic}" alt="profile" style="width:30px;height:30px;border-radius:50%;vertical-align:middle;margin-right:5px;"><strong>${message.sender}</strong>: ${message.content}`;
+            } else {
+              p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+            }
             chatLog.appendChild(p);
           });
           chatLog.scrollTop = chatLog.scrollHeight;
@@ -1514,7 +1568,11 @@
           querySnapshot.forEach((doc) => {
             const message = doc.data();
             const p = document.createElement('p');
-            p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+            if(message.profilePic) {
+              p.innerHTML = `<img src="${message.profilePic}" alt="profile" style="width:30px;height:30px;border-radius:50%;vertical-align:middle;margin-right:5px;"><strong>${message.sender}</strong>: ${message.content}`;
+            } else {
+              p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+            }
             chatLog.appendChild(p);
           });
           chatLog.scrollTop = chatLog.scrollHeight;
@@ -1535,6 +1593,7 @@
             sender: characterName,
             content: msg,
             chatType: doorChatMode ? "door" : "room",
+            profilePic: localStorage.getItem('profilePic') || "",
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
           });
           document.getElementById('chatInput').value = "";
