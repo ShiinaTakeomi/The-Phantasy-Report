@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dissonance Heights - Power Room</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Shared head content -->
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <style>
+    body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    .panel { border: 2px solid #444; padding: 20px; width: 600px; margin: 20px auto; border-radius: 8px; background: rgba(0,0,0,0.7); }
+    .control { margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <div class="panel" id="minigame-panel">
+    <h2>Wind Turbine Control Panel</h2>
+    <p><strong>Objective:</strong> Ensure the turbine provides electricity, water heating, and lighting.</p>
+    <button id="instructionsButton" onclick="toggleInstructions()">Instructions</button>
+    <div id="instructions" style="display: none;">
+      <p>
+        <strong>Step 1:</strong> Adjust the wind speed slider (optimal range: 40–70).<br>
+        <strong>Step 2:</strong> Pull the electrical output lever to toggle power supply.<br>
+        <strong>Step 3:</strong> Check water pressure and heater levels by pressing the corresponding buttons.<br>
+        <strong>Step 4:</strong> Ensure the overall light status is "On".<br><br>
+        <em>Note:</em> Every minute one of five malfunctions may occur.
+      </p>
+    </div>
+    <div class="control">
+      <label for="windSpeedSlider">Wind Speed:</label>
+      <input type="range" id="windSpeedSlider" min="0" max="100" onchange="updateWindSpeed()">
+      <span id="windSpeedValue"></span>
+    </div>
+    <div class="control">
+      <label>Electrical Output:</label>
+      <button id="outputLeverButton" onclick="toggleElectricalOutput()">Toggle Output</button>
+    </div>
+    <div class="control">
+      <label>Water Pressure:</label>
+      <button id="checkWaterPressureButton" onclick="checkWaterPressure()">Check Water</button>
+    </div>
+    <div class="control">
+      <label>Heater Level:</label>
+      <button id="checkHeaterLevelButton" onclick="checkHeaterLevel()">Check Heater</button>
+    </div>
+    <div class="control">
+      <label>Light Status:</label>
+      <span id="lightStatusDisplay">Unknown</span>
+    </div>
+    <div class="control">
+      <label>Voltage:</label>
+      <span id="voltageDisplay">0.0</span>
+    </div>
+    <div class="control">
+      <button onclick="hidePanel('minigame-panel')">Return to Main Menu</button>
+    </div>
+    <h3>System Log:</h3>
+    <div id="minigameLog"></div>
+    <div class="control">
+      <label>Power Status:</label>
+      <span id="powerStatusDisplay">Unknown</span>
+    </div>
+  </div>
+  <p style="text-align:center;"><a href="index.html">← Back to Main</a></p>
+  <script>
+    // (Include your JavaScript functions for power room controls: updateWindSpeed(), toggleElectricalOutput(), checkWaterPressure(), etc.)
+  </script>
+</body>
+</html>
