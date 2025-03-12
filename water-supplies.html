@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dissonance Heights - Water Supplies (Laundry)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Shared head content -->
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <style>
+    body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    .panel { border: 2px solid #444; padding: 20px; width: 600px; margin: 20px auto; border-radius: 8px; background: rgba(0,0,0,0.7); }
+    .chatArea { height:150px; overflow-y:auto; background: rgba(255,255,255,0.1); color:#fff; border:1px solid #ccc; padding:10px; border-radius:4px; }
+  </style>
+</head>
+<body>
+  <div class="panel" id="water-panel">
+    <h2>Water Supplies (Laundry)</h2>
+    <p>Water pressure is directly linked to the performance of the power panel and environmental efficiency (affected by garbage levels). Use the washing machine to clean clothes – remember, low power output or high garbage may result in lower water pressure.</p>
+    <div>
+      <p><strong>Water Pressure:</strong> <span id="waterPressureDisplay">Calculating...</span> PSI</p>
+      <p><strong>Water Inventory:</strong> <span id="waterInventoryDisplay">0</span> units</p>
+      <button onclick="collectWater()">Collect Water</button>
+    </div>
+    <div>
+      <h4>Washing Machine</h4>
+      <button onclick="washClothes()">Wash Clothes</button>
+      <div class="chatArea" id="laundryChatLog"></div>
+      <input type="text" id="laundryChatInput" placeholder="Type a message...">
+      <button onclick="sendLaundryChat()">Send</button>
+    </div>
+    <button onclick="hidePanel('water-panel')">Return to Main Menu</button>
+  </div>
+  <p style="text-align:center;"><a href="index.html">← Back to Main</a></p>
+  <script>
+    // (Include your JavaScript functions for water supplies: collectWater(), washClothes(), sendLaundryChat(), etc.)
+  </script>
+</body>
+</html>
