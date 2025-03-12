@@ -155,12 +155,7 @@
       border-radius: 4px;
       color: #222;
     }
-    /* New Recipe Book Button style */
-    .recipe-button {
-      background-color: #9b59b6;
-      border: 1px solid #fff;
-      color: #fff;
-    }
+    /* New Recipe Book Button style removed from facilities */
     /* Character Creation Section */
     #characterCreation {
       margin: 20px auto;
@@ -191,7 +186,7 @@
       padding: 8px;
       margin-bottom: 10px;
     }
-    /* Modal Styles (for plant selection, kitchen, water, door interaction) */
+    /* Modal Styles (for plant selection, door interaction) */
     .modal, #doorModal {
       display: none;
       position: fixed;
@@ -295,7 +290,7 @@
       max-width: 300px;
       font-size: 14px;
     }
-    /* New Community Kitchen Panel */
+    /* Community Kitchen Panel with Tabs */
     #kitchen-panel {
       display: none;
       border: 2px solid #444;
@@ -305,43 +300,34 @@
       border-radius: 8px;
       background: rgba(0,0,0,0.7);
     }
-    /* New Water Supplies Panel */
-    #water-panel {
-      display: none;
-      border: 2px solid #444;
-      padding: 20px;
-      width: 600px;
-      margin: 20px auto;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    /* Recipe Book Panel Styles */
-    #recipe-panel {
-      display: none;
-      border: 2px solid #444;
-      padding: 20px;
-      width: 600px;
-      margin: 20px auto;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    .recipe {
-      border: 1px solid #777;
-      padding: 10px;
+    .tab-headers {
+      display: flex;
+      justify-content: center;
       margin-bottom: 10px;
+    }
+    .tab-button {
+      background-color: #444;
+      border: 1px solid #999;
       border-radius: 4px;
-      background: rgba(255,255,255,0.1);
+      color: #eee;
+      cursor: pointer;
+      padding: 10px;
+      margin: 0 5px;
     }
-    .recipe h4 {
-      margin: 0 0 5px 0;
+    .tab-button:hover {
+      background-color: #555;
     }
-    .recipe p {
-      margin: 3px 0;
+    .tab-button.active {
+      background-color: #00bfff;
+      color: #222;
     }
-    .recipe button {
-      margin-top: 5px;
+    .tab-content {
+      display: none;
     }
-    /* NEW: Grocery Stand Styles - Option 2 with Tron Blue Neon Accents */
+    .tab-content.active {
+      display: block;
+    }
+    /* Baking Supplies, Recipe Book styling reused from Grocery Stand */
     .grocery-items-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -378,34 +364,6 @@
     .grocery-item button:hover {
       background-color: #009acd;
     }
-    /* Grocery Stand Tabbed Section Specific Styles */
-    .tab-headers {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    .tab-button {
-      background-color: #444;
-      border: 1px solid #999;
-      border-radius: 4px;
-      color: #eee;
-      cursor: pointer;
-      padding: 10px;
-      margin: 0 5px;
-    }
-    .tab-button:hover {
-      background-color: #555;
-    }
-    .tab-button.active {
-      background-color: #00bfff;
-      color: #222;
-    }
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
     /* Environmental Status Panel – New! */
     #envStatus {
       padding: 10px;
@@ -416,15 +374,15 @@
       margin: 10px auto;
       max-width: 600px;
     }
-    /* NEW: Spelunking Game Styles */
+    /* Spelunking Game Styles */
     #spelunkingGame {
-      display: none; /* Hidden until triggered */
+      display: none;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: #000; /* Black background for cave feel */
+      background: #000;
       z-index: 1100;
     }
     #spelunkingCanvas {
@@ -517,7 +475,6 @@
           <button onclick="openGroceryPanel()">Groceries Stand</button>
           <button onclick="openWaterPanel()">Water Supplies (Laundry)</button>
           <button onclick="togglePlayerStatus()">Biodata</button>
-          <button class="recipe-button" onclick="openRecipePanel()">Recipe Book</button>
         </div>
         <!-- New Environmental Status Panel -->
         <div id="envStatus"></div>
@@ -704,11 +661,23 @@
         <button onclick="harvestProduce()">Harvest Produce</button>
         <button onclick="hidePanel('garden-panel')">Return to Main Menu</button>
       </div>
-      <!-- Community Kitchen Panel -->
+      <!-- Community Kitchen Panel with Tabs for Chat and Cookbook -->
       <div id="kitchen-panel" class="panel">
         <h2>Community Kitchen</h2>
-        <p>Access the cookbook to view available recipes.</p>
-        <!-- (Recipe functionality has been removed) -->
+        <div class="tab-headers">
+          <button class="tab-button active" onclick="openKitchenTab(event, 'kitchenChatTab')">Chat</button>
+          <button class="tab-button" onclick="openKitchenTab(event, 'cookbookTab')">Cookbook</button>
+        </div>
+        <div id="kitchenChatTab" class="tab-content active">
+          <div id="kitchenChatLog" class="chatArea" style="height:150px; overflow-y:auto; background: rgba(255,255,255,0.1); color:#fff; border:1px solid #ccc; padding:10px; border-radius:4px;"></div>
+          <input type="text" id="kitchenChatInput" placeholder="Type a message...">
+          <button onclick="sendKitchenChat()">Send</button>
+        </div>
+        <div id="cookbookTab" class="tab-content">
+          <div id="recipeContainer">
+            <!-- Recipes rendered here -->
+          </div>
+        </div>
         <button onclick="hidePanel('kitchen-panel')">Return to Main Menu</button>
       </div>
       <!-- Water Supplies Panel -->
@@ -734,14 +703,6 @@
           <button onclick="sendLaundryChat()">Send</button>
         </div>
         <button onclick="hidePanel('water-panel')">Return to Main Menu</button>
-      </div>
-      <!-- Recipe Book Panel -->
-      <div id="recipe-panel" class="panel">
-        <h2>Recipe Book</h2>
-        <div id="recipeContainer">
-          <!-- Recipes will be rendered here -->
-        </div>
-        <button onclick="hidePanel('recipe-panel')">Return to Main Menu</button>
       </div>
       <!-- Chat Panel -->
       <div id="chatPanel" class="panel">
@@ -882,7 +843,6 @@
         }
       });
     }
-
     function updateHunger(delta) {
       const playerEmail = localStorage.getItem('playerName');
       if (!playerEmail) return;
@@ -895,7 +855,6 @@
         }
       });
     }
-
     function updateHealth(delta) {
       const playerEmail = localStorage.getItem('playerName');
       if (!playerEmail) return;
@@ -908,7 +867,6 @@
         }
       });
     }
-
     function updateReputation(delta) {
       const playerEmail = localStorage.getItem('playerName');
       if (!playerEmail) return;
@@ -932,7 +890,6 @@
       localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
       updateHarvestInventoryUI();
     }
-
     function removeItem(item, qty = 1) {
       if (harvestInventory[item]) {
         harvestInventory[item] = Math.max(0, harvestInventory[item] - qty);
@@ -943,7 +900,6 @@
       localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
       updateHarvestInventoryUI();
     }
-
     function updateHarvestInventoryUI() {
       const invDiv = document.getElementById('harvestInventory');
       let html = "";
@@ -982,7 +938,6 @@
       const keys = ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate', 'harvestInventory', 'water'];
       keys.forEach(key => localStorage.removeItem(key));
     }
-
     // Sign Out Function
     function signOutUser() {
       firebase.auth().signOut().then(() => {
@@ -992,7 +947,6 @@
         console.error("Error signing out: ", error);
       });
     }
-
     // New Garbage Chute Clear Function
     function clearGarbage() {
       garbageLevel = 0;
@@ -1005,7 +959,6 @@
       logDiv.innerHTML = logMessage + logDiv.innerHTML;
       alert("Garbage has been cleared.");
     }
-
     // Panel Toggles and Navigation
     function showGarbagePanel() {
       document.getElementById('garbage-panel').style.display = 'block';
@@ -1035,6 +988,9 @@
     function openKitchenPanel() {
       document.getElementById('kitchen-panel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
+      // Activate chat tab by default
+      openKitchenTab(null, 'kitchenChatTab');
+      listenForKitchenChat();
     }
     function openWaterPanel() {
       document.getElementById('water-panel').style.display = 'block';
@@ -1046,11 +1002,6 @@
       const pressure = Math.round(basePressure * efficiency);
       document.getElementById('waterPressureDisplay').textContent = pressure;
       document.getElementById('waterInventoryDisplay').textContent = waterInventory;
-    }
-    function openRecipePanel() {
-      document.getElementById('recipe-panel').style.display = 'block';
-      document.getElementById('main-screen').style.display = 'none';
-      renderRecipes();
     }
     function hidePanel(panelId) {
       document.getElementById(panelId).style.display = 'none';
@@ -1366,7 +1317,7 @@
         });
     }
 
-    // Recipe Book Functions
+    // Recipe Book Functions (now used in the Community Kitchen panel)
     function renderRecipes() {
       const container = document.getElementById('recipeContainer');
       container.innerHTML = "";
@@ -1395,7 +1346,6 @@
         container.appendChild(recipeDiv);
       });
     }
-
     function createRecipe(index) {
       const recipe = recipes[index];
       // Check if all required ingredients are available
@@ -1413,9 +1363,8 @@
       const btn = document.getElementById(`createBtn${index}`);
       btn.disabled = true;
       btn.textContent = "Creating... (1 min wait)";
-      // Wait one minute (60000 ms) then apply effects
+      // Wait one minute then apply effects
       setTimeout(() => {
-        // Apply benefits and cons
         if (recipe.benefits.health) updateHealth(recipe.benefits.health);
         if (recipe.benefits.mood) updateMood(recipe.benefits.mood);
         if (recipe.benefits.hunger) updateHunger(recipe.benefits.hunger);
@@ -1431,7 +1380,7 @@
       }, 60000);
     }
 
-    // Community Kitchen Chat & Cooking Functions (Recipes removed)
+    // Community Kitchen Chat Functions
     function sendKitchenChat() {
       const msg = document.getElementById('kitchenChatInput').value;
       if (msg.trim() !== "") {
@@ -1463,7 +1412,7 @@
         });
     }
 
-    // Water Supplies Chat & Washing Machine Functions
+    // Water Supplies Chat Functions
     function sendLaundryChat() {
       const msg = document.getElementById('laundryChatInput').value;
       if (msg.trim() !== "") {
@@ -1919,6 +1868,25 @@
       document.getElementById('mainGame').style.display = 'block';
     }
     // End of Spelunking Functions
+    // Tab functions for Community Kitchen Panel
+    function openKitchenTab(evt, tabName) {
+      const tabcontents = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < tabcontents.length; i++) {
+        tabcontents[i].classList.remove("active");
+      }
+      const tabbuttons = document.getElementsByClassName("tab-button");
+      for (let i = 0; i < tabbuttons.length; i++) {
+        tabbuttons[i].classList.remove("active");
+      }
+      document.getElementById(tabName).classList.add("active");
+      if (evt) {
+        evt.currentTarget.classList.add("active");
+      }
+      // If the cookbook tab is selected, render recipes
+      if (tabName === 'cookbookTab') {
+        renderRecipes();
+      }
+    }
     window.onload = function() {
       var roomSelect = document.getElementById('roomNumber');
       if (roomSelect) {
@@ -2019,9 +1987,7 @@
         renderGardenSlots();
       }, 300000);
     }
-    // Updated generateGroceryItems() with grouped categories and updated seedTypes
     function generateGroceryItems() {
-      // Populate Seeds container
       let seedContainer = document.getElementById("seedList");
       seedContainer.innerHTML = "";
       seedTypes.forEach(seed => {
@@ -2031,7 +1997,6 @@
                          <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
         seedContainer.appendChild(div);
       });
-      // Populate Mushrooms container
       let mushroomContainer = document.getElementById("mushroomList");
       mushroomContainer.innerHTML = "";
       mushroomTypes.forEach(mushroom => {
@@ -2041,7 +2006,6 @@
                          <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
         mushroomContainer.appendChild(div);
       });
-      // Populate Baking Supplies container
       let bakingContainer = document.getElementById("bakingContainer");
       if (!bakingContainer) {
         bakingContainer = document.createElement("div");
@@ -2064,7 +2028,6 @@
                          <button onclick="buyItem('${item}')">Buy ${item}</button>`;
         bakingContainer.appendChild(div);
       });
-      // Populate Health Items container
       let healthContainer = document.getElementById("healthItemList");
       if (!healthContainer) {
         healthContainer = document.createElement("div");
