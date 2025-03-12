@@ -155,7 +155,6 @@
       border-radius: 4px;
       color: #222;
     }
-    /* New Recipe Book Button style removed from facilities */
     /* Character Creation Section */
     #characterCreation {
       margin: 20px auto;
@@ -186,7 +185,7 @@
       padding: 8px;
       margin-bottom: 10px;
     }
-    /* Modal Styles (for plant selection, door interaction) */
+    /* Modal Styles (for plant selection, kitchen, water, door interaction) */
     .modal, #doorModal {
       display: none;
       position: fixed;
@@ -290,7 +289,7 @@
       max-width: 300px;
       font-size: 14px;
     }
-    /* Community Kitchen Panel with Tabs */
+    /* New Community Kitchen Panel */
     #kitchen-panel {
       display: none;
       border: 2px solid #444;
@@ -300,34 +299,38 @@
       border-radius: 8px;
       background: rgba(0,0,0,0.7);
     }
-    .tab-headers {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    .tab-button {
-      background-color: #444;
-      border: 1px solid #999;
-      border-radius: 4px;
-      color: #eee;
-      cursor: pointer;
-      padding: 10px;
-      margin: 0 5px;
-    }
-    .tab-button:hover {
-      background-color: #555;
-    }
-    .tab-button.active {
-      background-color: #00bfff;
-      color: #222;
-    }
-    .tab-content {
+    /* Recipe Panel for Cooking (new) */
+    #recipePanel {
       display: none;
+      border: 2px solid #444;
+      padding: 20px;
+      width: 600px;
+      margin: 20px auto;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.7);
     }
-    .tab-content.active {
-      display: block;
+    /* New Water Supplies Panel */
+    #water-panel {
+      display: none;
+      border: 2px solid #444;
+      padding: 20px;
+      width: 600px;
+      margin: 20px auto;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.7);
     }
-    /* Baking Supplies, Recipe Book styling reused from Grocery Stand */
+    /* Chat area within panels */
+    .panel .chatArea {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 150px;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.1);
+      margin-bottom: 10px;
+      color: #fff;
+      border-radius: 4px;
+    }
+    /* NEW: Grocery Stand Styles - Option 2 with Tron Blue Neon Accents */
     .grocery-items-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -364,6 +367,34 @@
     .grocery-item button:hover {
       background-color: #009acd;
     }
+    /* Grocery Stand Tabbed Section Specific Styles */
+    .tab-headers {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .tab-button {
+      background-color: #444;
+      border: 1px solid #999;
+      border-radius: 4px;
+      color: #eee;
+      cursor: pointer;
+      padding: 10px;
+      margin: 0 5px;
+    }
+    .tab-button:hover {
+      background-color: #555;
+    }
+    .tab-button.active {
+      background-color: #00bfff;
+      color: #222;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
     /* Environmental Status Panel – New! */
     #envStatus {
       padding: 10px;
@@ -374,15 +405,15 @@
       margin: 10px auto;
       max-width: 600px;
     }
-    /* Spelunking Game Styles */
+    /* NEW: Spelunking Game Styles */
     #spelunkingGame {
-      display: none;
+      display: none; /* Hidden until triggered */
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: #000;
+      background: #000; /* Black background for cave feel */
       z-index: 1100;
     }
     #spelunkingCanvas {
@@ -404,11 +435,10 @@
       z-index: 1200;
     }
   </style>
-  <!-- Firebase SDKs: Auth, Firestore, and Storage -->
+  <!-- Firebase SDKs: Auth and Firestore -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-storage-compat.js"></script>
 </head>
 <body>
   <div class="wrapper">
@@ -523,6 +553,10 @@
           <span id="voltageDisplay">0.0</span>
         </div>
         <div class="control">
+          <h4>Service Impact & Suggestions:</h4>
+          <div id="powerSuggestions" style="font-size:14px; background:rgba(255,255,255,0.1); padding:5px; border-radius:4px;"></div>
+        </div>
+        <div class="control">
           <button onclick="hidePanel('minigame-panel')">Return to Main Menu</button>
         </div>
         <h3>System Log:</h3>
@@ -549,7 +583,7 @@
         <h3>Garbage Log:</h3>
         <div id="garbageLog"></div>
       </div>
-      <!-- Grocery Stand Panel -->
+      <!-- Grocery Stand Tabbed Section Start -->
       <div id="grocery-panel" class="panel">
         <h2>Grocery Store</h2>
         <p>Purchase essential items. Prices may vary with electricity availability.</p>
@@ -603,38 +637,6 @@
                 <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
               </div>
             </div>
-            <!-- Baking Supplies Group -->
-            <h4>Baking Supplies</h4>
-            <div id="bakingContainer" class="grocery-items-container">
-              <div class="grocery-item">
-                <p>
-                  <strong>Flour</strong> - $3<br>
-                  <em>Basic baking ingredient.</em>
-                </p>
-                <button onclick="buyItem('Flour')">Buy Flour</button>
-              </div>
-              <div class="grocery-item">
-                <p>
-                  <strong>Sugar</strong> - $2<br>
-                  <em>Sweetens your recipes.</em>
-                </p>
-                <button onclick="buyItem('Sugar')">Buy Sugar</button>
-              </div>
-              <div class="grocery-item">
-                <p>
-                  <strong>Egg</strong> - $1<br>
-                  <em>Provides protein for your baked goods.</em>
-                </p>
-                <button onclick="buyItem('Egg')">Buy Egg</button>
-              </div>
-              <div class="grocery-item">
-                <p>
-                  <strong>Butter</strong> - $4<br>
-                  <em>Adds richness to recipes.</em>
-                </p>
-                <button onclick="buyItem('Butter')">Buy Butter</button>
-              </div>
-            </div>
             <!-- Health Items Group -->
             <h4>Health Items</h4>
             <div id="healthItemList"></div>
@@ -651,6 +653,7 @@
         </div>
         <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
       </div>
+      <!-- Grocery Stand Tabbed Section End -->
       <!-- Community Garden Panel -->
       <div id="garden-panel" class="panel">
         <h2>Community Garden</h2>
@@ -661,26 +664,30 @@
         <button onclick="harvestProduce()">Harvest Produce</button>
         <button onclick="hidePanel('garden-panel')">Return to Main Menu</button>
       </div>
-      <!-- Community Kitchen Panel with Tabs for Chat and Cookbook -->
+      <!-- Community Kitchen Panel -->
       <div id="kitchen-panel" class="panel">
         <h2>Community Kitchen</h2>
-        <div class="tab-headers">
-          <button class="tab-button active" onclick="openKitchenTab(event, 'kitchenChatTab')">Chat</button>
-          <button class="tab-button" onclick="openKitchenTab(event, 'cookbookTab')">Cookbook</button>
+        <p>Access the cookbook to view 20 available recipes. Each recipe has a single-sentence description based on plants and mushrooms grown in the community garden, along with its benefits and setbacks.</p>
+        <button onclick="openRecipePanel()">Cook</button>
+        <div id="stoveStatus" style="margin-top:10px; font-size:14px;">Stove: Available</div>
+        <div id="cookingProcess" style="display:none; margin-top:10px; font-size:14px;">
+          <p>Cooking in progress... Please wait 1 minute.</p>
         </div>
-        <div id="kitchenChatTab" class="tab-content active">
-          <div id="kitchenChatLog" class="chatArea" style="height:150px; overflow-y:auto; background: rgba(255,255,255,0.1); color:#fff; border:1px solid #ccc; padding:10px; border-radius:4px;"></div>
+        <div>
+          <h4>Kitchen Chat</h4>
+          <div class="chatArea" id="kitchenChatLog"></div>
           <input type="text" id="kitchenChatInput" placeholder="Type a message...">
           <button onclick="sendKitchenChat()">Send</button>
         </div>
-        <div id="cookbookTab" class="tab-content">
-          <div id="recipeContainer">
-            <!-- Recipes rendered here -->
-          </div>
-        </div>
         <button onclick="hidePanel('kitchen-panel')">Return to Main Menu</button>
       </div>
-      <!-- Water Supplies Panel -->
+      <!-- Recipe Panel -->
+      <div id="recipePanel" class="panel">
+        <h2>Recipe Selection</h2>
+        <div id="recipeListContainer" style="max-height:300px; overflow-y:auto;"></div>
+        <button onclick="hidePanel('recipePanel'); openKitchenPanel();">Cancel</button>
+      </div>
+      <!-- Water Supplies Panel (with refined water pressure calculation) -->
       <div id="water-panel" class="panel">
         <h2>Water Supplies (Laundry)</h2>
         <p>Water pressure is directly linked to the performance of the power panel and the environmental efficiency (affected by garbage levels). Use the washing machine to clean clothes – remember, low power output or high garbage may result in lower water pressure.</p>
@@ -711,6 +718,7 @@
         <input type="text" id="chatInput" placeholder="Type your message...">
         <button onclick="sendChatMessage()">Send</button>
         <button onclick="closeChat()">Close Chat</button>
+        <!-- Rest button will appear here for room owners -->
         <div id="restContainer" style="margin-top:10px;"></div>
       </div>
     </div>
@@ -727,7 +735,7 @@
       </div>
       <button onclick="closeDoorModal()">Cancel</button>
     </div>
-    <!-- Spelunking Game Container -->
+    <!-- NEW: Spelunking Game Container (triggered in Room 5) -->
     <div id="spelunkingGame">
       <canvas id="spelunkingCanvas"></canvas>
       <button id="exitSpelunking" onclick="exitSpelunkingGame()">Exit Cave</button>
@@ -737,7 +745,9 @@
     // Store original background settings (main menu background)
     const originalBackground = "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed";
 
+    // ----------------------------
     // Firebase Initialization & Config
+    // ----------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyD5avvNbSB5L_YtpyxbBYYnvUpjMa0WglE",
       authDomain: "thephantasyreport.firebaseapp.com",
@@ -750,9 +760,10 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const storage = firebase.storage();
 
+    // ----------------------------
     // Room Password Mapping
+    // ----------------------------
     const roomPasswords = {
       "Room 1": "0001",
       "Room 2": "1414",
@@ -794,43 +805,53 @@
       timer: null
     }));
 
-    // Updated seedTypes array with only 5 seeds for sale
+    // Grocery Items Arrays: 20 Seed Types and 5 Mushroom Types
     const seedTypes = [
-      "Sunflower Seed", "Pumpkin Seed", "Corn Seed", "Wheat Seed", "Rice Seed"
+      "Sunflower Seed", "Pumpkin Seed", "Corn Seed", "Wheat Seed", "Rice Seed",
+      "Barley Seed", "Oat Seed", "Millet Seed", "Sorghum Seed", "Quinoa Seed",
+      "Flax Seed", "Sesame Seed", "Chia Seed", "Cumin Seed", "Mustard Seed",
+      "Fennel Seed", "Caraway Seed", "Anise Seed", "Poppy Seed", "Basil Seed"
     ];
     const mushroomTypes = [
       "Button Mushroom", "Portobello Mushroom", "Shiitake Mushroom", "Oyster Mushroom", "Enoki Mushroom"
     ];
 
-    // Define recipes for cookies
-    const recipes = [
-      {
-        name: "Vitality Cookie",
-        ingredients: { "Flour": 2, "Egg": 1, "Butter": 1, "Sugar": 1 },
-        benefits: { health: 20 },
-        cons: { hunger: 5 }
-      },
-      {
-        name: "Cheer Cookie",
-        ingredients: { "Flour": 1, "Egg": 1, "Butter": 1, "Sugar": 2 },
-        benefits: { mood: 20 },
-        cons: { health: -5 }
-      },
-      {
-        name: "Sustenance Cookie",
-        ingredients: { "Flour": 1, "Egg": 2, "Sugar": 1 },
-        benefits: { hunger: -20 },
-        cons: { mood: -5 }
-      },
-      {
-        name: "Ambition Cookie",
-        ingredients: { "Flour": 2, "Egg": 1, "Butter": 1, "Sugar": 2 },
-        benefits: { reputation: 10 },
-        cons: { health: -10 }
-      }
-    ];
+    // ----------------------------
+    // Centralized Recipes Array – now with numeric benefits!
+    // ----------------------------
+    const recipes = [];
+    for (let i = 0; i < 10; i++) {
+      recipes.push({
+        title: "Garden Salad " + (i + 1),
+        description: "A refreshing mix of greens and button mushrooms that boosts vitality, though too much may slightly lower hunger.",
+        ingredients: [
+          { name: "Sunflower Seed", amount: 2 },
+          { name: "Button Mushroom", amount: 3 }
+        ],
+        water: "100ml",
+        benefits: "Boosts energy and mood.",
+        setbacks: "Slightly decreases hunger.",
+        hungerReduction: 10,
+        moodIncrease: 5
+      });
+      recipes.push({
+        title: "Mushroom Medley " + (i + 1),
+        description: "A savory dish combining portobello mushrooms with pumpkin seeds that improves strength but may affect mood if overconsumed.",
+        ingredients: [
+          { name: "Portobello Mushroom", amount: 2 },
+          { name: "Pumpkin Seed", amount: 2 }
+        ],
+        water: "120ml",
+        benefits: "Improves strength.",
+        setbacks: "May lower mood if eaten in excess.",
+        hungerReduction: 5,
+        moodIncrease: 3
+      });
+    }
 
-    // Helper Functions: Update Mood, Hunger, Health, Reputation
+    // ----------------------------
+    // Helper Functions: Update Mood and Hunger
+    // ----------------------------
     function updateMood(delta) {
       const playerEmail = localStorage.getItem('playerName');
       if (!playerEmail) return;
@@ -843,6 +864,7 @@
         }
       });
     }
+
     function updateHunger(delta) {
       const playerEmail = localStorage.getItem('playerName');
       if (!playerEmail) return;
@@ -855,32 +877,10 @@
         }
       });
     }
-    function updateHealth(delta) {
-      const playerEmail = localStorage.getItem('playerName');
-      if (!playerEmail) return;
-      const safePlayerName = sanitizePlayerName(playerEmail);
-      db.collection('players').doc(safePlayerName).get().then(doc => {
-        if (doc.exists) {
-          let currentHealth = doc.data().health || 100;
-          let newHealth = Math.min(100, Math.max(0, currentHealth + delta));
-          db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
-        }
-      });
-    }
-    function updateReputation(delta) {
-      const playerEmail = localStorage.getItem('playerName');
-      if (!playerEmail) return;
-      const safePlayerName = sanitizePlayerName(playerEmail);
-      db.collection('players').doc(safePlayerName).get().then(doc => {
-        if (doc.exists) {
-          let currentRep = doc.data().reputation || 0;
-          let newRep = currentRep + delta;
-          db.collection('players').doc(safePlayerName).set({ reputation: newRep, lastUpdated: Date.now() }, { merge: true });
-        }
-      });
-    }
 
+    // ----------------------------
     // Inventory Functions
+    // ----------------------------
     function addItem(item, qty = 1) {
       if (harvestInventory[item]) {
         harvestInventory[item] += qty;
@@ -890,6 +890,7 @@
       localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
       updateHarvestInventoryUI();
     }
+
     function removeItem(item, qty = 1) {
       if (harvestInventory[item]) {
         harvestInventory[item] = Math.max(0, harvestInventory[item] - qty);
@@ -900,6 +901,7 @@
       localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
       updateHarvestInventoryUI();
     }
+
     function updateHarvestInventoryUI() {
       const invDiv = document.getElementById('harvestInventory');
       let html = "";
@@ -910,7 +912,9 @@
       invDiv.innerHTML = html;
     }
 
+    // ----------------------------
     // In-App Notification Listener
+    // ----------------------------
     function listenForNotifications() {
       const ownerEmail = localStorage.getItem('playerName');
       if (!ownerEmail) return;
@@ -933,12 +937,17 @@
         });
     }
 
+    // ----------------------------
     // Utility: Clear All Game State
+    // ----------------------------
     function clearGameState() {
       const keys = ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate', 'harvestInventory', 'water'];
       keys.forEach(key => localStorage.removeItem(key));
     }
+
+    // ----------------------------
     // Sign Out Function
+    // ----------------------------
     function signOutUser() {
       firebase.auth().signOut().then(() => {
         clearGameState();
@@ -947,19 +956,10 @@
         console.error("Error signing out: ", error);
       });
     }
-    // New Garbage Chute Clear Function
-    function clearGarbage() {
-      garbageLevel = 0;
-      localStorage.setItem('garbageLevel', garbageLevel);
-      document.getElementById('garbageDisplay').textContent = garbageLevel;
-      const logDiv = document.getElementById('garbageLog');
-      const player = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown player";
-      const timestamp = new Date().toLocaleTimeString();
-      const logMessage = `<p>[${timestamp}] ${player} cleared the garbage.</p>`;
-      logDiv.innerHTML = logMessage + logDiv.innerHTML;
-      alert("Garbage has been cleared.");
-    }
+
+    // ----------------------------
     // Panel Toggles and Navigation
+    // ----------------------------
     function showGarbagePanel() {
       document.getElementById('garbage-panel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
@@ -988,9 +988,6 @@
     function openKitchenPanel() {
       document.getElementById('kitchen-panel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
-      // Activate chat tab by default
-      openKitchenTab(null, 'kitchenChatTab');
-      listenForKitchenChat();
     }
     function openWaterPanel() {
       document.getElementById('water-panel').style.display = 'block';
@@ -1003,25 +1000,39 @@
       document.getElementById('waterPressureDisplay').textContent = pressure;
       document.getElementById('waterInventoryDisplay').textContent = waterInventory;
     }
+
+    function collectWater() {
+      const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
+      const efficiency = Math.max(0.5, 1 - (garbageLevel / 200));
+      const minVoltageThreshold = 20;
+      const basePressure = voltage >= minVoltageThreshold ? voltage * 0.8 : 0;
+      const pressure = Math.round(basePressure * efficiency);
+      if (pressure >= 90) {
+        waterInventory += 5;
+        localStorage.setItem('water', waterInventory);
+        alert("Collected 5 water units! Your water inventory is now " + waterInventory + ".");
+      } else {
+        alert("Water pressure too low to collect water. Ensure the power panel is operating properly.");
+      }
+      document.getElementById('waterInventoryDisplay').textContent = waterInventory;
+    }
+
     function hidePanel(panelId) {
       document.getElementById(panelId).style.display = 'none';
       document.getElementById('main-screen').style.display = 'block';
-      document.body.style.backgroundImage = originalBackground;
+      document.body.style.backgroundImage = "url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
       document.body.style.backgroundRepeat = "no-repeat";
       document.body.style.backgroundAttachment = "fixed";
       document.body.style.backgroundSize = "cover";
       document.body.style.backgroundPosition = "center center";
     }
+
     function buyItem(item) {
       const prices = {
         'Food Staples': 10,
         'Lubricant Oil': 5,
         'Alcohol': 3,
-        'Cigarettes': 4,
-        'Flour': 3,
-        'Sugar': 2,
-        'Egg': 1,
-        'Butter': 4
+        'Cigarettes': 4
       };
       let price = prices[item] || 2;
       let money = parseInt(localStorage.getItem('money')) || 50;
@@ -1036,6 +1047,7 @@
         alert("Not enough money to purchase " + item);
       }
     }
+
     function applyItemEffects(item) {
       switch(item) {
         case "Food Staples":
@@ -1061,6 +1073,7 @@
           break;
       }
     }
+
     function consumeFirstAidKit() {
       if (harvestInventory["First Aid Kit"] && harvestInventory["First Aid Kit"] > 0) {
         removeItem("First Aid Kit", 1);
@@ -1079,6 +1092,7 @@
         alert("You don't have any First Aid Kits to use.");
       }
     }
+
     function loginUser() {
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
@@ -1127,6 +1141,7 @@
         document.getElementById('characterCreation').style.display = 'none';
       }
     });
+
     function sanitizePlayerName(name) {
       return name.replace(/[\/\\]/g, '_');
     }
@@ -1252,6 +1267,9 @@
               statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
               statusHTML += `<button onclick="enableEdit()">Edit Biodata</button>`;
               statusHTML += inventoryHTML;
+              if (harvestInventory["First Aid Kit"] && harvestInventory["First Aid Kit"] > 0) {
+                statusHTML += `<button onclick="consumeFirstAidKit()">Use First Aid Kit</button>`;
+              }
             } else {
               statusHTML += `<h3>Edit Character</h3>`;
               statusHTML += `<div><strong>Core Stats</strong><br>`;
@@ -1317,70 +1335,9 @@
         });
     }
 
-    // Recipe Book Functions (now used in the Community Kitchen panel)
-    function renderRecipes() {
-      const container = document.getElementById('recipeContainer');
-      container.innerHTML = "";
-      recipes.forEach((recipe, index) => {
-        let recipeDiv = document.createElement('div');
-        recipeDiv.className = "recipe";
-        let ingredientList = "";
-        for (let ingredient in recipe.ingredients) {
-          ingredientList += `${ingredient}: ${recipe.ingredients[ingredient]}<br>`;
-        }
-        let benefitsText = "";
-        for (let stat in recipe.benefits) {
-          benefitsText += `+${recipe.benefits[stat]} ${stat}<br>`;
-        }
-        let consText = "";
-        for (let stat in recipe.cons) {
-          consText += `${recipe.cons[stat] >= 0 ? "+" : ""}${recipe.cons[stat]} ${stat}<br>`;
-        }
-        recipeDiv.innerHTML = `
-          <h4>${recipe.name}</h4>
-          <p><strong>Ingredients Required:</strong><br>${ingredientList}</p>
-          <p><strong>Benefits:</strong><br>${benefitsText}</p>
-          <p><strong>Cons:</strong><br>${consText}</p>
-          <button id="createBtn${index}" onclick="createRecipe(${index})">Create ${recipe.name}</button>
-        `;
-        container.appendChild(recipeDiv);
-      });
-    }
-    function createRecipe(index) {
-      const recipe = recipes[index];
-      // Check if all required ingredients are available
-      for (let ingredient in recipe.ingredients) {
-        if (!harvestInventory[ingredient] || harvestInventory[ingredient] < recipe.ingredients[ingredient]) {
-          alert(`You are missing enough ${ingredient} to make ${recipe.name}.`);
-          return;
-        }
-      }
-      // Deduct the ingredients
-      for (let ingredient in recipe.ingredients) {
-        removeItem(ingredient, recipe.ingredients[ingredient]);
-      }
-      // Disable the button
-      const btn = document.getElementById(`createBtn${index}`);
-      btn.disabled = true;
-      btn.textContent = "Creating... (1 min wait)";
-      // Wait one minute then apply effects
-      setTimeout(() => {
-        if (recipe.benefits.health) updateHealth(recipe.benefits.health);
-        if (recipe.benefits.mood) updateMood(recipe.benefits.mood);
-        if (recipe.benefits.hunger) updateHunger(recipe.benefits.hunger);
-        if (recipe.benefits.reputation) updateReputation(recipe.benefits.reputation);
-        if (recipe.cons.health) updateHealth(recipe.cons.health);
-        if (recipe.cons.mood) updateMood(recipe.cons.mood);
-        if (recipe.cons.hunger) updateHunger(recipe.cons.hunger);
-        if (recipe.cons.reputation) updateReputation(recipe.cons.reputation);
-        alert(`${recipe.name} has been created and its effects applied!`);
-        btn.disabled = false;
-        btn.textContent = `Create ${recipe.name}`;
-        updatePlayerStatus();
-      }, 60000);
-    }
-
-    // Community Kitchen Chat Functions
+    // ----------------------------
+    // Community Kitchen Chat & Cooking Functions
+    // ----------------------------
     function sendKitchenChat() {
       const msg = document.getElementById('kitchenChatInput').value;
       if (msg.trim() !== "") {
@@ -1411,8 +1368,58 @@
           chatLog.scrollTop = chatLog.scrollHeight;
         });
     }
+    function openRecipePanel() {
+      const container = document.getElementById('recipeListContainer');
+      container.innerHTML = "";
+      recipes.forEach((r, index) => {
+        const div = document.createElement('div');
+        div.style.borderBottom = "1px solid #555";
+        div.style.padding = "5px 0";
+        div.innerHTML = `<strong>${index+1}: ${r.title}</strong><br>
+                         ${r.description}<br>
+                         <em>Ingredients:</em> ${r.ingredients.map(i => `${i.name} (${i.amount})`).join(", ")}<br>
+                         <em>Water:</em> ${r.water}<br>
+                         <em>Benefits:</em> ${r.benefits} &nbsp;&nbsp; <em>Setbacks:</em> ${r.setbacks}<br>
+                         <button onclick="cookRecipe(recipes[${index}])">Cook</button>`;
+        container.appendChild(div);
+      });
+      document.getElementById('recipePanel').style.display = 'block';
+      document.getElementById('kitchen-panel').style.display = 'none';
+    }
+    function cookRecipe(recipe) {
+      document.getElementById('recipePanel').style.display = 'none';
+      let missingIngredients = [];
+      recipe.ingredients.forEach(ing => {
+        if (!harvestInventory[ing.name] || harvestInventory[ing.name] < ing.amount) {
+          missingIngredients.push(`${ing.name} (need ${ing.amount}, have ${harvestInventory[ing.name] || 0})`);
+        }
+      });
+      if (missingIngredients.length > 0) {
+        alert("Cannot cook recipe. Missing ingredients:\n" + missingIngredients.join("\n"));
+        openRecipePanel();
+        return;
+      }
+      recipe.ingredients.forEach(ing => {
+        removeItem(ing.name, ing.amount);
+      });
+      document.getElementById("stoveStatus").textContent = "Stove: In Use";
+      document.getElementById("cookingProcess").style.display = "block";
+      setTimeout(() => {
+        document.getElementById("cookingProcess").style.display = "none";
+        document.getElementById("stoveStatus").textContent = "Stove: Available";
+        alert("Cooking complete! You made: " + recipe.title);
+        addItem("Cooked: " + recipe.title, 1);
+        applyRecipeBenefits(recipe);
+      }, 60000);
+    }
+    function applyRecipeBenefits(recipe) {
+      updateHunger(-recipe.hungerReduction);
+      updateMood(recipe.moodIncrease);
+    }
 
-    // Water Supplies Chat Functions
+    // ----------------------------
+    // Water Supplies Chat & Washing Machine Functions
+    // ----------------------------
     function sendLaundryChat() {
       const msg = document.getElementById('laundryChatInput').value;
       if (msg.trim() !== "") {
@@ -1448,9 +1455,12 @@
       updateMood(3);
     }
 
+    // ----------------------------
     // Room Interaction & Chat Functions
+    // ----------------------------
     function openRoomInteraction(roomName) {
       currentRoom = roomName;
+      // If the player enters Room 5, start the spelunking minigame
       if (roomName === "Room 5") {
         initSpelunkingGame();
         return;
@@ -1479,6 +1489,7 @@
       document.getElementById('chatPanel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
       listenForMessages(roomName);
+      // Add the Rest button for the room owner
       document.getElementById('restContainer').innerHTML = '<button onclick="restInRoom()" id="restButton">Rest (Recover Health)</button>';
     }
     function openDoorChat(roomName) {
@@ -1487,6 +1498,7 @@
       document.getElementById('chatLog').innerHTML = "";
       document.getElementById('chatPanel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
+      // Remove the rest button when not the owner
       document.getElementById('restContainer').innerHTML = '';
       listenForMessages(roomName);
     }
@@ -1542,7 +1554,10 @@
         });
       }
     });
+
+    // ----------------------------
     // Door Modal Functions
+    // ----------------------------
     function showDoorModal(roomName) {
       currentRoom = roomName;
       document.getElementById('doorTitle').textContent = "You are at the door of " + roomName;
@@ -1586,13 +1601,17 @@
       closeDoorModal();
       openDoorChat(currentRoom);
     }
+
+    // ----------------------------
     // New Power Panel Simulation Functions & Controls
+    // ----------------------------
     let windSpeed = localStorage.getItem('windSpeed') || 50;
     let electricalOutput = false;
     let lastInteractionTime = localStorage.getItem('lastInteractionTime') || Date.now();
     let garbageLevel = localStorage.getItem('garbageLevel') || 0;
     let lastGarbageUpdate = localStorage.getItem('lastGarbageUpdate') || Date.now();
     let powerStatus = "Unknown";
+
     function updateWindSpeed() {
       windSpeed = document.getElementById('windSpeedSlider').value;
       document.getElementById('windSpeedValue').textContent = windSpeed;
@@ -1601,24 +1620,28 @@
       updateLastInteraction();
       updateElectricalStatus();
     }
+
     function toggleElectricalOutput() {
       electricalOutput = !electricalOutput;
       document.getElementById('outputLeverButton').textContent = electricalOutput ? "Output On" : "Output Off";
       updateLastInteraction();
       updateElectricalStatus();
     }
+
     function checkWaterPressure() {
       const pressure = Math.floor(Math.random() * 41) + 80;
       alert("Current Water Pressure: " + pressure + " PSI.\nOptimal is above 90 PSI.");
       updateLastInteraction();
       updateElectricalStatus();
     }
+
     function checkHeaterLevel() {
       const heater = Math.floor(Math.random() * 41) + 80;
       alert("Current Heater Level: " + heater + ".\nOptimal is above 90.");
       updateLastInteraction();
       updateElectricalStatus();
     }
+
     function updateElectricalStatus() {
       if (windSpeed >= 40 && windSpeed <= 70 && electricalOutput) {
         powerStatus = "On";
@@ -1629,6 +1652,7 @@
       }
       document.getElementById('powerStatusDisplay').textContent = powerStatus;
     }
+
     function updateVoltage() {
       let factor = electricalOutput ? 1.0 : 0.5;
       let voltage = Math.round(windSpeed * factor + (Math.random() * 10 - 5));
@@ -1639,6 +1663,7 @@
       }
       localStorage.setItem('voltage', voltage);
     }
+
     function simulatePowerEvent() {
       if (Date.now() - lastInteractionTime > 60000) {
         const malfunctionType = Math.floor(Math.random() * 5);
@@ -1678,6 +1703,7 @@
         updateLastInteraction();
       }
     }
+
     function updateGarbageDisplay() {
       document.getElementById('garbageDisplay').textContent = garbageLevel;
       const now = Date.now();
@@ -1688,29 +1714,29 @@
         localStorage.setItem('garbageLevel', garbageLevel);
         localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
         document.getElementById('garbageDisplay').textContent = garbageLevel;
-        const logDiv = document.getElementById('garbageLog');
-        const timestamp = new Date().toLocaleTimeString();
-        const logMessage = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>`;
-        logDiv.innerHTML = logMessage + logDiv.innerHTML;
         if (garbageLevel > 80) {
           alert("High garbage levels detected! The community is getting sick.");
         }
       }
     }
+
     function logPowerMessage(message) {
       const logDiv = document.getElementById('minigameLog');
       const timestamp = new Date().toLocaleTimeString();
       logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
       logDiv.scrollTop = logDiv.scrollHeight;
     }
+
     function toggleInstructions() {
       const instrDiv = document.getElementById("instructions");
       instrDiv.style.display = (instrDiv.style.display === "none" || instrDiv.style.display === "") ? "block" : "none";
     }
+
     function updateLastInteraction() {
       lastInteractionTime = Date.now();
       localStorage.setItem('lastInteractionTime', lastInteractionTime);
     }
+
     function simulateHealthDecline() {
       if (garbageLevel > 80) {
         const playerEmail = localStorage.getItem('playerName');
@@ -1734,12 +1760,16 @@
         });
       }
     }
+
     function playerDied() {
       alert("Your health has reached zero. You have died.");
       clearGameState();
       window.location.href = "index.html";
     }
+
+    // ----------------------------
     // New Functionality: Rest in Room to Recover Health
+    // ----------------------------
     function restInRoom() {
       let restButton = document.getElementById("restButton");
       if (!restButton) return;
@@ -1748,9 +1778,10 @@
       const playerName = localStorage.getItem('playerName');
       if (!playerName) return;
       const safePlayerName = sanitizePlayerName(playerName);
-      let iterations = 12;
+      let iterations = 12; // 12 iterations of 5 seconds = 60 seconds
       let interval = setInterval(() => {
         iterations--;
+        // Update player's health: increase by 2 points (max health is 100)
         db.collection('players').doc(safePlayerName).get().then(doc => {
           if (doc.exists) {
             let currentHealth = doc.data().health || 100;
@@ -1766,6 +1797,7 @@
         }
       }, 5000);
     }
+
     function toggleMusicPlayer() {
       var player = document.getElementById("bgMusic");
       if (player.style.display === "none" || player.style.display === "" || player.style.width === "0px") {
@@ -1782,6 +1814,7 @@
         player.style.left = "-9999px";
       }
     }
+
     function updateEnvironmentStatus() {
       const envDiv = document.getElementById('envStatus');
       const currentWind = windSpeed;
@@ -1793,20 +1826,31 @@
       const currentGarbage = garbageLevel;
       envDiv.innerHTML = `Wind Speed: ${currentWind} | Voltage: ${voltage}V | Water Pressure: ${waterPressure} PSI | Garbage Level: ${currentGarbage}/100`;
     }
+
+    // ----------------------------
     // New Spelunking Minigame Functions
+    // ----------------------------
     function initSpelunkingGame() {
+      // Hide main game and show spelunking container
       document.getElementById('mainGame').style.display = 'none';
       document.getElementById('spelunkingGame').style.display = 'block';
+
       const canvas = document.getElementById('spelunkingCanvas');
       const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+
+      // Initialize game state for spelunking
       const gameState = {
         player: { x: canvas.width / 2, y: canvas.height - 60, width: 30, height: 30, speed: 4 },
         cave: generateCaveLayout(canvas.width, canvas.height),
-        enemies: []
+        enemies: [] // Can add enemy objects later
       };
+
+      // Set up keyboard controls for the spelunking game
       setupSpelunkingControls(gameState);
+
+      // Start the game loop
       function gameLoop() {
         updateGameState(gameState);
         renderGame(ctx, gameState);
@@ -1814,6 +1858,7 @@
       }
       gameLoop();
     }
+
     function generateCaveLayout(width, height) {
       const rows = 20;
       const cols = 20;
@@ -1823,28 +1868,36 @@
       for (let i = 0; i < rows; i++) {
         cave[i] = [];
         for (let j = 0; j < cols; j++) {
+          // 0: open space, 1: wall; adjust probability as needed for jagged cave walls.
           cave[i][j] = Math.random() < 0.2 ? 1 : 0;
         }
       }
       return { grid: cave, rows, cols, cellWidth, cellHeight };
     }
+
     function updateGameState(gameState) {
-      // Player movement is handled by keyboard events
+      // You can add collision detection and enemy updates here
+      // Currently, the player movement is handled by keyboard events
     }
+
     function renderGame(ctx, gameState) {
+      // Clear the canvas
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      // Draw cave layout
       const cave = gameState.cave;
       for (let i = 0; i < cave.rows; i++) {
         for (let j = 0; j < cave.cols; j++) {
           if (cave.grid[i][j] === 1) {
-            ctx.fillStyle = '#222';
+            ctx.fillStyle = '#222'; // Wall color
             ctx.fillRect(j * cave.cellWidth, i * cave.cellHeight, cave.cellWidth, cave.cellHeight);
           }
         }
       }
+      // Draw player as a rectangle
       ctx.fillStyle = '#FFD700';
       ctx.fillRect(gameState.player.x, gameState.player.y, gameState.player.width, gameState.player.height);
     }
+
     function setupSpelunkingControls(gameState) {
       document.addEventListener('keydown', function(e) {
         switch(e.key) {
@@ -1863,30 +1916,16 @@
         }
       });
     }
+
     function exitSpelunkingGame() {
       document.getElementById('spelunkingGame').style.display = 'none';
       document.getElementById('mainGame').style.display = 'block';
     }
+
+    // ----------------------------
     // End of Spelunking Functions
-    // Tab functions for Community Kitchen Panel
-    function openKitchenTab(evt, tabName) {
-      const tabcontents = document.getElementsByClassName("tab-content");
-      for (let i = 0; i < tabcontents.length; i++) {
-        tabcontents[i].classList.remove("active");
-      }
-      const tabbuttons = document.getElementsByClassName("tab-button");
-      for (let i = 0; i < tabbuttons.length; i++) {
-        tabbuttons[i].classList.remove("active");
-      }
-      document.getElementById(tabName).classList.add("active");
-      if (evt) {
-        evt.currentTarget.classList.add("active");
-      }
-      // If the cookbook tab is selected, render recipes
-      if (tabName === 'cookbookTab') {
-        renderRecipes();
-      }
-    }
+    // ----------------------------
+
     window.onload = function() {
       var roomSelect = document.getElementById('roomNumber');
       if (roomSelect) {
@@ -1930,6 +1969,7 @@
       listenForKitchenChat();
       listenForLaundryChat();
     };
+
     function renderGardenSlots() {
       const container = document.getElementById('plantSlots');
       container.innerHTML = "";
@@ -1949,6 +1989,7 @@
         container.appendChild(slotDiv);
       });
     }
+
     function openPlantSelectionModal(slotNumber) {
       const seedType = prompt("Enter the seed type to plant (choose one of the following seeds:\n" +
         seedTypes.join(", ") +
@@ -1969,6 +2010,7 @@
       };
       renderGardenSlots();
     }
+
     function waterPlant(slotNumber) {
       if (waterInventory < 1) {
         alert("No water available. Please collect water from the Water Supplies panel.");
@@ -1987,7 +2029,10 @@
         renderGardenSlots();
       }, 300000);
     }
+
+    // Updated generateGroceryItems() with grouped categories
     function generateGroceryItems() {
+      // Populate Seeds container
       let seedContainer = document.getElementById("seedList");
       seedContainer.innerHTML = "";
       seedTypes.forEach(seed => {
@@ -1997,6 +2042,7 @@
                          <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
         seedContainer.appendChild(div);
       });
+      // Populate Mushrooms container
       let mushroomContainer = document.getElementById("mushroomList");
       mushroomContainer.innerHTML = "";
       mushroomTypes.forEach(mushroom => {
@@ -2006,28 +2052,7 @@
                          <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
         mushroomContainer.appendChild(div);
       });
-      let bakingContainer = document.getElementById("bakingContainer");
-      if (!bakingContainer) {
-        bakingContainer = document.createElement("div");
-        bakingContainer.id = "bakingContainer";
-        bakingContainer.innerHTML = `<h4>Baking Supplies</h4>`;
-        document.getElementById("grocery-panel").appendChild(bakingContainer);
-      } else {
-        bakingContainer.innerHTML = `<h4>Baking Supplies</h4>`;
-      }
-      let supplies = ["Flour", "Sugar", "Egg", "Butter"];
-      supplies.forEach(item => {
-        let div = document.createElement("div");
-        div.className = "grocery-item";
-        let price = (item === "Egg") ? 1 : (item === "Sugar") ? 2 : (item === "Flour") ? 3 : 4;
-        let description = (item === "Flour") ? "Basic baking ingredient." :
-                          (item === "Sugar") ? "Sweetens your recipes." :
-                          (item === "Egg") ? "Provides protein for your baked goods." :
-                          "Adds richness to recipes.";
-        div.innerHTML = `<p><strong>${item}</strong> - $${price}<br><em>${description}</em></p>
-                         <button onclick="buyItem('${item}')">Buy ${item}</button>`;
-        bakingContainer.appendChild(div);
-      });
+      // Populate Health Items container
       let healthContainer = document.getElementById("healthItemList");
       if (!healthContainer) {
         healthContainer = document.createElement("div");
@@ -2043,6 +2068,7 @@
                        <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>`;
       healthContainer.appendChild(div);
     }
+
     function sellHarvest() {
       const checkboxes = document.querySelectorAll('.sell-checkbox:checked');
       if (checkboxes.length === 0) {
@@ -2068,6 +2094,7 @@
       updateSellInventory();
       updatePlayerStatus();
     }
+
     function toggleBuySell(mode) {
       if (mode === 'buy') {
         document.getElementById('buySection').style.display = 'grid';
@@ -2078,6 +2105,7 @@
         updateSellInventory();
       }
     }
+
     function updateSellInventory() {
       const sellDiv = document.getElementById('sellInventory');
       sellDiv.innerHTML = "";
@@ -2099,6 +2127,7 @@
         sellDiv.innerHTML = "<p>You have no items to sell.</p>";
       }
     }
+
     function openTab(evt, tabName) {
       var i, tabcontent, tabbuttons;
       tabcontent = document.getElementsByClassName("tab-content");
