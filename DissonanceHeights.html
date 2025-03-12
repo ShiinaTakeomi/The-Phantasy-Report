@@ -35,7 +35,7 @@
       font-family: 'Russo One', sans-serif;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     }
-    .container, .panel, #characterCreation, .modal, #loginPanel {
+    .container, .panel, #characterCreation, .modal {
       background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');
       background-color: rgba(0, 0, 0, 0.6);
     }
@@ -112,6 +112,8 @@
       padding: 5px;
       border-radius: 4px;
     }
+    /* Removed Exit (Sign Off) button per requirements */
+    /*
     .exit-button {
       position: absolute;
       left: 0;
@@ -127,6 +129,7 @@
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
       z-index: 1001;
     }
+    */
     .power-room {
       position: absolute;
       top: 210px;
@@ -155,14 +158,14 @@
       border-radius: 4px;
       color: #222;
     }
-    /* Character Creation Section */
+    /* Character Creation Section – REMOVED authentication parts per requirements */
     #characterCreation {
       margin: 20px auto;
       max-width: 300px;
       border: 2px solid #444;
       padding: 10px;
       font-size: 14px;
-      display: none;
+      display: none; /* You can choose to hide or remove this block if no auth is needed */
       color: #fff;
       border-radius: 8px;
       background: rgba(0,0,0,0.7);
@@ -250,7 +253,7 @@
       border-radius: 4px;
       background: rgba(255,255,255,0.1);
     }
-    /* Garden Slots */
+    /* Garden Slots – (Now using two separate sections below) */
     #garden-panel .slot {
       margin: 10px 0;
       padding: 5px;
@@ -262,18 +265,7 @@
       padding: 3px 6px;
       font-size: 12px;
     }
-    /* New panel for Login */
-    #loginPanel {
-      margin: 20px auto;
-      max-width: 300px;
-      border: 2px solid #444;
-      padding: 10px;
-      font-size: 14px;
-      color: #fff;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-      display: none;
-    }
+    /* Removed Login Panel entirely (authentication removed) */
     /* In-App Notification Panel */
     #notificationPanel {
       position: fixed;
@@ -326,7 +318,7 @@
     .tab-content.active {
       display: block;
     }
-    /* Baking Supplies, Recipe Book styling reused from Grocery Stand */
+    /* Grocery Stand Styles */
     .grocery-items-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -402,6 +394,17 @@
       cursor: pointer;
       z-index: 1200;
     }
+    /* --- New: Recipe Book Cooking Indicator --- */
+    /* Add a div for indicating cooking progress inside the cookbook tab */
+    #cookingProcess {
+      display: none;
+      background: #222;
+      color: #fff;
+      padding: 10px;
+      margin-top: 10px;
+      text-align: center;
+      border-radius: 4px;
+    }
   </style>
   <!-- Firebase SDKs: Auth, Firestore, and Storage -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
@@ -417,16 +420,9 @@
     <div style="text-align:center; margin-top:10px;">
       <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
     </div>
-    <!-- Login Panel -->
-    <div id="loginPanel">
-      <h3>Login / Register</h3>
-      <input type="email" id="loginEmail" placeholder="Email" required>
-      <input type="password" id="loginPassword" placeholder="Password" required>
-      <button onclick="loginUser()">Login</button>
-      <button onclick="registerUser()">Register</button>
-      <button onclick="googleSignIn()">Sign in with Google</button>
-    </div>
-    <!-- Character Creation Section -->
+    <!-- Removed Login Panel (authentication removed) -->
+    
+    <!-- Character Creation Section (optional; you may auto-assign a default guest name) -->
     <div id="characterCreation">
       <h3>Create Your Character</h3>
       <p>Welcome, <span id="displayName"></span>!</p>
@@ -460,7 +456,7 @@
       <div id="main-screen">
         <div class="container">
           <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
-          <button class="exit-button" onclick="signOutUser()">Exit</button>
+          <!-- Removed Exit (Sign Off) Button -->
           <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
           <div class="grid">
             <!-- Room buttons generated dynamically -->
@@ -621,10 +617,10 @@
         </div>
         <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
       </div>
-      <!-- Community Garden Panel -->
+      <!-- Community Garden Panel (Updated Layout) -->
       <div id="garden-panel" class="panel">
         <h2>Community Garden</h2>
-        <p>Manage your rooftop garden. Plants (seeds or mushrooms) need water to mature. They require 5 minutes and sufficient water to grow.</p>
+        <p>Manage your rooftop garden. Plant your essential seeds in <strong>Soil</strong> slots and mushrooms in <strong>Tree Stump</strong> slots. Each plant takes 5 minutes to mature and needs water to grow.</p>
         <div id="plantSlots"></div>
         <button onclick="harvestProduce()">Harvest Produce</button>
         <button onclick="hidePanel('garden-panel')">Return to Main Menu</button>
@@ -643,13 +639,15 @@
         </div>
         <div id="cookbookTab" class="tab-content">
           <div id="recipeContainer"></div>
+          <!-- Added Cooking Process Indicator -->
+          <div id="cookingProcess">Cooking in progress... Please wait 1 minute.</div>
         </div>
         <button onclick="hidePanel('kitchen-panel')">Return to Main Menu</button>
       </div>
-      <!-- Water Supplies Panel -->
+      <!-- Water Supplies Panel (Chat area height increased) -->
       <div id="water-panel" class="panel">
         <h2>Water Supplies (Laundry)</h2>
-        <p>Water pressure is directly linked to the performance of the power panel and the environmental efficiency (affected by garbage levels). Use the washing machine to clean clothes – remember, low power output or high garbage may result in lower water pressure.</p>
+        <p>Water pressure is directly linked to the performance of the power panel and environmental efficiency (affected by garbage levels). Use the washing machine to clean clothes – remember, low power output or high garbage may result in lower water pressure.</p>
         <div>
           <p>
             <strong>Water Pressure:</strong> 
@@ -664,7 +662,8 @@
         <div>
           <h4>Washing Machine</h4>
           <button onclick="washClothes()">Wash Clothes</button>
-          <div class="chatArea" id="laundryChatLog"></div>
+          <!-- Increased chat area height for Water Supplies -->
+          <div class="chatArea" id="laundryChatLog" style="height:300px;"></div>
           <input type="text" id="laundryChatInput" placeholder="Type a message...">
           <button onclick="sendLaundryChat()">Send</button>
         </div>
@@ -702,7 +701,7 @@
   <script>
     // Store original background settings (main menu background)
     const originalBackground = "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed";
-
+    
     // Firebase Initialization & Config
     const firebaseConfig = {
       apiKey: "AIzaSyD5avvNbSB5L_YtpyxbBYYnvUpjMa0WglE",
@@ -714,7 +713,7 @@
       measurementId: "G-9MS36H0YV4"
     };
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+    // Authentication functions removed per requirement.
     const db = firebase.firestore();
     const storage = firebase.storage();
 
@@ -752,15 +751,22 @@
     let doorChatMode = false;
     let harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
     let waterInventory = parseInt(localStorage.getItem('water')) || 0;
-    // Global gardenSlots for 10 slots
-    let gardenSlots = Array.from({length: 10}, (_, i) => ({
+
+    // --- Community Garden: Use two separate arrays (Soil for seeds, Tree Stump for mushrooms) ---
+    let soilSlots = Array.from({length: 5}, (_, i) => ({
+      slot: i + 1,
+      type: null,
+      watered: false,
+      timer: null
+    }));
+    let stumpSlots = Array.from({length: 5}, (_, i) => ({
       slot: i + 1,
       type: null,
       watered: false,
       timer: null
     }));
 
-    // Updated seedTypes array with only 5 seeds for sale
+    // Seeds and Mushrooms (exactly 5 each)
     const seedTypes = [
       "Sunflower Seed", "Pumpkin Seed", "Corn Seed", "Wheat Seed", "Rice Seed"
     ];
@@ -768,7 +774,7 @@
       "Button Mushroom", "Portobello Mushroom", "Shiitake Mushroom", "Oyster Mushroom", "Enoki Mushroom"
     ];
 
-    // Define recipes for cookies
+    // Cookie Recipes (exactly 4 types)
     const recipes = [
       {
         name: "Vitality Cookie",
@@ -798,9 +804,9 @@
 
     // Helper Functions: Update Mood, Hunger, Health, Reputation
     function updateMood(delta) {
-      const playerEmail = localStorage.getItem('playerName');
-      if (!playerEmail) return;
-      const safePlayerName = sanitizePlayerName(playerEmail);
+      // (Using localStorage "playerName" as default guest name if not provided)
+      let playerName = localStorage.getItem('playerName') || "Guest";
+      const safePlayerName = sanitizePlayerName(playerName);
       db.collection('players').doc(safePlayerName).get().then(doc => {
         if (doc.exists) {
           let currentMood = doc.data().mood || 100;
@@ -810,9 +816,8 @@
       });
     }
     function updateHunger(delta) {
-      const playerEmail = localStorage.getItem('playerName');
-      if (!playerEmail) return;
-      const safePlayerName = sanitizePlayerName(playerEmail);
+      let playerName = localStorage.getItem('playerName') || "Guest";
+      const safePlayerName = sanitizePlayerName(playerName);
       db.collection('players').doc(safePlayerName).get().then(doc => {
         if (doc.exists) {
           let currentHunger = doc.data().hunger || 0;
@@ -822,9 +827,8 @@
       });
     }
     function updateHealth(delta) {
-      const playerEmail = localStorage.getItem('playerName');
-      if (!playerEmail) return;
-      const safePlayerName = sanitizePlayerName(playerEmail);
+      let playerName = localStorage.getItem('playerName') || "Guest";
+      const safePlayerName = sanitizePlayerName(playerName);
       db.collection('players').doc(safePlayerName).get().then(doc => {
         if (doc.exists) {
           let currentHealth = doc.data().health || 100;
@@ -834,9 +838,8 @@
       });
     }
     function updateReputation(delta) {
-      const playerEmail = localStorage.getItem('playerName');
-      if (!playerEmail) return;
-      const safePlayerName = sanitizePlayerName(playerEmail);
+      let playerName = localStorage.getItem('playerName') || "Guest";
+      const safePlayerName = sanitizePlayerName(playerName);
       db.collection('players').doc(safePlayerName).get().then(doc => {
         if (doc.exists) {
           let currentRep = doc.data().reputation || 0;
@@ -848,20 +851,14 @@
 
     // Inventory Functions
     function addItem(item, qty = 1) {
-      if (harvestInventory[item]) {
-        harvestInventory[item] += qty;
-      } else {
-        harvestInventory[item] = qty;
-      }
+      harvestInventory[item] = (harvestInventory[item] || 0) + qty;
       localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
       updateHarvestInventoryUI();
     }
     function removeItem(item, qty = 1) {
       if (harvestInventory[item]) {
         harvestInventory[item] = Math.max(0, harvestInventory[item] - qty);
-        if (harvestInventory[item] === 0) {
-          delete harvestInventory[item];
-        }
+        if (harvestInventory[item] === 0) delete harvestInventory[item];
       }
       localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
       updateHarvestInventoryUI();
@@ -872,16 +869,15 @@
       for (let item in harvestInventory) {
         html += `<p>${item}: ${harvestInventory[item]}</p>`;
       }
-      if (!html) html = "<p>None</p>";
-      invDiv.innerHTML = html;
+      invDiv.innerHTML = html || "<p>None</p>";
     }
 
     // In-App Notification Listener
     function listenForNotifications() {
-      const ownerEmail = localStorage.getItem('playerName');
-      if (!ownerEmail) return;
+      let playerName = localStorage.getItem('playerName') || "Guest";
+      if (!playerName) return;
       db.collection("notifications")
-        .where("owner", "==", ownerEmail)
+        .where("owner", "==", playerName)
         .orderBy("timestamp", "desc")
         .onSnapshot(snapshot => {
           let notifications = "";
@@ -904,29 +900,11 @@
       const keys = ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate', 'harvestInventory', 'water'];
       keys.forEach(key => localStorage.removeItem(key));
     }
-    // Sign Out Function
-    function signOutUser() {
-      firebase.auth().signOut().then(() => {
-        clearGameState();
-        window.location.href = "index.html";
-      }).catch((error) => {
-        console.error("Error signing out: ", error);
-      });
-    }
-    // New Garbage Chute Clear Function
-    function clearGarbage() {
-      garbageLevel = 0;
-      localStorage.setItem('garbageLevel', garbageLevel);
-      document.getElementById('garbageDisplay').textContent = garbageLevel;
-      const logDiv = document.getElementById('garbageLog');
-      const player = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown player";
-      const timestamp = new Date().toLocaleTimeString();
-      const logMessage = `<p>[${timestamp}] ${player} cleared the garbage.</p>`;
-      logDiv.innerHTML = logMessage + logDiv.innerHTML;
-      alert("Garbage has been cleared.");
-    }
 
-    // Panel Toggles and Navigation
+    // Removed Sign In/Sign Out functionality per requirements
+    // (All functions related to login/register/googleSignIn/signOut are removed)
+
+    // Panel Navigation Functions
     function showGarbagePanel() {
       document.getElementById('garbage-panel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
@@ -955,8 +933,7 @@
     function openKitchenPanel() {
       document.getElementById('kitchen-panel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
-      // Activate chat tab by default
-      openKitchenTab(null, 'kitchenChatTab');
+      openKitchenTab(null, 'kitchenChatTab'); // Activate chat tab by default
       listenForKitchenChat();
     }
     function openWaterPanel() {
@@ -973,7 +950,7 @@
     function hidePanel(panelId) {
       document.getElementById(panelId).style.display = 'none';
       document.getElementById('main-screen').style.display = 'block';
-      // Reset background explicitly to the main menu image URL
+      // Reset background to main menu
       document.body.style.backgroundImage = "url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
       document.body.style.backgroundRepeat = "no-repeat";
       document.body.style.backgroundAttachment = "fixed";
@@ -1032,8 +1009,7 @@
     function consumeFirstAidKit() {
       if (harvestInventory["First Aid Kit"] && harvestInventory["First Aid Kit"] > 0) {
         removeItem("First Aid Kit", 1);
-        const playerName = localStorage.getItem('playerName');
-        if (!playerName) return;
+        let playerName = localStorage.getItem('playerName') || "Guest";
         const safePlayerName = sanitizePlayerName(playerName);
         db.collection('players').doc(safePlayerName).get().then(doc => {
           if (doc.exists) {
@@ -1047,59 +1023,18 @@
         alert("You don't have any First Aid Kits to use.");
       }
     }
-    function loginUser() {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-          document.getElementById('loginPanel').style.display = 'none';
-          checkCharacterExistence();
-        })
-        .catch(error => {
-          alert("Login error: " + error.message);
-        });
+
+    // Since authentication is removed, we assign a default guest name if none exists.
+    if (!localStorage.getItem('playerName')) {
+      localStorage.setItem('playerName', 'Guest');
     }
-    function registerUser() {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(() => {
-          document.getElementById('loginPanel').style.display = 'none';
-          checkCharacterExistence();
-        })
-        .catch(error => {
-          alert("Registration error: " + error.message);
-        });
-    }
-    function googleSignIn() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      firebase.auth().signInWithPopup(provider)
-        .then(result => {
-          document.getElementById('loginPanel').style.display = 'none';
-          checkCharacterExistence();
-        })
-        .catch(error => {
-          alert("Google sign-in error: " + error.message);
-        });
-    }
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        if (!localStorage.getItem('playerName')) {
-          localStorage.setItem('playerName', user.email);
-        }
-        checkCharacterExistence();
-        listenForNotifications();
-      } else {
-        document.getElementById('loginPanel').style.display = 'block';
-        document.getElementById('mainGame').style.display = 'none';
-        document.getElementById('characterCreation').style.display = 'none';
-      }
-    });
+    
+    // For character creation, if you still want it, you can use it to set extra data.
     function sanitizePlayerName(name) {
       return name.replace(/[\/\\]/g, '_');
     }
     function checkCharacterExistence() {
-      const playerName = localStorage.getItem('playerName');
+      let playerName = localStorage.getItem('playerName');
       if (!playerName) return;
       const safePlayerName = sanitizePlayerName(playerName);
       db.collection('players').doc(safePlayerName).get().then((doc) => {
@@ -1118,7 +1053,7 @@
       });
     }
     function createCharacter() {
-      const playerName = localStorage.getItem('playerName');
+      let playerName = localStorage.getItem('playerName');
       if (!playerName) return;
       const safePlayerName = sanitizePlayerName(playerName);
       const charName = document.getElementById('charName').value;
@@ -1161,9 +1096,7 @@
           document.getElementById('characterCreation').style.display = 'none';
           document.getElementById('mainGame').style.display = 'block';
           updatePlayerStatus();
-          db.collection('rooms').doc('Room ' + roomNumber).set({
-            owner: playerName
-          }, { merge: true });
+          db.collection('rooms').doc('Room ' + roomNumber).set({ owner: playerName }, { merge: true });
         })
         .catch((error) => {
           console.error("Error creating character:", error);
@@ -1183,7 +1116,7 @@
       biodataDiv.style.display = (biodataDiv.style.display === "none" || biodataDiv.style.display === "") ? "block" : "none";
     }
     function updatePlayerStatus() {
-      const playerName = localStorage.getItem('playerName');
+      let playerName = localStorage.getItem('playerName');
       if (!playerName) return;
       const safePlayerName = sanitizePlayerName(playerName);
       db.collection('players').doc(safePlayerName)
@@ -1261,7 +1194,7 @@
       }
     }
     function saveBiodata() {
-      const playerName = localStorage.getItem('playerName');
+      let playerName = localStorage.getItem('playerName');
       if (!playerName) return;
       const safePlayerName = sanitizePlayerName(playerName);
       const updatedData = {
@@ -1276,10 +1209,7 @@
         lastUpdated: Date.now()
       };
       db.collection('players').doc(safePlayerName).set(updatedData, { merge: true })
-        .then(() => {
-          isEditing = false;
-          updatePlayerStatus();
-        })
+        .then(() => { isEditing = false; updatePlayerStatus(); })
         .catch(error => {
           console.error("Error saving biodata:", error);
         });
@@ -1317,22 +1247,20 @@
     }
     function createRecipe(index) {
       const recipe = recipes[index];
-      // Check if all required ingredients are available
       for (let ingredient in recipe.ingredients) {
         if (!harvestInventory[ingredient] || harvestInventory[ingredient] < recipe.ingredients[ingredient]) {
           alert(`You are missing enough ${ingredient} to make ${recipe.name}.`);
           return;
         }
       }
-      // Deduct the ingredients
       for (let ingredient in recipe.ingredients) {
         removeItem(ingredient, recipe.ingredients[ingredient]);
       }
-      // Disable the button
+      // Show cooking process indicator (in the cookbook tab)
+      document.getElementById("cookingProcess").style.display = "block";
       const btn = document.getElementById(`createBtn${index}`);
       btn.disabled = true;
       btn.textContent = "Creating... (1 min wait)";
-      // Wait one minute then apply effects
       setTimeout(() => {
         if (recipe.benefits.health) updateHealth(recipe.benefits.health);
         if (recipe.benefits.mood) updateMood(recipe.benefits.mood);
@@ -1345,6 +1273,7 @@
         alert(`${recipe.name} has been created and its effects applied!`);
         btn.disabled = false;
         btn.textContent = `Create ${recipe.name}`;
+        document.getElementById("cookingProcess").style.display = "none";
         updatePlayerStatus();
       }, 60000);
     }
@@ -1355,7 +1284,7 @@
       if (msg.trim() !== "") {
         db.collection("messages").add({
           room: "Community Kitchen",
-          sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown",
+          sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Guest",
           content: msg,
           chatType: "kitchen",
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -1381,13 +1310,13 @@
         });
     }
 
-    // Water Supplies Chat Functions
+    // Water Supplies Chat Functions (chat area height increased)
     function sendLaundryChat() {
       const msg = document.getElementById('laundryChatInput').value;
       if (msg.trim() !== "") {
         db.collection("messages").add({
           room: "Water Supplies",
-          sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown",
+          sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Guest",
           content: msg,
           chatType: "laundry",
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -1427,7 +1356,7 @@
       db.collection("rooms").doc(roomName).get().then(doc => {
         if (doc.exists) {
           const roomData = doc.data();
-          const currentPlayer = localStorage.getItem("playerName");
+          const currentPlayer = localStorage.getItem("playerName") || "Guest";
           if (currentPlayer === roomData.owner) {
             openRoomChat(roomName);
           } else {
@@ -1448,7 +1377,7 @@
       document.getElementById('chatPanel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
       listenForMessages(roomName);
-      document.getElementById('restContainer').innerHTML = `<button onclick="restInRoom()" id="restButton">Rest (Recover Health)</button>`;
+      document.getElementById('restContainer').innerHTML = '<button onclick="restInRoom()" id="restButton">Rest (Recover Health)</button>';
     }
     function openDoorChat(roomName) {
       doorChatMode = true;
@@ -1485,7 +1414,7 @@
     async function sendChatMessage() {
       const msg = document.getElementById('chatInput').value;
       if (msg.trim() !== "") {
-        const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
+        const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Guest";
         try {
           await db.collection("messages").add({
             room: currentRoom,
@@ -1500,6 +1429,17 @@
         }
       }
     }
+    document.addEventListener('DOMContentLoaded', function() {
+      const chatInput = document.getElementById('chatInput');
+      if (chatInput) {
+        chatInput.addEventListener('keydown', function(event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            sendChatMessage();
+          }
+        });
+      }
+    });
 
     // Door Modal Functions
     function showDoorModal(roomName) {
@@ -1531,7 +1471,7 @@
       db.collection("rooms").doc(currentRoom).get().then(doc => {
         if (doc.exists) {
           const owner = doc.data().owner;
-          const visitor = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "A visitor";
+          const visitor = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Guest";
           db.collection("notifications").add({
             owner: owner,
             room: currentRoom,
@@ -1546,7 +1486,7 @@
       openDoorChat(currentRoom);
     }
 
-    // New Power Panel Simulation Functions & Controls
+    // Power Panel Functions
     let windSpeed = localStorage.getItem('windSpeed') || 50;
     let electricalOutput = false;
     let lastInteractionTime = localStorage.getItem('lastInteractionTime') || Date.now();
@@ -1621,20 +1561,18 @@
             break;
         }
         alert("Malfunction Detected!\n" + malfunctionMessage);
-        const playerEmail = localStorage.getItem('playerName');
-        if (playerEmail) {
-          const safePlayerName = sanitizePlayerName(playerEmail);
-          db.collection('players').doc(safePlayerName).get().then(doc => {
-            if (doc.exists) {
-              let currentHealth = doc.data().health || 100;
-              let newHealth = Math.max(0, currentHealth - 5);
-              db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
-              if (newHealth === 0) {
-                playerDied();
-              }
+        let playerEmail = localStorage.getItem('playerName') || "Guest";
+        const safePlayerName = sanitizePlayerName(playerEmail);
+        db.collection('players').doc(safePlayerName).get().then(doc => {
+          if (doc.exists) {
+            let currentHealth = doc.data().health || 100;
+            let newHealth = Math.max(0, currentHealth - 5);
+            db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+            if (newHealth === 0) {
+              playerDied();
             }
-          });
-        }
+          }
+        });
         updateLastInteraction();
       }
     }
@@ -1673,8 +1611,7 @@
     }
     function simulateHealthDecline() {
       if (garbageLevel > 80) {
-        const playerEmail = localStorage.getItem('playerName');
-        if (!playerEmail) return;
+        let playerEmail = localStorage.getItem('playerName') || "Guest";
         const safePlayerName = sanitizePlayerName(playerEmail);
         db.collection('players').doc(safePlayerName).get().then((doc) => {
           if (doc.exists) {
@@ -1699,14 +1636,14 @@
       clearGameState();
       window.location.href = "index.html";
     }
-    // New Functionality: Rest in Room to Recover Health
+
+    // Rest Functionality: 1 minute total (using 12 iterations of 5 seconds)
     function restInRoom() {
       let restButton = document.getElementById("restButton");
       if (!restButton) return;
       restButton.disabled = true;
       restButton.textContent = "Resting...";
-      const playerName = localStorage.getItem('playerName');
-      if (!playerName) return;
+      let playerName = localStorage.getItem('playerName') || "Guest";
       const safePlayerName = sanitizePlayerName(playerName);
       let iterations = 12;
       let interval = setInterval(() => {
@@ -1726,6 +1663,8 @@
         }
       }, 5000);
     }
+
+    // Music Player Toggle
     function toggleMusicPlayer() {
       var player = document.getElementById("bgMusic");
       if (player.style.display === "none" || player.style.display === "" || player.style.width === "0px") {
@@ -1742,6 +1681,8 @@
         player.style.left = "-9999px";
       }
     }
+
+    // Environment Status
     function updateEnvironmentStatus() {
       const envDiv = document.getElementById('envStatus');
       const currentWind = windSpeed;
@@ -1754,82 +1695,177 @@
       envDiv.innerHTML = `Wind Speed: ${currentWind} | Voltage: ${voltage}V | Water Pressure: ${waterPressure} PSI | Garbage Level: ${currentGarbage}/100`;
     }
 
-    // New Spelunking Minigame Functions
-    function initSpelunkingGame() {
-      document.getElementById('mainGame').style.display = 'none';
-      document.getElementById('spelunkingGame').style.display = 'block';
-      const canvas = document.getElementById('spelunkingCanvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      const gameState = {
-        player: { x: canvas.width / 2, y: canvas.height - 60, width: 30, height: 30, speed: 4 },
-        cave: generateCaveLayout(canvas.width, canvas.height),
-        enemies: []
-      };
-      setupSpelunkingControls(gameState);
-      function gameLoop() {
-        updateGameState(gameState);
-        renderGame(ctx, gameState);
-        requestAnimationFrame(gameLoop);
-      }
-      gameLoop();
-    }
-    function generateCaveLayout(width, height) {
-      const rows = 20;
-      const cols = 20;
-      const cellWidth = width / cols;
-      const cellHeight = height / rows;
-      const cave = [];
-      for (let i = 0; i < rows; i++) {
-        cave[i] = [];
-        for (let j = 0; j < cols; j++) {
-          cave[i][j] = Math.random() < 0.2 ? 1 : 0;
-        }
-      }
-      return { grid: cave, rows, cols, cellWidth, cellHeight };
-    }
-    function updateGameState(gameState) {
-      // Player movement is handled by keyboard events
-    }
-    function renderGame(ctx, gameState) {
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      const cave = gameState.cave;
-      for (let i = 0; i < cave.rows; i++) {
-        for (let j = 0; j < cave.cols; j++) {
-          if (cave.grid[i][j] === 1) {
-            ctx.fillStyle = '#222';
-            ctx.fillRect(j * cave.cellWidth, i * cave.cellHeight, cave.cellWidth, cave.cellHeight);
+    // Community Garden Functions: Render two sections (Soil and Tree Stump)
+    function renderGardenSlots() {
+      const container = document.getElementById("plantSlots");
+      container.innerHTML = "";
+      container.innerHTML += "<h4>Soil (Seeds)</h4>";
+      soilSlots.forEach(slot => {
+        let div = document.createElement("div");
+        div.className = "slot";
+        if (!slot.type) {
+          div.innerHTML = `Slot ${slot.slot}: <span class="status">Empty</span> <button onclick="openPlantSelection(${slot.slot}, 'soil')">Plant Seed</button>`;
+        } else {
+          let status = slot.watered ? "Watered, growing..." : "Planted: " + slot.type + " (needs water)";
+          div.innerHTML = `Slot ${slot.slot}: <span class="status">${status}</span>`;
+          if (!slot.watered) {
+            div.innerHTML += ` <button onclick="waterPlant(${slot.slot}, 'soil')">Water Plant</button>`;
           }
         }
-      }
-      ctx.fillStyle = '#FFD700';
-      ctx.fillRect(gameState.player.x, gameState.player.y, gameState.player.width, gameState.player.height);
-    }
-    function setupSpelunkingControls(gameState) {
-      document.addEventListener('keydown', function(e) {
-        switch(e.key) {
-          case "ArrowUp":
-            gameState.player.y -= gameState.player.speed;
-            break;
-          case "ArrowDown":
-            gameState.player.y += gameState.player.speed;
-            break;
-          case "ArrowLeft":
-            gameState.player.x -= gameState.player.speed;
-            break;
-          case "ArrowRight":
-            gameState.player.x += gameState.player.speed;
-            break;
+        container.appendChild(div);
+      });
+      container.innerHTML += "<h4>Tree Stump (Mushrooms)</h4>";
+      stumpSlots.forEach(slot => {
+        let div = document.createElement("div");
+        div.className = "slot";
+        if (!slot.type) {
+          div.innerHTML = `Slot ${slot.slot}: <span class="status">Empty</span> <button onclick="openPlantSelection(${slot.slot}, 'stump')">Plant Mushroom</button>`;
+        } else {
+          let status = slot.watered ? "Watered, growing..." : "Planted: " + slot.type + " (needs water)";
+          div.innerHTML = `Slot ${slot.slot}: <span class="status">${status}</span>`;
+          if (!slot.watered) {
+            div.innerHTML += ` <button onclick="waterPlant(${slot.slot}, 'stump')">Water Plant</button>`;
+          }
         }
+        container.appendChild(div);
       });
     }
-    function exitSpelunkingGame() {
-      document.getElementById('spelunkingGame').style.display = 'none';
-      document.getElementById('mainGame').style.display = 'block';
+    function openPlantSelection(slotNum, category) {
+      let available = (category === 'soil') ? seedTypes : mushroomTypes;
+      const type = prompt("Enter the type to plant (choose from: " + available.join(", ") + ")");
+      if (!type) return;
+      if (available.indexOf(type) === -1) {
+        alert("Invalid type. Please choose from: " + available.join(", "));
+        return;
+      }
+      if (!harvestInventory[type] || harvestInventory[type] < 1) {
+        alert("You do not have any " + type + " in your inventory.");
+        return;
+      }
+      removeItem(type, 1);
+      if (category === 'soil') {
+        soilSlots[slotNum - 1] = { slot: slotNum, type: type, watered: false, timer: null };
+      } else {
+        stumpSlots[slotNum - 1] = { slot: slotNum, type: type, watered: false, timer: null };
+      }
+      renderGardenSlots();
+    }
+    function waterPlant(slotNum, category) {
+      if (waterInventory < 1) {
+        alert("No water available. Please collect water.");
+        return;
+      }
+      waterInventory--;
+      localStorage.setItem('water', waterInventory);
+      document.getElementById('waterInventoryDisplay').textContent = waterInventory;
+      let slotArray = (category === 'soil') ? soilSlots : stumpSlots;
+      slotArray[slotNum - 1].watered = true;
+      renderGardenSlots();
+      // 5 minutes maturity (300000 ms)
+      slotArray[slotNum - 1].timer = setTimeout(() => {
+        const matureType = slotArray[slotNum - 1].type;
+        alert("Your " + matureType + " has matured!");
+        addItem(matureType, 1);
+        slotArray[slotNum - 1] = { slot: slotNum, type: null, watered: false, timer: null };
+        renderGardenSlots();
+      }, 300000);
     }
 
-    // Tab functions for Community Kitchen Panel
+    // Grocery Stand Functions
+    function generateGroceryItems() {
+      // Seeds
+      let seedContainer = document.getElementById("seedList");
+      seedContainer.innerHTML = "";
+      seedTypes.forEach(seed => {
+        let div = document.createElement("div");
+        div.className = "grocery-item";
+        div.innerHTML = `<p><strong>${seed}</strong> - $2<br><em>${seed} is essential for growth.</em></p>
+                         <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
+        seedContainer.appendChild(div);
+      });
+      // Mushrooms
+      let mushroomContainer = document.getElementById("mushroomList");
+      mushroomContainer.innerHTML = "";
+      mushroomTypes.forEach(mushroom => {
+        let div = document.createElement("div");
+        div.className = "grocery-item";
+        div.innerHTML = `<p><strong>${mushroom}</strong> - $2<br><em>${mushroom} adds flavor and nutrients.</em></p>
+                         <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
+        mushroomContainer.appendChild(div);
+      });
+      // Health Items
+      let healthContainer = document.getElementById("healthItemList");
+      if (!healthContainer) {
+        healthContainer = document.createElement("div");
+        healthContainer.id = "healthItemList";
+        healthContainer.innerHTML = `<h4>Health Items</h4>`;
+        document.getElementById("grocery-panel").appendChild(healthContainer);
+      } else {
+        healthContainer.innerHTML = `<h4>Health Items</h4>`;
+      }
+      let div = document.createElement("div");
+      div.className = "grocery-item";
+      div.innerHTML = `<p><strong>First Aid Kit</strong> - $8<br><em>Restores 20 health.</em></p>
+                       <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>`;
+      healthContainer.appendChild(div);
+    }
+    function sellHarvest() {
+      const checkboxes = document.querySelectorAll('.sell-checkbox:checked');
+      if (!checkboxes.length) {
+        alert("Select at least one item to sell.");
+        return;
+      }
+      const sellPrices = { 'Food Staples': 5, 'Lubricant Oil': 2.5, 'Alcohol': 1.5, 'Cigarettes': 2 };
+      checkboxes.forEach(cb => {
+        const item = cb.getAttribute('data-item');
+        const qty = harvestInventory[item];
+        const price = sellPrices[item] || 1;
+        let money = parseInt(localStorage.getItem('money')) || 50;
+        money += price * qty;
+        localStorage.setItem('money', money);
+        removeItem(item, qty);
+        alert(`Sold ${qty} ${item}(s) for $${price * qty}.`);
+      });
+      updateSellInventory();
+      updatePlayerStatus();
+    }
+    function toggleBuySell(mode) {
+      if (mode === 'buy') {
+        document.getElementById('buySection').style.display = 'grid';
+        document.getElementById('sellSection').style.display = 'none';
+      } else {
+        document.getElementById('buySection').style.display = 'none';
+        document.getElementById('sellSection').style.display = 'block';
+        updateSellInventory();
+      }
+    }
+    function updateSellInventory() {
+      const sellDiv = document.getElementById('sellInventory');
+      sellDiv.innerHTML = "";
+      for (let item in harvestInventory) {
+        const qty = harvestInventory[item];
+        if (qty > 0) {
+          let div = document.createElement('div');
+          div.className = "sell-item";
+          div.innerHTML = `<label>
+                            <input type="checkbox" class="sell-checkbox" data-item="${item}" data-qty="${qty}">
+                            ${item} - Quantity: ${qty}
+                           </label>`;
+          sellDiv.appendChild(div);
+        }
+      }
+      if (!sellDiv.innerHTML) sellDiv.innerHTML = "<p>You have no items to sell.</p>";
+    }
+    function openTab(evt, tabName) {
+      const tabs = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < tabs.length; i++) { tabs[i].style.display = "none"; }
+      const btns = document.getElementsByClassName("tab-button");
+      for (let i = 0; i < btns.length; i++) { btns[i].classList.remove("active"); }
+      document.getElementById(tabName).style.display = "block";
+      evt.currentTarget.classList.add("active");
+    }
+
+    // Community Kitchen Tab Functions (Cookbook and Chat)
     function openKitchenTab(evt, tabName) {
       const tabcontents = document.getElementsByClassName("tab-content");
       for (let i = 0; i < tabcontents.length; i++) {
@@ -1843,13 +1879,12 @@
       if (evt) {
         evt.currentTarget.classList.add("active");
       }
-      // If the cookbook tab is selected, render recipes
       if (tabName === 'cookbookTab') {
         renderRecipes();
       }
     }
 
-    // --- Missing functions added as stubs ---
+    // Stub functions for missing features
     function collectWater() {
       alert("collectWater() function is not implemented yet.");
     }
@@ -1857,7 +1892,7 @@
       alert("harvestProduce() function is not implemented yet.");
     }
 
-    // Single window.onload function to initialize everything
+    // Single window.onload initialization
     window.onload = function() {
       // Populate room numbers
       var roomSelect = document.getElementById('roomNumber');
@@ -1880,7 +1915,7 @@
           gridContainer.appendChild(btn);
         });
       }
-      // Render garden slots
+      // Render Garden Slots (using soilSlots and stumpSlots)
       var plantSlotsDiv = document.getElementById("plantSlots");
       if (plantSlotsDiv) {
         renderGardenSlots();
@@ -1890,9 +1925,8 @@
       updateVoltage();
       updateGarbageDisplay();
       updateEnvironmentStatus();
-      if (localStorage.getItem('playerName')) {
-        checkCharacterExistence();
-      }
+      // Check character existence (if using character creation; if not, defaults to Guest)
+      checkCharacterExistence();
       harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
       waterInventory = parseInt(localStorage.getItem('water')) || 0;
       generateGroceryItems();
