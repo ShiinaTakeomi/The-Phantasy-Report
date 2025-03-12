@@ -112,8 +112,7 @@
       padding: 5px;
       border-radius: 4px;
     }
-    /* Removed Exit (Sign Off) button per requirements */
-    /*
+    /* Re-added Exit Button below Garbage Chute per request */
     .exit-button {
       position: absolute;
       left: 0;
@@ -129,7 +128,6 @@
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
       z-index: 1001;
     }
-    */
     .power-room {
       position: absolute;
       top: 210px;
@@ -395,7 +393,6 @@
       z-index: 1200;
     }
     /* --- New: Recipe Book Cooking Indicator --- */
-    /* Add a div for indicating cooking progress inside the cookbook tab */
     #cookingProcess {
       display: none;
       background: #222;
@@ -456,7 +453,19 @@
       <div id="main-screen">
         <div class="container">
           <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
-          <!-- Removed Exit (Sign Off) Button -->
+          <!-- Re-added Exit Button below Garbage Chute -->
+<button class="exit-button" onclick="signOutUser()">Exit</button>
+
+<script>
+  function signOutUser() {
+    firebase.auth().signOut().then(() => {
+      clearGameState();
+      window.location.href = 'index.html';
+    }).catch((error) => {
+      console.error("Error signing out: ", error);
+    });
+  }
+</script>
           <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
           <div class="grid">
             <!-- Room buttons generated dynamically -->
@@ -639,12 +648,12 @@
         </div>
         <div id="cookbookTab" class="tab-content">
           <div id="recipeContainer"></div>
-          <!-- Added Cooking Process Indicator -->
+          <!-- Cooking Process Indicator -->
           <div id="cookingProcess">Cooking in progress... Please wait 1 minute.</div>
         </div>
         <button onclick="hidePanel('kitchen-panel')">Return to Main Menu</button>
       </div>
-      <!-- Water Supplies Panel (Chat area height increased) -->
+      <!-- Water Supplies Panel (Chat area styling updated to match Community Kitchen) -->
       <div id="water-panel" class="panel">
         <h2>Water Supplies (Laundry)</h2>
         <p>Water pressure is directly linked to the performance of the power panel and environmental efficiency (affected by garbage levels). Use the washing machine to clean clothes – remember, low power output or high garbage may result in lower water pressure.</p>
@@ -662,8 +671,8 @@
         <div>
           <h4>Washing Machine</h4>
           <button onclick="washClothes()">Wash Clothes</button>
-          <!-- Increased chat area height for Water Supplies -->
-          <div class="chatArea" id="laundryChatLog" style="height:300px;"></div>
+          <!-- Updated chat area styling to match Community Kitchen -->
+          <div class="chatArea" id="laundryChatLog" style="height:150px; overflow-y:auto; background: rgba(255,255,255,0.1); color:#fff; border:1px solid #ccc; padding:10px; border-radius:4px;"></div>
           <input type="text" id="laundryChatInput" placeholder="Type a message...">
           <button onclick="sendLaundryChat()">Send</button>
         </div>
@@ -752,7 +761,7 @@
     let harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
     let waterInventory = parseInt(localStorage.getItem('water')) || 0;
 
-    // --- Community Garden: Use two separate arrays (Soil for seeds, Tree Stump for mushrooms) ---
+    // --- Community Garden: Two separate arrays (Soil for seeds, Tree Stump for mushrooms) ---
     let soilSlots = Array.from({length: 5}, (_, i) => ({
       slot: i + 1,
       type: null,
@@ -804,7 +813,6 @@
 
     // Helper Functions: Update Mood, Hunger, Health, Reputation
     function updateMood(delta) {
-      // (Using localStorage "playerName" as default guest name if not provided)
       let playerName = localStorage.getItem('playerName') || "Guest";
       const safePlayerName = sanitizePlayerName(playerName);
       db.collection('players').doc(safePlayerName).get().then(doc => {
@@ -900,9 +908,6 @@
       const keys = ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate', 'harvestInventory', 'water'];
       keys.forEach(key => localStorage.removeItem(key));
     }
-
-    // Removed Sign In/Sign Out functionality per requirements
-    // (All functions related to login/register/googleSignIn/signOut are removed)
 
     // Panel Navigation Functions
     function showGarbagePanel() {
@@ -1024,12 +1029,12 @@
       }
     }
 
-    // Since authentication is removed, we assign a default guest name if none exists.
+    // Since authentication is removed, assign a default guest name if none exists.
     if (!localStorage.getItem('playerName')) {
       localStorage.setItem('playerName', 'Guest');
     }
     
-    // For character creation, if you still want it, you can use it to set extra data.
+    // For character creation (optional)
     function sanitizePlayerName(name) {
       return name.replace(/[\/\\]/g, '_');
     }
@@ -1309,8 +1314,20 @@
           chatLog.scrollTop = chatLog.scrollHeight;
         });
     }
+    // Added event listener to allow sending kitchen chat via Enter key
+    document.addEventListener('DOMContentLoaded', function() {
+      const kitchenChatInput = document.getElementById('kitchenChatInput');
+      if (kitchenChatInput) {
+        kitchenChatInput.addEventListener('keydown', function(event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            sendKitchenChat();
+          }
+        });
+      }
+    });
 
-    // Water Supplies Chat Functions (chat area height increased)
+    // Water Supplies Chat Functions
     function sendLaundryChat() {
       const msg = document.getElementById('laundryChatInput').value;
       if (msg.trim() !== "") {
@@ -1341,6 +1358,19 @@
           chatLog.scrollTop = chatLog.scrollHeight;
         });
     }
+    // Added event listener for laundry chat Enter key
+    document.addEventListener('DOMContentLoaded', function() {
+      const laundryChatInput = document.getElementById('laundryChatInput');
+      if (laundryChatInput) {
+        laundryChatInput.addEventListener('keydown', function(event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            sendLaundryChat();
+          }
+        });
+      }
+    });
+
     function washClothes() {
       alert("You washed your clothes. Your health improves slightly.");
       updateMood(3);
@@ -1429,17 +1459,7 @@
         }
       }
     }
-    document.addEventListener('DOMContentLoaded', function() {
-      const chatInput = document.getElementById('chatInput');
-      if (chatInput) {
-        chatInput.addEventListener('keydown', function(event) {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            sendChatMessage();
-          }
-        });
-      }
-    });
+    // Added event listener for chat panel input Enter key already exists above
 
     // Door Modal Functions
     function showDoorModal(roomName) {
@@ -1938,13 +1958,33 @@
       listenForKitchenChat();
       listenForLaundryChat();
       
-      // Add chat input listener for Enter key
+      // Add chat input listener for Chat Panel (Enter key)
       const chatInput = document.getElementById('chatInput');
       if (chatInput) {
         chatInput.addEventListener('keydown', function(event) {
           if (event.key === "Enter") {
             event.preventDefault();
             sendChatMessage();
+          }
+        });
+      }
+      // Add chat input listener for Community Kitchen chat (Enter key)
+      const kitchenChatInput = document.getElementById('kitchenChatInput');
+      if (kitchenChatInput) {
+        kitchenChatInput.addEventListener('keydown', function(event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            sendKitchenChat();
+          }
+        });
+      }
+      // Add chat input listener for Water Supplies chat (Enter key)
+      const laundryChatInput = document.getElementById('laundryChatInput');
+      if (laundryChatInput) {
+        laundryChatInput.addEventListener('keydown', function(event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            sendLaundryChat();
           }
         });
       }
