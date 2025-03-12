@@ -19,7 +19,7 @@
       color: #eee;
       position: relative;
     }
-    /* Apply full-page dark overlay using a pseudo-element */
+    /* Full-page dark overlay */
     body::before {
       content: "";
       position: fixed;
@@ -35,6 +35,7 @@
       font-family: 'Russo One', sans-serif;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     }
+    /* Shared container style */
     .container, .panel, #characterCreation, .modal {
       background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');
       background-color: rgba(0, 0, 0, 0.6);
@@ -46,20 +47,33 @@
       padding: 10px;
       border-radius: 8px;
     }
-    .panel {
-      display: none;
-      border: 2px solid #444;
-      padding: 20px;
-      width: 600px;
+    /* Removed inline panels – they now exist as separate HTML files */
+    /* Navigation buttons for the separate pages */
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
       margin: 20px auto;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
+      max-width: 800px;
     }
-    .panel h2, .modal h2 {
-      text-align: center;
+    .nav-links a {
+      text-decoration: none;
+    }
+    .nav-links button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: 2px solid #fff;
+      border-radius: 4px;
+      background-color: #5DADE2;
       color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s;
     }
-    /* Grid of Rooms */
+    .nav-links button:hover {
+      background-color: #4a90e2;
+    }
+    /* Grid of Rooms (for room interactions that are not fully modularized) */
     .grid {
       display: grid;
       grid-template-columns: repeat(5, 100px);
@@ -82,88 +96,14 @@
     .grid button:hover {
       background-color: rgba(255,255,255,0.4);
     }
-    /* Buttons */
-    .garden-button {
-      position: absolute;
-      left: 210px;
-      top: 10px;
-      padding: 10px;
-      background-color: #5DADE2;
-      border: 2px solid #fff;
-      border-radius: 4px;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .garbage-chute {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 50px;
-      height: 520px;
-      background-color: rgba(211,211,211,0.3);
-      border: 2px solid #999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      writing-mode: vertical-rl;
-      cursor: pointer;
-      font-size: 12px;
-      padding: 5px;
-      border-radius: 4px;
-    }
-    /* Re-added Exit Button below Garbage Chute per request */
-    .exit-button {
-      position: absolute;
-      left: 0;
-      top: 530px;
-      padding: 10px 15px;
-      background-color: #FF4136;
-      border: 2px solid #fff;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 4px;
-      color: #fff;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-      z-index: 1001;
-    }
-    .power-room {
-      position: absolute;
-      top: 210px;
-      left: calc(60px + 520px + 10px);
-      width: 100px;
-      height: 100px;
-      background-color: rgba(192,192,255,0.5);
-      border: 2px solid #666;
-      cursor: pointer;
-      font-size: 14px;
-      border-radius: 4px;
-    }
-    .facilities {
-      margin-top: 30px;
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-    }
-    .facilities button {
-      padding: 10px 20px;
-      background-color: rgba(200,150,130,0.7);
-      border: 1px solid #999;
-      cursor: pointer;
-      font-size: 16px;
-      margin: 5px;
-      border-radius: 4px;
-      color: #222;
-    }
-    /* Character Creation Section – REMOVED authentication parts per requirements */
+    /* Character Creation Section */
     #characterCreation {
       margin: 20px auto;
       max-width: 300px;
       border: 2px solid #444;
       padding: 10px;
       font-size: 14px;
-      display: none; /* You can choose to hide or remove this block if no auth is needed */
+      display: none;
       color: #fff;
       border-radius: 8px;
       background: rgba(0,0,0,0.7);
@@ -178,15 +118,38 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    /* Enlarged editing fields for Biodata */
-    #playerStatus input,
-    #playerStatus textarea {
-      width: 100% !important;
-      font-size: 16px;
-      padding: 8px;
-      margin-bottom: 10px;
+    /* Chat Panel and Modal styles remain */
+    #chatPanel {
+      display: none;
+      border: 2px solid #444;
+      padding: 10px;
+      width: 90%;
+      max-width: 600px;
+      margin: 20px auto;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 8px;
     }
-    /* Modal Styles (for plant selection, door interaction) */
+    #chatLog {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 200px;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.1);
+      margin-bottom: 10px;
+      color: #fff;
+      border-radius: 4px;
+    }
+    #playerStatus {
+      margin: 20px auto;
+      max-width: 300px;
+      border: 2px solid #444;
+      padding: 10px;
+      font-size: 14px;
+      color: #fff;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.7);
+    }
+    /* Door Modal (Knocking and PIN system) */
     .modal, #doorModal {
       display: none;
       position: fixed;
@@ -210,150 +173,7 @@
       cursor: pointer;
       width: 100%;
     }
-    /* Responsive Chat Panel */
-    #chatPanel {
-      display: none;
-      border: 2px solid #444;
-      padding: 10px;
-      width: 90%;
-      max-width: 600px;
-      margin: 20px auto;
-      background: rgba(0, 0, 0, 0.8);
-      border-radius: 8px;
-    }
-    /* Responsive Chat Log */
-    #chatLog {
-      border: 1px solid #ccc;
-      padding: 10px;
-      height: 200px;
-      overflow-y: auto;
-      background: rgba(255, 255, 255, 0.1);
-      margin-bottom: 10px;
-      color: #fff;
-      border-radius: 4px;
-    }
-    /* Biodata Panel */
-    #playerStatus {
-      margin: 20px auto;
-      max-width: 300px;
-      border: 2px solid #444;
-      padding: 10px;
-      font-size: 14px;
-      color: #fff;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    /* Harvest Inventory Display */
-    #harvestInventory {
-      margin-top: 10px;
-      padding: 5px;
-      border: 1px solid #aaa;
-      border-radius: 4px;
-      background: rgba(255,255,255,0.1);
-    }
-    /* Garden Slots – (Now using two separate sections below) */
-    #garden-panel .slot {
-      margin: 10px 0;
-      padding: 5px;
-      border: 1px solid #777;
-      border-radius: 4px;
-    }
-    #garden-panel .slot button {
-      margin-left: 5px;
-      padding: 3px 6px;
-      font-size: 12px;
-    }
-    /* Removed Login Panel entirely (authentication removed) */
-    /* In-App Notification Panel */
-    #notificationPanel {
-      position: fixed;
-      top: 70px;
-      right: 20px;
-      background: rgba(0,0,0,0.8);
-      color: #fff;
-      padding: 10px;
-      border: 1px solid #fff;
-      border-radius: 4px;
-      z-index: 1002;
-      display: none;
-      max-width: 300px;
-      font-size: 14px;
-    }
-    /* Community Kitchen Panel with Tabs */
-    #kitchen-panel {
-      display: none;
-      border: 2px solid #444;
-      padding: 20px;
-      width: 600px;
-      margin: 20px auto;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-    }
-    .tab-headers {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    .tab-button {
-      background-color: #444;
-      border: 1px solid #999;
-      border-radius: 4px;
-      color: #eee;
-      cursor: pointer;
-      padding: 10px;
-      margin: 0 5px;
-    }
-    .tab-button:hover {
-      background-color: #555;
-    }
-    .tab-button.active {
-      background-color: #00bfff;
-      color: #222;
-    }
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    /* Grocery Stand Styles */
-    .grocery-items-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-    .grocery-item {
-      background: #222;
-      border: 1px solid #444;
-      border-radius: 8px;
-      padding: 15px;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      color: #e0e0e0;
-    }
-    .grocery-item:hover {
-      transform: scale(1.03);
-      box-shadow: 0 0 10px #00bfff;
-    }
-    .grocery-item p {
-      margin: 0 0 8px;
-      font-size: 15px;
-      font-weight: bold;
-    }
-    .grocery-item button {
-      background-color: #00bfff;
-      border: none;
-      border-radius: 5px;
-      padding: 8px;
-      color: #222;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.25s ease;
-    }
-    .grocery-item button:hover {
-      background-color: #009acd;
-    }
-    /* Environmental Status Panel – New! */
+    /* Environmental Status Panel */
     #envStatus {
       padding: 10px;
       text-align: center;
@@ -363,47 +183,8 @@
       margin: 10px auto;
       max-width: 600px;
     }
-    /* Spelunking Game Styles */
-    #spelunkingGame {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      z-index: 1100;
-    }
-    #spelunkingCanvas {
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle, #444 0%, #000 70%);
-    }
-    #exitSpelunking {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      padding: 10px 15px;
-      font-size: 16px;
-      border: none;
-      border-radius: 4px;
-      background-color: #FF4136;
-      color: #fff;
-      cursor: pointer;
-      z-index: 1200;
-    }
-    /* --- New: Recipe Book Cooking Indicator --- */
-    #cookingProcess {
-      display: none;
-      background: #222;
-      color: #fff;
-      padding: 10px;
-      margin-top: 10px;
-      text-align: center;
-      border-radius: 4px;
-    }
   </style>
-  <!-- Firebase SDKs: Auth, Firestore, and Storage -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
@@ -417,9 +198,8 @@
     <div style="text-align:center; margin-top:10px;">
       <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
     </div>
-    <!-- Removed Login Panel (authentication removed) -->
-    
-    <!-- Character Creation Section (optional; you may auto-assign a default guest name) -->
+
+    <!-- Character Creation Section (if no character exists) -->
     <div id="characterCreation">
       <h3>Create Your Character</h3>
       <p>Welcome, <span id="displayName"></span>!</p>
@@ -445,6 +225,7 @@
         <button type="submit">Create Character</button>
       </form>
     </div>
+
     <!-- Main Game Section -->
     <div id="mainGame" style="display: none;">
       <!-- Notification Panel -->
@@ -452,233 +233,36 @@
       <!-- Main Screen -->
       <div id="main-screen">
         <div class="container">
-          <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
-          <!-- Re-added Exit Button below Garbage Chute -->
-<button class="exit-button" onclick="signOutUser()">Exit</button>
-<script>
-  function signOutUser() {
-    firebase.auth().signOut().then(() => {
-      clearGameState();
-      window.location.href = 'index.html';
-    }).catch((error) => {
-      console.error("Error signing out: ", error);
-    });
-  }
-</script>
-          <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
-          <div class="grid">
-            <!-- Room buttons generated dynamically -->
+          <!-- Top controls (these buttons originally opened inline panels) are now replaced by navigation links -->
+          <div class="nav-links">
+            <a href="garbage-chute.html"><button>Garbage Chute</button></a>
+            <a href="community-garden.html"><button>Community Garden</button></a>
+            <a href="community-kitchen.html"><button>Community Kitchen</button></a>
+            <a href="groceries-stand.html"><button>Groceries Stand</button></a>
+            <a href="water-supplies.html"><button>Water Supplies (Laundry)</button></a>
+            <a href="power-room.html"><button>Power Room</button></a>
+            <a href="room5.html"><button>Room 5</button></a>
+            <a href="room14.html"><button>Room 14</button></a>
           </div>
-          <button class="power-room" onclick="showPowerPanel()">
-            Power Room <span id="powerAlert" style="display:none; font-size:1.2em; color:red;">!</span>
-          </button>
+          <!-- Additionally, here is a grid of rooms for interactive room chat (if needed) -->
+          <div class="grid">
+            <!-- Generate room buttons dynamically -->
+          </div>
         </div>
         <div class="facilities">
-          <button onclick="openKitchenPanel()">Community Kitchen</button>
-          <button onclick="openGroceryPanel()">Groceries Stand</button>
-          <button onclick="openWaterPanel()">Water Supplies (Laundry)</button>
+          <!-- You can also include additional navigation or quick access links here -->
           <button onclick="togglePlayerStatus()">Biodata</button>
         </div>
-        <!-- New Environmental Status Panel -->
+        <!-- Environmental Status Panel -->
         <div id="envStatus"></div>
+        <!-- Biodata Panel -->
         <div id="playerStatus">
-          <!-- Biodata dynamically updated -->
+          <!-- Biodata updated dynamically -->
         </div>
       </div>
-      <!-- Panels -->
-      <!-- Power Panel -->
-      <div id="minigame-panel" class="panel">
-        <h2>Wind Turbine Control Panel</h2>
-        <p><strong>Objective:</strong> Ensure the turbine provides electricity, water heating, and lighting.</p>
-        <button id="instructionsButton" onclick="toggleInstructions()">Instructions</button>
-        <div id="instructions" style="display: none;">
-          <p>
-            <strong>Step 1:</strong> Adjust the wind speed slider (optimal range: 40–70).<br>
-            <strong>Step 2:</strong> Pull the electrical output lever to toggle power supply.<br>
-            <strong>Step 3:</strong> Check water pressure and heater levels by pressing the corresponding buttons.<br>
-            <strong>Step 4:</strong> Ensure the overall light status is "On".<br><br>
-            <em>Note:</em> Every minute one of five malfunctions may occur. Follow the on-screen instructions to fix them; failure will negatively affect your biodata.
-          </p>
-        </div>
-        <div class="control">
-          <label for="windSpeedSlider">Wind Speed:</label>
-          <input type="range" id="windSpeedSlider" min="0" max="100" onchange="updateWindSpeed()">
-          <span id="windSpeedValue"></span>
-        </div>
-        <div class="control">
-          <label>Electrical Output:</label>
-          <button id="outputLeverButton" onclick="toggleElectricalOutput()">Toggle Output</button>
-        </div>
-        <div class="control">
-          <label>Water Pressure:</label>
-          <button id="checkWaterPressureButton" onclick="checkWaterPressure()">Check Water</button>
-        </div>
-        <div class="control">
-          <label>Heater Level:</label>
-          <button id="checkHeaterLevelButton" onclick="checkHeaterLevel()">Check Heater</button>
-        </div>
-        <div class="control">
-          <label>Light Status:</label>
-          <span id="lightStatusDisplay">Unknown</span>
-        </div>
-        <div class="control">
-          <label>Voltage:</label>
-          <span id="voltageDisplay">0.0</span>
-        </div>
-        <div class="control">
-          <button onclick="hidePanel('minigame-panel')">Return to Main Menu</button>
-        </div>
-        <h3>System Log:</h3>
-        <div id="minigameLog"></div>
-        <div class="control">
-          <label>Power Status:</label>
-          <span id="powerStatusDisplay">Unknown</span>
-        </div>
-      </div>
-      <!-- Garbage Chute Panel -->
-      <div id="garbage-panel" class="panel">
-        <h2>Garbage Chute Control</h2>
-        <p><strong>Objective:</strong> Clear accumulated garbage before it causes a community health crisis.</p>
-        <div class="control">
-          <label>Garbage Level:</label>
-          <span id="garbageDisplay"></span> / 100
-        </div>
-        <div class="control">
-          <button onclick="clearGarbage()">Clear Garbage</button>
-        </div>
-        <div class="control">
-          <button onclick="hidePanel('garbage-panel')">Return to Main Menu</button>
-        </div>
-        <h3>Garbage Log:</h3>
-        <div id="garbageLog"></div>
-      </div>
-      <!-- Grocery Stand Panel -->
-      <div id="grocery-panel" class="panel">
-        <h2>Grocery Store</h2>
-        <p>Purchase essential items. Prices may vary with electricity availability.</p>
-        <!-- Tab Headers -->
-        <div class="tab-headers">
-          <button class="tab-button active" onclick="openTab(event, 'buyTab')">Buy Items</button>
-          <button class="tab-button" onclick="openTab(event, 'sellTab')">Sell Items</button>
-        </div>
-        <!-- Tab Content -->
-        <div id="buyTab" class="tab-content" style="display: block;">
-          <div id="buySection" class="grocery-items-container">
-            <!-- Basic Food Group -->
-            <h4>Basic Food</h4>
-            <div id="basicFoodContainer" class="grocery-items-container">
-              <div class="grocery-item">
-                <p>
-                  <strong>Food Staples</strong> - $10<br>
-                  <em>Basic nourishment to reduce hunger.</em>
-                </p>
-                <button onclick="buyItem('Food Staples')">Buy Food</button>
-              </div>
-            </div>
-            <!-- Seeds Group -->
-            <h4>Seeds for Community Garden</h4>
-            <div id="seedList"></div>
-            <!-- Mushrooms Group -->
-            <h4>Mushrooms for Cultivation</h4>
-            <div id="mushroomList"></div>
-            <!-- Maintenance Items Group -->
-            <h4>Maintenance Items</h4>
-            <div id="maintenanceContainer" class="grocery-items-container">
-              <div class="grocery-item">
-                <p>
-                  <strong>Lubricant Oil</strong> - $5<br>
-                  <em>Essential for keeping the power panel running smoothly.</em>
-                </p>
-                <button onclick="buyItem('Lubricant Oil')">Buy Lubricant Oil</button>
-              </div>
-              <div class="grocery-item">
-                <p>
-                  <strong>Alcohol</strong> - $3<br>
-                  <em>Boosts mood but may have minor setbacks on health.</em>
-                </p>
-                <button onclick="buyItem('Alcohol')">Buy Alcohol</button>
-              </div>
-              <div class="grocery-item">
-                <p>
-                  <strong>Cigarettes</strong> - $4<br>
-                  <em>Temporarily improves mood but reduces health over time.</em>
-                </p>
-                <button onclick="buyItem('Cigarettes')">Buy Cigarettes</button>
-              </div>
-            </div>
-            <!-- Baking Supplies Group -->
-            <h4>Baking Supplies</h4>
-            <div id="bakingContainer" class="grocery-items-container"></div>
-            <!-- Health Items Group -->
-            <h4>Health Items</h4>
-            <div id="healthItemList"></div>
-          </div>
-        </div>
-        <div id="sellTab" class="tab-content" style="display: none;">
-          <div id="sellSection">
-            <h3>Sell Your Harvest</h3>
-            <div id="sellInventory">
-              <!-- Dynamically generated sell inventory list -->
-            </div>
-            <button onclick="sellHarvest()">Sell Selected Items</button>
-          </div>
-        </div>
-        <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
-      </div>
-      <!-- Community Garden Panel (Updated Layout) -->
-      <div id="garden-panel" class="panel">
-        <h2>Community Garden</h2>
-        <p>Manage your rooftop garden. Plant your essential seeds in <strong>Soil</strong> slots and mushrooms in <strong>Tree Stump</strong> slots. Each plant takes 5 minutes to mature and needs water to grow.</p>
-        <div id="plantSlots"></div>
-        <button onclick="harvestProduce()">Harvest Produce</button>
-        <button onclick="hidePanel('garden-panel')">Return to Main Menu</button>
-      </div>
-      <!-- Community Kitchen Panel with Tabs for Chat and Cookbook -->
-      <div id="kitchen-panel" class="panel">
-        <h2>Community Kitchen</h2>
-        <div class="tab-headers">
-          <button class="tab-button active" onclick="openKitchenTab(event, 'kitchenChatTab')">Chat</button>
-          <button class="tab-button" onclick="openKitchenTab(event, 'cookbookTab')">Cookbook</button>
-        </div>
-        <div id="kitchenChatTab" class="tab-content active">
-          <div id="kitchenChatLog" class="chatArea" style="height:150px; overflow-y:auto; background: rgba(255,255,255,0.1); color:#fff; border:1px solid #ccc; padding:10px; border-radius:4px;"></div>
-          <input type="text" id="kitchenChatInput" placeholder="Type a message...">
-          <button onclick="sendKitchenChat()">Send</button>
-        </div>
-        <div id="cookbookTab" class="tab-content">
-          <div id="recipeContainer"></div>
-          <!-- Cooking Process Indicator -->
-          <div id="cookingProcess">Cooking in progress... Please wait 1 minute.</div>
-        </div>
-        <button onclick="hidePanel('kitchen-panel')">Return to Main Menu</button>
-      </div>
-      <!-- Water Supplies Panel (Chat area styling updated to match Community Kitchen) -->
-      <div id="water-panel" class="panel">
-        <h2>Water Supplies (Laundry)</h2>
-        <p>Water pressure is directly linked to the performance of the power panel and environmental efficiency (affected by garbage levels). Use the washing machine to clean clothes – remember, low power output or high garbage may result in lower water pressure.</p>
-        <div>
-          <p>
-            <strong>Water Pressure:</strong> 
-            <span id="waterPressureDisplay">Calculating...</span> PSI
-          </p>
-          <p>
-            <strong>Water Inventory:</strong> 
-            <span id="waterInventoryDisplay">0</span> units
-          </p>
-          <button onclick="collectWater()">Collect Water</button>
-        </div>
-        <div>
-          <h4>Washing Machine</h4>
-          <button onclick="washClothes()">Wash Clothes</button>
-          <!-- Updated chat area styling to match Community Kitchen -->
-          <div class="chatArea" id="laundryChatLog" style="height:150px; overflow-y:auto; background: rgba(255,255,255,0.1); color:#fff; border:1px solid #ccc; padding:10px; border-radius:4px;"></div>
-          <input type="text" id="laundryChatInput" placeholder="Type a message...">
-          <button onclick="sendLaundryChat()">Send</button>
-        </div>
-        <button onclick="hidePanel('water-panel')">Return to Main Menu</button>
-      </div>
-      <!-- Chat Panel -->
-      <div id="chatPanel" class="panel">
+
+      <!-- Chat Modal (for room interactions that are not separated) -->
+      <div id="chatPanel">
         <h2 id="chatRoomTitle"></h2>
         <div id="chatLog"></div>
         <input type="text" id="chatInput" placeholder="Type your message...">
@@ -687,7 +271,8 @@
         <div id="restContainer" style="margin-top:10px;"></div>
       </div>
     </div>
-    <!-- Door Modal -->
+
+    <!-- Door Modal (Knocking & PIN system) -->
     <div id="doorModal">
       <h2 id="doorTitle">Door Interaction</h2>
       <div id="doorOptions">
@@ -700,14 +285,16 @@
       </div>
       <button onclick="closeDoorModal()">Cancel</button>
     </div>
-    <!-- Spelunking Game Container -->
+
+    <!-- Spelunking Game Container (for Room 5) -->
     <div id="spelunkingGame">
       <canvas id="spelunkingCanvas"></canvas>
       <button id="exitSpelunking" onclick="exitSpelunkingGame()">Exit Cave</button>
     </div>
   </div>
+
   <script>
-    // Store original background settings (main menu background)
+    // Store original background settings
     const originalBackground = "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed";
     
     // Firebase Initialization & Config
@@ -721,7 +308,6 @@
       measurementId: "G-9MS36H0YV4"
     };
     firebase.initializeApp(firebaseConfig);
-    // Authentication functions removed per requirement.
     const db = firebase.firestore();
     const storage = firebase.storage();
 
@@ -760,7 +346,7 @@
     let harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
     let waterInventory = parseInt(localStorage.getItem('water')) || 0;
 
-    // --- Community Garden: Two separate arrays (Soil for seeds, Tree Stump for mushrooms) ---
+    // Community Garden arrays (Soil and Tree Stump slots)
     let soilSlots = Array.from({length: 5}, (_, i) => ({
       slot: i + 1,
       type: null,
@@ -774,7 +360,7 @@
       timer: null
     }));
 
-    // Seeds and Mushrooms (exactly 5 each)
+    // Seeds and Mushrooms
     const seedTypes = [
       "Sunflower Seed", "Pumpkin Seed", "Corn Seed", "Wheat Seed", "Rice Seed"
     ];
@@ -782,7 +368,7 @@
       "Button Mushroom", "Portobello Mushroom", "Shiitake Mushroom", "Oyster Mushroom", "Enoki Mushroom"
     ];
 
-    // Cookie Recipes (exactly 4 types)
+    // Cookie Recipes
     const recipes = [
       {
         name: "Vitality Cookie",
@@ -810,7 +396,7 @@
       }
     ];
 
-    // Helper Functions: Update Mood, Hunger, Health, Reputation
+    // Helper Functions (updateMood, updateHunger, updateHealth, updateReputation)
     function updateMood(delta) {
       let playerName = localStorage.getItem('playerName') || "Guest";
       const safePlayerName = sanitizePlayerName(playerName);
@@ -902,60 +488,23 @@
         });
     }
 
-    // Utility: Clear All Game State
+    // Utility: Clear Game State
     function clearGameState() {
       const keys = ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate', 'harvestInventory', 'water'];
       keys.forEach(key => localStorage.removeItem(key));
     }
 
-    // Panel Navigation Functions
-    function showGarbagePanel() {
-      document.getElementById('garbage-panel').style.display = 'block';
-      document.getElementById('main-screen').style.display = 'none';
-    }
-    function showPowerPanel() {
-      document.body.style.backgroundImage = "url('https://i.pinimg.com/736x/2d/d9/76/2dd9762815138628d3c380fe097241d2.jpg')";
-      document.body.style.backgroundSize = "cover";
-      document.body.style.backgroundPosition = "center center";
-      document.getElementById('minigame-panel').style.display = 'block';
-      document.getElementById('main-screen').style.display = 'none';
-    }
-    function openGroceryPanel() {
-      document.getElementById('grocery-panel').style.display = 'block';
-      document.getElementById('main-screen').style.display = 'none';
-      generateGroceryItems();
-      updateHarvestInventoryUI();
-    }
-    function openGardenPanel() {
-      document.body.style.backgroundImage = "url('https://i.pinimg.com/736x/1a/97/af/1a97af089b326864a32ddb9f788c7c2d.jpg')";
-      document.body.style.backgroundSize = "cover";
-      document.body.style.backgroundPosition = "center center";
-      document.getElementById('garden-panel').style.display = 'block';
-      document.getElementById('main-screen').style.display = 'none';
-      renderGardenSlots();
-    }
-    function openKitchenPanel() {
-      document.getElementById('kitchen-panel').style.display = 'block';
-      document.getElementById('main-screen').style.display = 'none';
-      openKitchenTab(null, 'kitchenChatTab'); // Activate chat tab by default
-      listenForKitchenChat();
-    }
-    function openWaterPanel() {
-      document.getElementById('water-panel').style.display = 'block';
-      document.getElementById('main-screen').style.display = 'none';
-      updateWaterPressure(); // Update water pressure display immediately
-      document.getElementById('waterInventoryDisplay').textContent = waterInventory;
-    }
-    function hidePanel(panelId) {
-      document.getElementById(panelId).style.display = 'none';
-      document.getElementById('main-screen').style.display = 'block';
-      // Reset background to main menu
-      document.body.style.backgroundImage = "url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
-      document.body.style.backgroundRepeat = "no-repeat";
-      document.body.style.backgroundAttachment = "fixed";
-      document.body.style.backgroundSize = "cover";
-      document.body.style.backgroundPosition = "center center";
-    }
+    // Panel Navigation Functions – these now mostly handle showing/hiding the main game screen.
+    function showGarbagePanel() { /* For room grid interactions if needed */ }
+    function showPowerPanel() { /* For room grid interactions if needed */ }
+    function openGroceryPanel() { /* For room grid interactions if needed */ }
+    function openGardenPanel() { /* For room grid interactions if needed */ }
+    function openKitchenPanel() { /* For room grid interactions if needed */ }
+    function openWaterPanel() { /* For room grid interactions if needed */ }
+    function hidePanel(panelId) { /* For room grid interactions if needed */ }
+
+    // (Note: All detailed panel code is now in separate files.
+    // The main file now relies on navigation links below.)
 
     // Purchase and Inventory Functions
     function buyItem(item) {
@@ -1025,12 +574,10 @@
       }
     }
 
-    // Since authentication is removed, assign a default guest name if none exists.
+    // Character Creation Functions
     if (!localStorage.getItem('playerName')) {
       localStorage.setItem('playerName', 'Guest');
     }
-    
-    // For character creation (optional)
     function sanitizePlayerName(name) {
       return name.replace(/[\/\\]/g, '_');
     }
@@ -1257,7 +804,6 @@
       for (let ingredient in recipe.ingredients) {
         removeItem(ingredient, recipe.ingredients[ingredient]);
       }
-      // Show cooking process indicator (in the cookbook tab)
       document.getElementById("cookingProcess").style.display = "block";
       const btn = document.getElementById(`createBtn${index}`);
       btn.disabled = true;
@@ -1310,7 +856,6 @@
           chatLog.scrollTop = chatLog.scrollHeight;
         });
     }
-    // Added event listener to allow sending kitchen chat via Enter key
     document.addEventListener('DOMContentLoaded', function() {
       const kitchenChatInput = document.getElementById('kitchenChatInput');
       if (kitchenChatInput) {
@@ -1354,7 +899,6 @@
           chatLog.scrollTop = chatLog.scrollHeight;
         });
     }
-    // Added event listener for laundry chat Enter key
     document.addEventListener('DOMContentLoaded', function() {
       const laundryChatInput = document.getElementById('laundryChatInput');
       if (laundryChatInput) {
@@ -1376,9 +920,11 @@
     function openRoomInteraction(roomName) {
       currentRoom = roomName;
       if (roomName === "Room 5") {
-        initSpelunkingGame();
+        // For Room 5, redirect to the separate spelunking game page
+        window.location.href = "room5.html";
         return;
       }
+      // For other rooms that are still handled here, fetch room data:
       db.collection("rooms").doc(roomName).get().then(doc => {
         if (doc.exists) {
           const roomData = doc.data();
@@ -1455,7 +1001,8 @@
         }
       }
     }
-    // Door Modal Functions
+
+    // Door Modal Functions (Knocking & PIN system)
     function showDoorModal(roomName) {
       currentRoom = roomName;
       document.getElementById('doorTitle').textContent = "You are at the door of " + roomName;
@@ -1558,7 +1105,6 @@
       localStorage.setItem('voltage', voltage);
       updateWaterPressure();
     }
-    // New function to update water pressure display based on current voltage and garbage level
     function updateWaterPressure() {
       const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
       const efficiency = Math.max(0.5, 1 - (garbageLevel / 200));
@@ -1568,7 +1114,6 @@
       const wpDisplay = document.getElementById('waterPressureDisplay');
       if (wpDisplay) {
         wpDisplay.textContent = pressure;
-        // Visual feedback: if pressure is low, color red; otherwise, white
         wpDisplay.style.color = pressure < 50 ? "red" : "#fff";
       }
     }
@@ -1671,7 +1216,7 @@
       window.location.href = "index.html";
     }
 
-    // Rest Functionality: 1 minute total (using 12 iterations of 5 seconds)
+    // Rest Functionality (1 minute total, 12 iterations of 5 seconds)
     function restInRoom() {
       let restButton = document.getElementById("restButton");
       if (!restButton) return;
@@ -1729,7 +1274,7 @@
       envDiv.innerHTML = `Wind Speed: ${currentWind} | Voltage: ${voltage}V | Water Pressure: ${waterPressure} PSI | Garbage Level: ${currentGarbage}/100`;
     }
 
-    // Community Garden Functions: Render two sections (Soil and Tree Stump)
+    // Community Garden Functions
     function renderGardenSlots() {
       const container = document.getElementById("plantSlots");
       container.innerHTML = "";
@@ -1764,33 +1309,20 @@
         container.appendChild(div);
       });
     }
-    // Improved planting interaction: automatically check player's inventory and use first available seed/mushroom.
     function openPlantSelection(slotNum, category) {
-      // Determine allowed types based on category
       let available = (category === 'soil') ? seedTypes : mushroomTypes;
-      // Filter the allowed types by those that exist in the player's inventory
       let inventoryOptions = available.filter(type => harvestInventory[type] && harvestInventory[type] > 0);
-      
-      // If no available items in inventory, alert and exit
       if (inventoryOptions.length === 0) {
         alert("You do not have any " + (category === 'soil' ? "seeds" : "mushrooms") + " in your inventory.");
         return;
       }
-      
-      // Automatically select the first available type from the inventory
       let selectedType = inventoryOptions[0];
-      
-      // Remove one unit of the selected item from the inventory
       removeItem(selectedType, 1);
-      
-      // Update the appropriate garden slot with the selected type
       if (category === 'soil') {
         soilSlots[slotNum - 1] = { slot: slotNum, type: selectedType, watered: false, timer: null };
       } else {
         stumpSlots[slotNum - 1] = { slot: slotNum, type: selectedType, watered: false, timer: null };
       }
-      
-      // Re-render the garden slots to show the update
       renderGardenSlots();
     }
     function waterPlant(slotNum, category) {
@@ -1804,7 +1336,6 @@
       let slotArray = (category === 'soil') ? soilSlots : stumpSlots;
       slotArray[slotNum - 1].watered = true;
       renderGardenSlots();
-      // 5 minutes maturity (300000 ms)
       slotArray[slotNum - 1].timer = setTimeout(() => {
         const matureType = slotArray[slotNum - 1].type;
         alert("Your " + matureType + " has matured!");
@@ -1816,7 +1347,6 @@
 
     // Grocery Stand Functions
     function generateGroceryItems() {
-      // Seeds
       let seedContainer = document.getElementById("seedList");
       seedContainer.innerHTML = "";
       seedTypes.forEach(seed => {
@@ -1826,7 +1356,6 @@
                          <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
         seedContainer.appendChild(div);
       });
-      // Mushrooms
       let mushroomContainer = document.getElementById("mushroomList");
       mushroomContainer.innerHTML = "";
       mushroomTypes.forEach(mushroom => {
@@ -1836,7 +1365,6 @@
                          <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
         mushroomContainer.appendChild(div);
       });
-      // Health Items
       let healthContainer = document.getElementById("healthItemList");
       if (!healthContainer) {
         healthContainer = document.createElement("div");
@@ -1908,7 +1436,7 @@
       evt.currentTarget.classList.add("active");
     }
 
-    // Community Kitchen Tab Functions (Cookbook and Chat)
+    // Community Kitchen Tab Functions
     function openKitchenTab(evt, tabName) {
       const tabcontents = document.getElementsByClassName("tab-content");
       for (let i = 0; i < tabcontents.length; i++) {
@@ -1927,32 +1455,19 @@
       }
     }
 
-    // Stub functions for missing features
-    function collectWater() {
-      // Calculate water collected based on current voltage and efficiency
-      const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
-      const efficiency = Math.max(0.5, 1 - (garbageLevel / 200));
-      const minVoltageThreshold = 20;
-      const basePressure = voltage >= minVoltageThreshold ? voltage * 0.8 : 0;
-      const pressure = Math.round(basePressure * efficiency);
-      // For example, water collected = floor(pressure/10) + 5
-      const waterCollected = Math.floor(pressure / 10) + 5;
-      waterInventory += waterCollected;
-      localStorage.setItem('water', waterInventory);
-      // Update display
-      const waterInvDisplay = document.getElementById('waterInventoryDisplay');
-      if (waterInvDisplay) {
-        waterInvDisplay.textContent = waterInventory;
-      }
-      alert("You collected " + waterCollected + " units of water!");
+    // Spelunking Game Functions (for Room 5)
+    function initSpelunkingGame() {
+      // Initialize the spelunking game; details omitted for brevity.
+      window.location.href = "room5.html";
     }
-    function harvestProduce() {
-      alert("harvestProduce() function is not implemented yet.");
+    function exitSpelunkingGame() {
+      // Exit spelunking game logic; details omitted.
+      window.location.href = "index.html";
     }
 
-    // Single window.onload initialization
+    // Document onload initialization
     window.onload = function() {
-      // Populate room numbers
+      // Populate room numbers for character creation select
       var roomSelect = document.getElementById('roomNumber');
       if (roomSelect) {
         for (let i = 1; i <= 25; i++) {
@@ -1965,6 +1480,7 @@
       // Generate Room buttons in the grid
       var gridContainer = document.querySelector(".grid");
       if (gridContainer) {
+        // Order of rooms: descending by row (as in your original code)
         const rooms = [21,22,23,24,25,16,17,18,19,20,11,12,13,14,15,6,7,8,9,10,1,2,3,4,5];
         rooms.forEach(function(room) {
           let btn = document.createElement("button");
@@ -1973,7 +1489,7 @@
           gridContainer.appendChild(btn);
         });
       }
-      // Render Garden Slots (using soilSlots and stumpSlots)
+      // Render Garden Slots if the element exists (for inline testing)
       var plantSlotsDiv = document.getElementById("plantSlots");
       if (plantSlotsDiv) {
         renderGardenSlots();
@@ -1983,7 +1499,6 @@
       updateVoltage();
       updateGarbageDisplay();
       updateEnvironmentStatus();
-      // Check character existence (if using character creation; if not, defaults to Guest)
       checkCharacterExistence();
       harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
       waterInventory = parseInt(localStorage.getItem('water')) || 0;
@@ -1996,7 +1511,7 @@
       listenForKitchenChat();
       listenForLaundryChat();
       
-      // Add chat input listener for Chat Panel (Enter key)
+      // Add chat input listener for main chat panel
       const chatInput = document.getElementById('chatInput');
       if (chatInput) {
         chatInput.addEventListener('keydown', function(event) {
@@ -2006,7 +1521,7 @@
           }
         });
       }
-      // Add chat input listener for Community Kitchen chat (Enter key)
+      // Add chat input listener for Community Kitchen chat
       const kitchenChatInput = document.getElementById('kitchenChatInput');
       if (kitchenChatInput) {
         kitchenChatInput.addEventListener('keydown', function(event) {
@@ -2016,7 +1531,7 @@
           }
         });
       }
-      // Add chat input listener for Water Supplies chat (Enter key)
+      // Add chat input listener for Water Supplies chat
       const laundryChatInput = document.getElementById('laundryChatInput');
       if (laundryChatInput) {
         laundryChatInput.addEventListener('keydown', function(event) {
