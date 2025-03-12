@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dissonance Heights - Groceries Stand</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Shared head content: fonts, favicon, styles, Firebase, etc. -->
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <style>
+    /* (Shared CSS – same as in your main file) */
+    body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    .panel { border: 2px solid #444; padding: 20px; width: 600px; margin: 20px auto; border-radius: 8px; background: rgba(0,0,0,0.7); }
+    .tab-headers { display: flex; justify-content: center; margin-bottom: 10px; }
+    .tab-button { background-color: #444; border: 1px solid #999; border-radius: 4px; color: #eee; cursor: pointer; padding: 10px; margin: 0 5px; }
+  </style>
+</head>
+<body>
+  <div class="panel" id="grocery-panel">
+    <h2>Grocery Store</h2>
+    <p>Purchase essential items. Prices may vary with electricity availability.</p>
+    <!-- Tab Headers -->
+    <div class="tab-headers">
+      <button class="tab-button active" onclick="openTab(event, 'buyTab')">Buy Items</button>
+      <button class="tab-button" onclick="openTab(event, 'sellTab')">Sell Items</button>
+    </div>
+    <!-- Tab Content -->
+    <div id="buyTab" class="tab-content" style="display: block;">
+      <div id="buySection" class="grocery-items-container">
+        <!-- Example item -->
+        <h4>Basic Food</h4>
+        <div class="grocery-item">
+          <p>
+            <strong>Food Staples</strong> - $10<br>
+            <em>Basic nourishment to reduce hunger.</em>
+          </p>
+          <button onclick="buyItem('Food Staples')">Buy Food</button>
+        </div>
+        <!-- Additional items (seeds, mushrooms, etc.) will be generated dynamically -->
+      </div>
+    </div>
+    <div id="sellTab" class="tab-content" style="display: none;">
+      <div id="sellSection">
+        <h3>Sell Your Harvest</h3>
+        <div id="sellInventory">
+          <!-- Dynamically generated sell inventory list -->
+        </div>
+        <button onclick="sellHarvest()">Sell Selected Items</button>
+      </div>
+    </div>
+    <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
+  </div>
+  <p style="text-align:center;"><a href="index.html">← Back to Main</a></p>
+  <script>
+    // (Include your JavaScript functions for grocery interactions, openTab(), buyItem(), sellHarvest(), etc.)
+  </script>
+</body>
+</html>
