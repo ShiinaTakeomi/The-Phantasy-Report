@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dissonance Heights - Garbage Chute</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Include your shared fonts, favicon, styles, Firebase SDKs, etc. -->
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <style>
+    /* (Copy all the styles from your original file) */
+    body { margin: 0; padding: 0; font-family: Arial, sans-serif; /* … */ }
+    .panel { border: 2px solid #444; padding: 20px; width: 600px; margin: 20px auto; border-radius: 8px; background: rgba(0,0,0,0.7); }
+    .control { margin: 10px 0; }
+  </style>
+  <!-- Firebase SDKs and other scripts (if needed) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+  <!-- (Other Firebase and custom scripts as in your index.html) -->
+</head>
+<body>
+  <div class="panel" id="garbage-panel">
+    <h2>Garbage Chute Control</h2>
+    <p><strong>Objective:</strong> Clear accumulated garbage before it causes a community health crisis.</p>
+    <div class="control">
+      <label>Garbage Level:</label>
+      <span id="garbageDisplay"></span> / 100
+    </div>
+    <div class="control">
+      <button onclick="clearGarbage()">Clear Garbage</button>
+    </div>
+    <div class="control">
+      <button onclick="hidePanel('garbage-panel')">Return to Main Menu</button>
+    </div>
+    <h3>Garbage Log:</h3>
+    <div id="garbageLog"></div>
+  </div>
+  <p style="text-align:center;"><a href="index.html">← Back to Main</a></p>
+  <script>
+    // (Include any JavaScript functions needed for this panel, e.g., clearGarbage(), hidePanel(), etc.)
+  </script>
+</body>
+</html>
