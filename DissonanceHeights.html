@@ -155,7 +155,6 @@
       border-radius: 4px;
       color: #222;
     }
-    /* New Recipe Book Button style removed from facilities */
     /* Character Creation Section */
     #characterCreation {
       margin: 20px auto;
@@ -605,36 +604,7 @@
             </div>
             <!-- Baking Supplies Group -->
             <h4>Baking Supplies</h4>
-            <div id="bakingContainer" class="grocery-items-container">
-              <div class="grocery-item">
-                <p>
-                  <strong>Flour</strong> - $3<br>
-                  <em>Basic baking ingredient.</em>
-                </p>
-                <button onclick="buyItem('Flour')">Buy Flour</button>
-              </div>
-              <div class="grocery-item">
-                <p>
-                  <strong>Sugar</strong> - $2<br>
-                  <em>Sweetens your recipes.</em>
-                </p>
-                <button onclick="buyItem('Sugar')">Buy Sugar</button>
-              </div>
-              <div class="grocery-item">
-                <p>
-                  <strong>Egg</strong> - $1<br>
-                  <em>Provides protein for your baked goods.</em>
-                </p>
-                <button onclick="buyItem('Egg')">Buy Egg</button>
-              </div>
-              <div class="grocery-item">
-                <p>
-                  <strong>Butter</strong> - $4<br>
-                  <em>Adds richness to recipes.</em>
-                </p>
-                <button onclick="buyItem('Butter')">Buy Butter</button>
-              </div>
-            </div>
+            <div id="bakingContainer" class="grocery-items-container"></div>
             <!-- Health Items Group -->
             <h4>Health Items</h4>
             <div id="healthItemList"></div>
@@ -655,9 +625,7 @@
       <div id="garden-panel" class="panel">
         <h2>Community Garden</h2>
         <p>Manage your rooftop garden. Plants (seeds or mushrooms) need water to mature. They require 5 minutes and sufficient water to grow.</p>
-        <div id="plantSlots">
-          <!-- Garden slots generated dynamically -->
-        </div>
+        <div id="plantSlots"></div>
         <button onclick="harvestProduce()">Harvest Produce</button>
         <button onclick="hidePanel('garden-panel')">Return to Main Menu</button>
       </div>
@@ -674,9 +642,7 @@
           <button onclick="sendKitchenChat()">Send</button>
         </div>
         <div id="cookbookTab" class="tab-content">
-          <div id="recipeContainer">
-            <!-- Recipes rendered here -->
-          </div>
+          <div id="recipeContainer"></div>
         </div>
         <button onclick="hidePanel('kitchen-panel')">Return to Main Menu</button>
       </div>
@@ -904,7 +870,7 @@
       const invDiv = document.getElementById('harvestInventory');
       let html = "";
       for (let item in harvestInventory) {
-        html += <p>${item}: ${harvestInventory[item]}</p>;
+        html += `<p>${item}: ${harvestInventory[item]}</p>`;
       }
       if (!html) html = "<p>None</p>";
       invDiv.innerHTML = html;
@@ -921,7 +887,7 @@
           let notifications = "";
           snapshot.forEach(doc => {
             const data = doc.data();
-            notifications += <p>${data.message}</p>;
+            notifications += `<p>${data.message}</p>`;
           });
           const panel = document.getElementById("notificationPanel");
           if (notifications) {
@@ -955,10 +921,11 @@
       const logDiv = document.getElementById('garbageLog');
       const player = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown player";
       const timestamp = new Date().toLocaleTimeString();
-      const logMessage = <p>[${timestamp}] ${player} cleared the garbage.</p>;
+      const logMessage = `<p>[${timestamp}] ${player} cleared the garbage.</p>`;
       logDiv.innerHTML = logMessage + logDiv.innerHTML;
       alert("Garbage has been cleared.");
     }
+
     // Panel Toggles and Navigation
     function showGarbagePanel() {
       document.getElementById('garbage-panel').style.display = 'block';
@@ -1003,15 +970,15 @@
       document.getElementById('waterPressureDisplay').textContent = pressure;
       document.getElementById('waterInventoryDisplay').textContent = waterInventory;
     }
-  function hidePanel(panelId) {
-  document.getElementById(panelId).style.display = 'none';
-  document.getElementById('main-screen').style.display = 'block';
-  // Reset background explicitly to the main menu image URL
-  document.body.style.backgroundImage = "url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
-  document.body.style.backgroundRepeat = "no-repeat";
-  document.body.style.backgroundAttachment = "fixed";
-  document.body.style.backgroundSize = "cover";
-  document.body.style.backgroundPosition = "center center";
+    function hidePanel(panelId) {
+      document.getElementById(panelId).style.display = 'none';
+      document.getElementById('main-screen').style.display = 'block';
+      // Reset background explicitly to the main menu image URL
+      document.body.style.backgroundImage = "url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+      document.body.style.backgroundRepeat = "no-repeat";
+      document.body.style.backgroundAttachment = "fixed";
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center center";
     }
     function buyItem(item) {
       const prices = {
@@ -1224,57 +1191,57 @@
           if (doc.exists) {
             const data = doc.data();
             localStorage.setItem('characterName', data.name);
-            let statusHTML = <h3>Biodata</h3>;
+            let statusHTML = `<h3>Biodata</h3>`;
             if (!isEditing) {
-              let coreStatsHTML = <h4>Core Stats</h4>;
-              coreStatsHTML += <p><strong>Name:</strong> ${data.name}</p>;
-              coreStatsHTML += <p><strong>Health:</strong> ${data.health}</p>;
-              coreStatsHTML += <div style="background:#444; border:1px solid #222; width:100%; height:20px; border-radius:5px; margin:5px 0;">
+              let coreStatsHTML = `<h4>Core Stats</h4>`;
+              coreStatsHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
+              coreStatsHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+              coreStatsHTML += `<div style="background:#444; border:1px solid #222; width:100%; height:20px; border-radius:5px; margin:5px 0;">
                    <div style="background:#4CAF50; width:${data.health}%; height:100%; border-radius:5px;"></div>
-                  </div>;
-              coreStatsHTML += <p><strong>Hunger:</strong> ${data.hunger}</p>;
-              coreStatsHTML += <p><strong>Injury:</strong> ${data.injury}</p>;
-              coreStatsHTML += <p><strong>Mood:</strong> ${data.mood}</p>;
-              coreStatsHTML += <p><strong>Room:</strong> ${data.roomNumber ? "Room " + data.roomNumber : "Not set"}</p>;
-              coreStatsHTML += <p><strong>Reputation:</strong> ${data.reputation || 0}</p>;
-              let narrativeHTML = <h4>Background</h4>;
-              narrativeHTML += <p><strong>Reason:</strong> ${data.reason || "N/A"}</p>;
-              narrativeHTML += <p><strong>Backstory:</strong> ${data.backstory || "N/A"}</p>;
-              narrativeHTML += <p><strong>Skills:</strong> ${data.skills ? data.skills.join(", ") : "N/A"}</p>;
-              narrativeHTML += <p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>;
-              narrativeHTML += <p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>;
-              let inventoryHTML = <h4>Inventory</h4>;
+                  </div>`;
+              coreStatsHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+              coreStatsHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+              coreStatsHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+              coreStatsHTML += `<p><strong>Room:</strong> ${data.roomNumber ? "Room " + data.roomNumber : "Not set"}</p>`;
+              coreStatsHTML += `<p><strong>Reputation:</strong> ${data.reputation || 0}</p>`;
+              let narrativeHTML = `<h4>Background</h4>`;
+              narrativeHTML += `<p><strong>Reason:</strong> ${data.reason || "N/A"}</p>`;
+              narrativeHTML += `<p><strong>Backstory:</strong> ${data.backstory || "N/A"}</p>`;
+              narrativeHTML += `<p><strong>Skills:</strong> ${data.skills ? data.skills.join(", ") : "N/A"}</p>`;
+              narrativeHTML += `<p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>`;
+              narrativeHTML += `<p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>`;
+              let inventoryHTML = `<h4>Inventory</h4>`;
               for (let item in harvestInventory) {
-                inventoryHTML += <p>${item}: ${harvestInventory[item]}</p>;
+                inventoryHTML += `<p>${item}: ${harvestInventory[item]}</p>`;
               }
-              if (!inventoryHTML) inventoryHTML += <p>None</p>;
-              statusHTML += <div id="coreStats">${coreStatsHTML}</div>;
-              statusHTML += <div id="narrativeStats" style="display:none;">${narrativeHTML}</div>;
-              statusHTML += <button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>;
-              statusHTML += <button onclick="enableEdit()">Edit Biodata</button>;
+              if (!inventoryHTML) inventoryHTML += `<p>None</p>`;
+              statusHTML += `<div id="coreStats">${coreStatsHTML}</div>`;
+              statusHTML += `<div id="narrativeStats" style="display:none;">${narrativeHTML}</div>`;
+              statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
+              statusHTML += `<button onclick="enableEdit()">Edit Biodata</button>`;
               statusHTML += inventoryHTML;
             } else {
-              statusHTML += <h3>Edit Character</h3>;
-              statusHTML += <div><strong>Core Stats</strong><br>;
-              statusHTML += <p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" style="height:40px; font-size:16px;" /></p>;
-              statusHTML += <p><strong>Health:</strong> ${data.health}</p>;
-              statusHTML += <p><strong>Hunger:</strong> ${data.hunger}</p>;
-              statusHTML += <p><strong>Injury:</strong> ${data.injury}</p>;
-              statusHTML += <p><strong>Mood:</strong> ${data.mood}</p>;
-              statusHTML += <p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25" style="height:40px; font-size:16px;" /></p>;
-              statusHTML += <p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" style="height:40px; font-size:16px;" /></p></div>;
-              statusHTML += <div><strong>Background</strong><br>;
-              statusHTML += <p><strong>Reason:</strong> <textarea id="editReason" style="height:80px; font-size:16px;">${data.reason}</textarea></p>;
-              statusHTML += <p><strong>Backstory:</strong> <textarea id="editBackstory" style="height:80px; font-size:16px;">${data.backstory || ""}</textarea></p>;
-              statusHTML += <p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>;
-              statusHTML += <p><strong>Alliances:</strong> <input type="text" id="editAlliances" value="${data.alliances ? data.alliances.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>;
-              statusHTML += <p><strong>Rivalries:</strong> <input type="text" id="editRivalries" value="${data.rivalries ? data.rivalries.join(", ") : ""}" style="height:40px; font-size:16px;" /></p></div>;
-              statusHTML += <button onclick="saveBiodata()">Save Changes</button>;
-              statusHTML += <button onclick="cancelEdit()">Cancel</button>;
+              statusHTML += `<h3>Edit Character</h3>`;
+              statusHTML += `<div><strong>Core Stats</strong><br>`;
+              statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" style="height:40px; font-size:16px;" /></p>`;
+              statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+              statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+              statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+              statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+              statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25" style="height:40px; font-size:16px;" /></p>`;
+              statusHTML += `<p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" style="height:40px; font-size:16px;" /></p></div>`;
+              statusHTML += `<div><strong>Background</strong><br>`;
+              statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason" style="height:80px; font-size:16px;">${data.reason}</textarea></p>`;
+              statusHTML += `<p><strong>Backstory:</strong> <textarea id="editBackstory" style="height:80px; font-size:16px;">${data.backstory || ""}</textarea></p>`;
+              statusHTML += `<p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>`;
+              statusHTML += `<p><strong>Alliances:</strong> <input type="text" id="editAlliances" value="${data.alliances ? data.alliances.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>`;
+              statusHTML += `<p><strong>Rivalries:</strong> <input type="text" id="editRivalries" value="${data.rivalries ? data.rivalries.join(", ") : ""}" style="height:40px; font-size:16px;" /></p></div>`;
+              statusHTML += `<button onclick="saveBiodata()">Save Changes</button>`;
+              statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
             }
-            statusHTML += <p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>;
-            statusHTML += <p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>;
-            statusHTML += <p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>;
+            statusHTML += `<p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>`;
+            statusHTML += `<p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>`;
+            statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
             document.getElementById('playerStatus').innerHTML = statusHTML;
             updateHarvestInventoryUI();
           }
@@ -1327,23 +1294,23 @@
         recipeDiv.className = "recipe";
         let ingredientList = "";
         for (let ingredient in recipe.ingredients) {
-          ingredientList += ${ingredient}: ${recipe.ingredients[ingredient]}<br>;
+          ingredientList += `${ingredient}: ${recipe.ingredients[ingredient]}<br>`;
         }
         let benefitsText = "";
         for (let stat in recipe.benefits) {
-          benefitsText += +${recipe.benefits[stat]} ${stat}<br>;
+          benefitsText += `+${recipe.benefits[stat]} ${stat}<br>`;
         }
         let consText = "";
         for (let stat in recipe.cons) {
-          consText += ${recipe.cons[stat] >= 0 ? "+" : ""}${recipe.cons[stat]} ${stat}<br>;
+          consText += `${recipe.cons[stat] >= 0 ? "+" : ""}${recipe.cons[stat]} ${stat}<br>`;
         }
-        recipeDiv.innerHTML = 
+        recipeDiv.innerHTML = `
           <h4>${recipe.name}</h4>
           <p><strong>Ingredients Required:</strong><br>${ingredientList}</p>
           <p><strong>Benefits:</strong><br>${benefitsText}</p>
           <p><strong>Cons:</strong><br>${consText}</p>
           <button id="createBtn${index}" onclick="createRecipe(${index})">Create ${recipe.name}</button>
-        ;
+        `;
         container.appendChild(recipeDiv);
       });
     }
@@ -1352,7 +1319,7 @@
       // Check if all required ingredients are available
       for (let ingredient in recipe.ingredients) {
         if (!harvestInventory[ingredient] || harvestInventory[ingredient] < recipe.ingredients[ingredient]) {
-          alert(You are missing enough ${ingredient} to make ${recipe.name}.);
+          alert(`You are missing enough ${ingredient} to make ${recipe.name}.`);
           return;
         }
       }
@@ -1361,7 +1328,7 @@
         removeItem(ingredient, recipe.ingredients[ingredient]);
       }
       // Disable the button
-      const btn = document.getElementById(createBtn${index});
+      const btn = document.getElementById(`createBtn${index}`);
       btn.disabled = true;
       btn.textContent = "Creating... (1 min wait)";
       // Wait one minute then apply effects
@@ -1374,9 +1341,9 @@
         if (recipe.cons.mood) updateMood(recipe.cons.mood);
         if (recipe.cons.hunger) updateHunger(recipe.cons.hunger);
         if (recipe.cons.reputation) updateReputation(recipe.cons.reputation);
-        alert(${recipe.name} has been created and its effects applied!);
+        alert(`${recipe.name} has been created and its effects applied!`);
         btn.disabled = false;
-        btn.textContent = Create ${recipe.name};
+        btn.textContent = `Create ${recipe.name}`;
         updatePlayerStatus();
       }, 60000);
     }
@@ -1406,7 +1373,7 @@
           querySnapshot.forEach((doc) => {
             const message = doc.data();
             const p = document.createElement('p');
-            p.innerHTML = <strong>${message.sender}</strong>: ${message.content};
+            p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
             chatLog.appendChild(p);
           });
           chatLog.scrollTop = chatLog.scrollHeight;
@@ -1438,7 +1405,7 @@
           querySnapshot.forEach((doc) => {
             const message = doc.data();
             const p = document.createElement('p');
-            p.innerHTML = <strong>${message.sender}</strong>: ${message.content};
+            p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
             chatLog.appendChild(p);
           });
           chatLog.scrollTop = chatLog.scrollHeight;
@@ -1480,7 +1447,7 @@
       document.getElementById('chatPanel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
       listenForMessages(roomName);
-      document.getElementById('restContainer').innerHTML = '<button onclick="restInRoom()" id="restButton">Rest (Recover Health)</button>';
+      document.getElementById('restContainer').innerHTML = `<button onclick="restInRoom()" id="restButton">Rest (Recover Health)</button>`;
     }
     function openDoorChat(roomName) {
       doorChatMode = true;
@@ -1503,7 +1470,7 @@
           querySnapshot.forEach((doc) => {
             const message = doc.data();
             const p = document.createElement('p');
-            p.innerHTML = <strong>${message.sender}</strong>: ${message.content};
+            p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
             chatLog.appendChild(p);
           });
           chatLog.scrollTop = chatLog.scrollHeight;
@@ -1577,7 +1544,7 @@
           db.collection("notifications").add({
             owner: owner,
             room: currentRoom,
-            message: ${visitor} knocked on your door of ${currentRoom}.,
+            message: `${visitor} knocked on your door of ${currentRoom}.`,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
           });
         }
@@ -1691,7 +1658,7 @@
         document.getElementById('garbageDisplay').textContent = garbageLevel;
         const logDiv = document.getElementById('garbageLog');
         const timestamp = new Date().toLocaleTimeString();
-        const logMessage = <p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>;
+        const logMessage = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>`;
         logDiv.innerHTML = logMessage + logDiv.innerHTML;
         if (garbageLevel > 80) {
           alert("High garbage levels detected! The community is getting sick.");
@@ -1701,7 +1668,7 @@
     function logPowerMessage(message) {
       const logDiv = document.getElementById('minigameLog');
       const timestamp = new Date().toLocaleTimeString();
-      logDiv.innerHTML += <p>[${timestamp}] ${message}</p>;
+      logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
       logDiv.scrollTop = logDiv.scrollHeight;
     }
     function toggleInstructions() {
@@ -1792,7 +1759,7 @@
       const basePressure = voltage >= minVoltageThreshold ? voltage * 0.8 : 0;
       const waterPressure = Math.round(basePressure * efficiency);
       const currentGarbage = garbageLevel;
-      envDiv.innerHTML = Wind Speed: ${currentWind} | Voltage: ${voltage}V | Water Pressure: ${waterPressure} PSI | Garbage Level: ${currentGarbage}/100;
+      envDiv.innerHTML = `Wind Speed: ${currentWind} | Voltage: ${voltage}V | Water Pressure: ${waterPressure} PSI | Garbage Level: ${currentGarbage}/100`;
     }
     // New Spelunking Minigame Functions
     function initSpelunkingGame() {
@@ -1939,12 +1906,12 @@
         slotDiv.className = "slot";
         slotDiv.id = "slot" + slot.slot;
         if (!slot.type) {
-          slotDiv.innerHTML = 'Slot ' + slot.slot + ': <span class="status">Empty</span> <button onclick="openPlantSelectionModal(' + slot.slot + ')">Plant Seed</button>';
+          slotDiv.innerHTML = `Slot ${slot.slot}: <span class="status">Empty</span> <button onclick="openPlantSelectionModal(${slot.slot})">Plant Seed</button>`;
         } else {
           let statusText = slot.watered ? "Watered, growing..." : "Planted: " + slot.type + " (needs water)";
-          slotDiv.innerHTML = 'Slot ' + slot.slot + ': <span class="status">' + statusText + '</span>';
+          slotDiv.innerHTML = `Slot ${slot.slot}: <span class="status">${statusText}</span>`;
           if (!slot.watered) {
-            slotDiv.innerHTML += ' <button onclick="waterPlant(' + slot.slot + ')">Water Plant</button>';
+            slotDiv.innerHTML += ` <button onclick="waterPlant(${slot.slot})">Water Plant</button>`;
           }
         }
         container.appendChild(slotDiv);
@@ -1994,8 +1961,8 @@
       seedTypes.forEach(seed => {
         let div = document.createElement("div");
         div.className = "grocery-item";
-        div.innerHTML = <p><strong>${seed}</strong> - $2<br><em>${seed} is ideal for growing nutrient-rich produce.</em></p>
-                         <button onclick="buyItem('${seed}')">Buy ${seed}</button>;
+        div.innerHTML = `<p><strong>${seed}</strong> - $2<br><em>${seed} is ideal for growing nutrient-rich produce.</em></p>
+                         <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
         seedContainer.appendChild(div);
       });
       let mushroomContainer = document.getElementById("mushroomList");
@@ -2003,18 +1970,18 @@
       mushroomTypes.forEach(mushroom => {
         let div = document.createElement("div");
         div.className = "grocery-item";
-        div.innerHTML = <p><strong>${mushroom}</strong> - $2<br><em>${mushroom} adds unique flavor and nutrients.</em></p>
-                         <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>;
+        div.innerHTML = `<p><strong>${mushroom}</strong> - $2<br><em>${mushroom} adds unique flavor and nutrients.</em></p>
+                         <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
         mushroomContainer.appendChild(div);
       });
       let bakingContainer = document.getElementById("bakingContainer");
       if (!bakingContainer) {
         bakingContainer = document.createElement("div");
         bakingContainer.id = "bakingContainer";
-        bakingContainer.innerHTML = <h4>Baking Supplies</h4>;
+        bakingContainer.innerHTML = `<h4>Baking Supplies</h4>`;
         document.getElementById("grocery-panel").appendChild(bakingContainer);
       } else {
-        bakingContainer.innerHTML = <h4>Baking Supplies</h4>;
+        bakingContainer.innerHTML = `<h4>Baking Supplies</h4>`;
       }
       let supplies = ["Flour", "Sugar", "Egg", "Butter"];
       supplies.forEach(item => {
@@ -2025,23 +1992,23 @@
                           (item === "Sugar") ? "Sweetens your recipes." :
                           (item === "Egg") ? "Provides protein for your baked goods." :
                           "Adds richness to recipes.";
-        div.innerHTML = <p><strong>${item}</strong> - $${price}<br><em>${description}</em></p>
-                         <button onclick="buyItem('${item}')">Buy ${item}</button>;
+        div.innerHTML = `<p><strong>${item}</strong> - $${price}<br><em>${description}</em></p>
+                         <button onclick="buyItem('${item}')">Buy ${item}</button>`;
         bakingContainer.appendChild(div);
       });
       let healthContainer = document.getElementById("healthItemList");
       if (!healthContainer) {
         healthContainer = document.createElement("div");
         healthContainer.id = "healthItemList";
-        healthContainer.innerHTML = <h4>Health Items</h4>;
+        healthContainer.innerHTML = `<h4>Health Items</h4>`;
         document.getElementById("grocery-panel").appendChild(healthContainer);
       } else {
-        healthContainer.innerHTML = <h4>Health Items</h4>;
+        healthContainer.innerHTML = `<h4>Health Items</h4>`;
       }
       let div = document.createElement("div");
       div.className = "grocery-item";
-      div.innerHTML = <p><strong>First Aid Kit</strong> - $8<br><em>Restores 20 health.</em></p>
-                       <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>;
+      div.innerHTML = `<p><strong>First Aid Kit</strong> - $8<br><em>Restores 20 health.</em></p>
+                       <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>`;
       healthContainer.appendChild(div);
     }
     function sellHarvest() {
@@ -2064,7 +2031,7 @@
         money += price * qty;
         localStorage.setItem('money', money);
         removeItem(item, qty);
-        alert(Sold ${qty} ${item}(s) for $${price * qty}.);
+        alert(`Sold ${qty} ${item}(s) for $${price * qty}.`);
       });
       updateSellInventory();
       updatePlayerStatus();
@@ -2087,12 +2054,12 @@
         if (qty > 0) {
           const div = document.createElement('div');
           div.className = "sell-item";
-          div.innerHTML = 
+          div.innerHTML = `
             <label>
               <input type="checkbox" class="sell-checkbox" data-item="${item}" data-qty="${qty}">
               ${item} - Quantity: ${qty}
             </label>
-          ;
+          `;
           sellDiv.appendChild(div);
         }
       }
@@ -2113,6 +2080,558 @@
       document.getElementById(tabName).style.display = "block";
       evt.currentTarget.classList.add("active");
     }
+    // End of Recipe Book & Grocery Functions
+
+    // Community Kitchen Chat Functions
+    function sendKitchenChat() {
+      const msg = document.getElementById('kitchenChatInput').value;
+      if (msg.trim() !== "") {
+        db.collection("messages").add({
+          room: "Community Kitchen",
+          sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown",
+          content: msg,
+          chatType: "kitchen",
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('kitchenChatInput').value = "";
+      }
+    }
+    function listenForKitchenChat() {
+      const chatLog = document.getElementById('kitchenChatLog');
+      db.collection("messages")
+        .where("room", "==", "Community Kitchen")
+        .where("chatType", "==", "kitchen")
+        .orderBy("timestamp")
+        .onSnapshot((querySnapshot) => {
+          chatLog.innerHTML = "";
+          querySnapshot.forEach((doc) => {
+            const message = doc.data();
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+            chatLog.appendChild(p);
+          });
+          chatLog.scrollTop = chatLog.scrollHeight;
+        });
+    }
+
+    // Water Supplies Chat Functions
+    function sendLaundryChat() {
+      const msg = document.getElementById('laundryChatInput').value;
+      if (msg.trim() !== "") {
+        db.collection("messages").add({
+          room: "Water Supplies",
+          sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown",
+          content: msg,
+          chatType: "laundry",
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('laundryChatInput').value = "";
+      }
+    }
+    function listenForLaundryChat() {
+      const chatLog = document.getElementById('laundryChatLog');
+      db.collection("messages")
+        .where("room", "==", "Water Supplies")
+        .where("chatType", "==", "laundry")
+        .orderBy("timestamp")
+        .onSnapshot((querySnapshot) => {
+          chatLog.innerHTML = "";
+          querySnapshot.forEach((doc) => {
+            const message = doc.data();
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+            chatLog.appendChild(p);
+          });
+          chatLog.scrollTop = chatLog.scrollHeight;
+        });
+    }
+    function washClothes() {
+      alert("You washed your clothes. Your health improves slightly.");
+      updateMood(3);
+    }
+
+    // Room Interaction & Chat Functions
+    function openRoomInteraction(roomName) {
+      currentRoom = roomName;
+      if (roomName === "Room 5") {
+        initSpelunkingGame();
+        return;
+      }
+      db.collection("rooms").doc(roomName).get().then(doc => {
+        if (doc.exists) {
+          const roomData = doc.data();
+          const currentPlayer = localStorage.getItem("playerName");
+          if (currentPlayer === roomData.owner) {
+            openRoomChat(roomName);
+          } else {
+            showDoorModal(roomName);
+          }
+        } else {
+          alert("Room " + roomName + " does not exist. Please contact support.");
+        }
+      }).catch(error => {
+        console.error("Error fetching room data:", error);
+        alert("Error fetching room data for " + roomName);
+      });
+    }
+    function openRoomChat(roomName) {
+      doorChatMode = false;
+      document.getElementById('chatRoomTitle').textContent = roomName + " Chat (Inside)";
+      document.getElementById('chatLog').innerHTML = "";
+      document.getElementById('chatPanel').style.display = 'block';
+      document.getElementById('main-screen').style.display = 'none';
+      listenForMessages(roomName);
+      document.getElementById('restContainer').innerHTML = `<button onclick="restInRoom()" id="restButton">Rest (Recover Health)</button>`;
+    }
+    function openDoorChat(roomName) {
+      doorChatMode = true;
+      document.getElementById('chatRoomTitle').textContent = roomName + " Door Chat (Visitor)";
+      document.getElementById('chatLog').innerHTML = "";
+      document.getElementById('chatPanel').style.display = 'block';
+      document.getElementById('main-screen').style.display = 'none';
+      document.getElementById('restContainer').innerHTML = '';
+      listenForMessages(roomName);
+    }
+    function listenForMessages(roomName) {
+      const chatLog = document.getElementById('chatLog');
+      const messagesRef = db.collection("messages");
+      messagesRef
+        .where("room", "==", roomName)
+        .where("chatType", "==", doorChatMode ? "door" : "room")
+        .orderBy("timestamp")
+        .onSnapshot((querySnapshot) => {
+          chatLog.innerHTML = "";
+          querySnapshot.forEach((doc) => {
+            const message = doc.data();
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+            chatLog.appendChild(p);
+          });
+          chatLog.scrollTop = chatLog.scrollHeight;
+        });
+    }
+    function closeChat() {
+      document.getElementById('chatPanel').style.display = 'none';
+      document.getElementById('main-screen').style.display = 'block';
+      currentRoom = "";
+    }
+    async function sendChatMessage() {
+      const msg = document.getElementById('chatInput').value;
+      if (msg.trim() !== "") {
+        const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Unknown";
+        try {
+          await db.collection("messages").add({
+            room: currentRoom,
+            sender: characterName,
+            content: msg,
+            chatType: doorChatMode ? "door" : "room",
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          document.getElementById('chatInput').value = "";
+        } catch (error) {
+          console.error("Error sending message:", error);
+        }
+      }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      const chatInput = document.getElementById('chatInput');
+      if (chatInput) {
+        chatInput.addEventListener('keydown', function(event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            sendChatMessage();
+          }
+        });
+      }
+    });
+    // Door Modal Functions
+    function showDoorModal(roomName) {
+      currentRoom = roomName;
+      document.getElementById('doorTitle').textContent = "You are at the door of " + roomName;
+      document.getElementById('doorModal').style.display = 'block';
+      document.getElementById('passwordDiv').style.display = 'none';
+      document.getElementById('doorPassword').value = "";
+    }
+    function closeDoorModal() {
+      document.getElementById('doorModal').style.display = 'none';
+    }
+    function showPasswordInput() {
+      document.getElementById('passwordDiv').style.display = 'block';
+    }
+    function verifyPassword() {
+      const enteredPassword = document.getElementById('doorPassword').value;
+      const correctPassword = roomPasswords[currentRoom];
+      if (enteredPassword === correctPassword) {
+        alert("Password correct. You now enter the room.");
+        closeDoorModal();
+        openRoomChat(currentRoom);
+      } else {
+        alert("Incorrect password. Please try again or choose to knock.");
+      }
+    }
+    function handleKnock() {
+      alert("You knocked on the door. Please wait for the owner’s response.");
+      db.collection("rooms").doc(currentRoom).get().then(doc => {
+        if (doc.exists) {
+          const owner = doc.data().owner;
+          const visitor = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "A visitor";
+          db.collection("notifications").add({
+            owner: owner,
+            room: currentRoom,
+            message: `${visitor} knocked on your door of ${currentRoom}.`,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+      }).catch(error => {
+        console.error("Error sending knock notification:", error);
+      });
+      closeDoorModal();
+      openDoorChat(currentRoom);
+    }
+    // New Power Panel Simulation Functions & Controls
+    let windSpeed = localStorage.getItem('windSpeed') || 50;
+    let electricalOutput = false;
+    let lastInteractionTime = localStorage.getItem('lastInteractionTime') || Date.now();
+    let garbageLevel = localStorage.getItem('garbageLevel') || 0;
+    let lastGarbageUpdate = localStorage.getItem('lastGarbageUpdate') || Date.now();
+    let powerStatus = "Unknown";
+    function updateWindSpeed() {
+      windSpeed = document.getElementById('windSpeedSlider').value;
+      document.getElementById('windSpeedValue').textContent = windSpeed;
+      localStorage.setItem('windSpeed', windSpeed);
+      updateVoltage();
+      updateLastInteraction();
+      updateElectricalStatus();
+    }
+    function toggleElectricalOutput() {
+      electricalOutput = !electricalOutput;
+      document.getElementById('outputLeverButton').textContent = electricalOutput ? "Output On" : "Output Off";
+      updateLastInteraction();
+      updateElectricalStatus();
+    }
+    function checkWaterPressure() {
+      const pressure = Math.floor(Math.random() * 41) + 80;
+      alert("Current Water Pressure: " + pressure + " PSI.\nOptimal is above 90 PSI.");
+      updateLastInteraction();
+      updateElectricalStatus();
+    }
+    function checkHeaterLevel() {
+      const heater = Math.floor(Math.random() * 41) + 80;
+      alert("Current Heater Level: " + heater + ".\nOptimal is above 90.");
+      updateLastInteraction();
+      updateElectricalStatus();
+    }
+    function updateElectricalStatus() {
+      if (windSpeed >= 40 && windSpeed <= 70 && electricalOutput) {
+        powerStatus = "On";
+        document.getElementById('lightStatusDisplay').textContent = "Lights On";
+      } else {
+        powerStatus = "Off";
+        document.getElementById('lightStatusDisplay').textContent = "Lights Off";
+      }
+      document.getElementById('powerStatusDisplay').textContent = powerStatus;
+    }
+    function updateVoltage() {
+      let factor = electricalOutput ? 1.0 : 0.5;
+      let voltage = Math.round(windSpeed * factor + (Math.random() * 10 - 5));
+      voltage = Math.max(0, voltage);
+      const voltageDisplayElement = document.getElementById('voltageDisplay');
+      if (voltageDisplayElement) {
+        voltageDisplayElement.textContent = voltage.toFixed(1);
+      }
+      localStorage.setItem('voltage', voltage);
+    }
+    function simulatePowerEvent() {
+      if (Date.now() - lastInteractionTime > 60000) {
+        const malfunctionType = Math.floor(Math.random() * 5);
+        let malfunctionMessage = "";
+        switch(malfunctionType) {
+          case 0:
+            malfunctionMessage = "Wind calibration error: Re-adjust the wind speed slider to bring it into the optimal range (40–70).";
+            break;
+          case 1:
+            malfunctionMessage = "Electrical output fluctuation: Toggle the electrical output lever to stabilize the system.";
+            break;
+          case 2:
+            malfunctionMessage = "Water pressure drop: Press 'Check Water' to review and fix water pressure issues.";
+            break;
+          case 3:
+            malfunctionMessage = "Heater level fluctuation: Press 'Check Heater' to ensure heater levels are optimal.";
+            break;
+          case 4:
+            malfunctionMessage = "Sensor error: Re-check all controls (wind speed, output lever, water, heater) to recalibrate the system.";
+            break;
+        }
+        alert("Malfunction Detected!\n" + malfunctionMessage);
+        const playerEmail = localStorage.getItem('playerName');
+        if (playerEmail) {
+          const safePlayerName = sanitizePlayerName(playerEmail);
+          db.collection('players').doc(safePlayerName).get().then(doc => {
+            if (doc.exists) {
+              let currentHealth = doc.data().health || 100;
+              let newHealth = Math.max(0, currentHealth - 5);
+              db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+              if (newHealth === 0) {
+                playerDied();
+              }
+            }
+          });
+        }
+        updateLastInteraction();
+      }
+    }
+    function updateGarbageDisplay() {
+      document.getElementById('garbageDisplay').textContent = garbageLevel;
+      const now = Date.now();
+      const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
+      if (elapsedMinutes > 0) {
+        garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
+        lastGarbageUpdate = now;
+        localStorage.setItem('garbageLevel', garbageLevel);
+        localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
+        document.getElementById('garbageDisplay').textContent = garbageLevel;
+        const logDiv = document.getElementById('garbageLog');
+        const timestamp = new Date().toLocaleTimeString();
+        const logMessage = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>`;
+        logDiv.innerHTML = logMessage + logDiv.innerHTML;
+        if (garbageLevel > 80) {
+          alert("High garbage levels detected! The community is getting sick.");
+        }
+      }
+    }
+    function logPowerMessage(message) {
+      const logDiv = document.getElementById('minigameLog');
+      const timestamp = new Date().toLocaleTimeString();
+      logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+    function toggleInstructions() {
+      const instrDiv = document.getElementById("instructions");
+      instrDiv.style.display = (instrDiv.style.display === "none" || instrDiv.style.display === "") ? "block" : "none";
+    }
+    function updateLastInteraction() {
+      lastInteractionTime = Date.now();
+      localStorage.setItem('lastInteractionTime', lastInteractionTime);
+    }
+    function simulateHealthDecline() {
+      if (garbageLevel > 80) {
+        const playerEmail = localStorage.getItem('playerName');
+        if (!playerEmail) return;
+        const safePlayerName = sanitizePlayerName(playerEmail);
+        db.collection('players').doc(safePlayerName).get().then((doc) => {
+          if (doc.exists) {
+            let data = doc.data();
+            let currentHealth = data.health || 100;
+            let extraDecline = 0;
+            if (data.hunger > 70) extraDecline += 1;
+            if (data.mood < 30) extraDecline += 1;
+            let newHealth = Math.max(0, currentHealth - 1 - extraDecline);
+            db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+            if (newHealth === 0) {
+              playerDied();
+            }
+          }
+        }).catch((error) => {
+          console.error("Error decreasing health: ", error);
+        });
+      }
+    }
+    function playerDied() {
+      alert("Your health has reached zero. You have died.");
+      clearGameState();
+      window.location.href = "index.html";
+    }
+    // New Functionality: Rest in Room to Recover Health
+    function restInRoom() {
+      let restButton = document.getElementById("restButton");
+      if (!restButton) return;
+      restButton.disabled = true;
+      restButton.textContent = "Resting...";
+      const playerName = localStorage.getItem('playerName');
+      if (!playerName) return;
+      const safePlayerName = sanitizePlayerName(playerName);
+      let iterations = 12;
+      let interval = setInterval(() => {
+        iterations--;
+        db.collection('players').doc(safePlayerName).get().then(doc => {
+          if (doc.exists) {
+            let currentHealth = doc.data().health || 100;
+            let newHealth = Math.min(100, currentHealth + 2);
+            db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+          }
+        });
+        if (iterations <= 0) {
+          clearInterval(interval);
+          restButton.disabled = false;
+          restButton.textContent = "Rest (Recover Health)";
+          alert("Rest complete! Your health has improved.");
+        }
+      }, 5000);
+    }
+    function toggleMusicPlayer() {
+      var player = document.getElementById("bgMusic");
+      if (player.style.display === "none" || player.style.display === "" || player.style.width === "0px") {
+        player.style.display = "block";
+        player.style.width = "300px";
+        player.style.height = "200px";
+        player.style.position = "relative";
+        player.style.left = "0";
+      } else {
+        player.style.display = "none";
+        player.style.width = "0";
+        player.style.height = "0";
+        player.style.position = "absolute";
+        player.style.left = "-9999px";
+      }
+    }
+    function updateEnvironmentStatus() {
+      const envDiv = document.getElementById('envStatus');
+      const currentWind = windSpeed;
+      const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
+      const efficiency = Math.max(0.5, 1 - (garbageLevel / 200));
+      const minVoltageThreshold = 20;
+      const basePressure = voltage >= minVoltageThreshold ? voltage * 0.8 : 0;
+      const waterPressure = Math.round(basePressure * efficiency);
+      const currentGarbage = garbageLevel;
+      envDiv.innerHTML = `Wind Speed: ${currentWind} | Voltage: ${voltage}V | Water Pressure: ${waterPressure} PSI | Garbage Level: ${currentGarbage}/100`;
+    }
+    // New Spelunking Minigame Functions
+    function initSpelunkingGame() {
+      document.getElementById('mainGame').style.display = 'none';
+      document.getElementById('spelunkingGame').style.display = 'block';
+      const canvas = document.getElementById('spelunkingCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const gameState = {
+        player: { x: canvas.width / 2, y: canvas.height - 60, width: 30, height: 30, speed: 4 },
+        cave: generateCaveLayout(canvas.width, canvas.height),
+        enemies: []
+      };
+      setupSpelunkingControls(gameState);
+      function gameLoop() {
+        updateGameState(gameState);
+        renderGame(ctx, gameState);
+        requestAnimationFrame(gameLoop);
+      }
+      gameLoop();
+    }
+    function generateCaveLayout(width, height) {
+      const rows = 20;
+      const cols = 20;
+      const cellWidth = width / cols;
+      const cellHeight = height / rows;
+      const cave = [];
+      for (let i = 0; i < rows; i++) {
+        cave[i] = [];
+        for (let j = 0; j < cols; j++) {
+          cave[i][j] = Math.random() < 0.2 ? 1 : 0;
+        }
+      }
+      return { grid: cave, rows, cols, cellWidth, cellHeight };
+    }
+    function updateGameState(gameState) {
+      // Player movement is handled by keyboard events
+    }
+    function renderGame(ctx, gameState) {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      const cave = gameState.cave;
+      for (let i = 0; i < cave.rows; i++) {
+        for (let j = 0; j < cave.cols; j++) {
+          if (cave.grid[i][j] === 1) {
+            ctx.fillStyle = '#222';
+            ctx.fillRect(j * cave.cellWidth, i * cave.cellHeight, cave.cellWidth, cave.cellHeight);
+          }
+        }
+      }
+      ctx.fillStyle = '#FFD700';
+      ctx.fillRect(gameState.player.x, gameState.player.y, gameState.player.width, gameState.player.height);
+    }
+    function setupSpelunkingControls(gameState) {
+      document.addEventListener('keydown', function(e) {
+        switch(e.key) {
+          case "ArrowUp":
+            gameState.player.y -= gameState.player.speed;
+            break;
+          case "ArrowDown":
+            gameState.player.y += gameState.player.speed;
+            break;
+          case "ArrowLeft":
+            gameState.player.x -= gameState.player.speed;
+            break;
+          case "ArrowRight":
+            gameState.player.x += gameState.player.speed;
+            break;
+        }
+      });
+    }
+    function exitSpelunkingGame() {
+      document.getElementById('spelunkingGame').style.display = 'none';
+      document.getElementById('mainGame').style.display = 'block';
+    }
+    // End of Spelunking Functions
+    // Tab functions for Community Kitchen Panel
+    function openKitchenTab(evt, tabName) {
+      const tabcontents = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < tabcontents.length; i++) {
+        tabcontents[i].classList.remove("active");
+      }
+      const tabbuttons = document.getElementsByClassName("tab-button");
+      for (let i = 0; i < tabbuttons.length; i++) {
+        tabbuttons[i].classList.remove("active");
+      }
+      document.getElementById(tabName).classList.add("active");
+      if (evt) {
+        evt.currentTarget.classList.add("active");
+      }
+      // If the cookbook tab is selected, render recipes
+      if (tabName === 'cookbookTab') {
+        renderRecipes();
+      }
+    }
+    window.onload = function() {
+      var roomSelect = document.getElementById('roomNumber');
+      if (roomSelect) {
+        for (let i = 1; i <= 25; i++) {
+          let option = document.createElement('option');
+          option.value = i;
+          option.textContent = "Room " + i;
+          roomSelect.appendChild(option);
+        }
+      }
+      var gridContainer = document.querySelector(".grid");
+      if (gridContainer) {
+        const rooms = [21,22,23,24,25,16,17,18,19,20,11,12,13,14,15,6,7,8,9,10,1,2,3,4,5];
+        rooms.forEach(function(room) {
+          let btn = document.createElement("button");
+          btn.textContent = "Room " + room;
+          btn.onclick = function() { openRoomInteraction("Room " + room); };
+          gridContainer.appendChild(btn);
+        });
+      }
+      var plantSlotsDiv = document.getElementById("plantSlots");
+      if (plantSlotsDiv) {
+        renderGardenSlots();
+      }
+      document.getElementById('windSpeedSlider').value = windSpeed;
+      document.getElementById('windSpeedValue').textContent = windSpeed;
+      updateVoltage();
+      updateGarbageDisplay();
+      updateEnvironmentStatus();
+      if (localStorage.getItem('playerName')) {
+        checkCharacterExistence();
+      }
+      harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
+      waterInventory = parseInt(localStorage.getItem('water')) || 0;
+      generateGroceryItems();
+      setInterval(simulatePowerEvent, 60000);
+      setInterval(updateGarbageDisplay, 60000);
+      setInterval(updateVoltage, 5000);
+      setInterval(simulateHealthDecline, 60000);
+      setInterval(updateEnvironmentStatus, 5000);
+      listenForKitchenChat();
+      listenForLaundryChat();
+    };
   </script>
 </body>
 </html>
