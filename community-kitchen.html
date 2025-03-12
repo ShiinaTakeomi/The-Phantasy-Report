@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dissonance Heights - Community Kitchen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Shared head content -->
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <style>
+    body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    .panel { border: 2px solid #444; padding: 20px; width: 600px; margin: 20px auto; border-radius: 8px; background: rgba(0,0,0,0.7); }
+    .tab-headers { display: flex; justify-content: center; margin-bottom: 10px; }
+    .tab-button { background-color: #444; border: 1px solid #999; border-radius: 4px; color: #eee; cursor: pointer; padding: 10px; margin: 0 5px; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body>
+  <div class="panel" id="kitchen-panel">
+    <h2>Community Kitchen</h2>
+    <div class="tab-headers">
+      <button class="tab-button active" onclick="openKitchenTab(event, 'kitchenChatTab')">Chat</button>
+      <button class="tab-button" onclick="openKitchenTab(event, 'cookbookTab')">Cookbook</button>
+    </div>
+    <div id="kitchenChatTab" class="tab-content active">
+      <div id="kitchenChatLog" class="chatArea" style="height:150px; overflow-y:auto; background: rgba(255,255,255,0.1); color:#fff; border:1px solid #ccc; padding:10px; border-radius:4px;"></div>
+      <input type="text" id="kitchenChatInput" placeholder="Type a message...">
+      <button onclick="sendKitchenChat()">Send</button>
+    </div>
+    <div id="cookbookTab" class="tab-content">
+      <div id="recipeContainer"></div>
+      <div id="cookingProcess">Cooking in progress... Please wait 1 minute.</div>
+    </div>
+    <button onclick="hidePanel('kitchen-panel')">Return to Main Menu</button>
+  </div>
+  <p style="text-align:center;"><a href="index.html">← Back to Main</a></p>
+  <script>
+    // (Include your JavaScript functions for community kitchen: openKitchenTab(), sendKitchenChat(), renderRecipes(), etc.)
+  </script>
+</body>
+</html>
