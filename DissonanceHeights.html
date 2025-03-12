@@ -967,12 +967,20 @@
     // New Garbage Chute Clear Function
     // ----------------------------
     // Add the following function to fix the garbage chute.
-    function clearGarbage() {
-      garbageLevel = 0;
-      localStorage.setItem('garbageLevel', garbageLevel);
-      document.getElementById('garbageDisplay').textContent = garbageLevel;
-      alert("Garbage has been cleared.");
-    }
+function clearGarbage() {
+  garbageLevel = 0;
+  localStorage.setItem('garbageLevel', garbageLevel);
+  document.getElementById('garbageDisplay').textContent = garbageLevel;
+  const logDiv = document.getElementById('garbageLog');
+  // Get the player's name (or fallback to "Unknown player")
+  const player = localStorage.getItem('playerName') || "Unknown player";
+  const timestamp = new Date().toLocaleTimeString();
+  // Prepend the log message so the newest entry appears at the top
+  const logMessage = `<p>[${timestamp}] ${player} cleared the garbage.</p>`;
+  logDiv.innerHTML = logMessage + logDiv.innerHTML;
+  alert("Garbage has been cleared.");
+}
+
 
     // ----------------------------
     // Panel Toggles and Navigation
