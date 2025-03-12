@@ -1750,26 +1750,34 @@
         container.appendChild(div);
       });
     }
-    function openPlantSelection(slotNum, category) {
-      let available = (category === 'soil') ? seedTypes : mushroomTypes;
-      const type = prompt("Enter the type to plant (choose from: " + available.join(", ") + ")");
-      if (!type) return;
-      if (available.indexOf(type) === -1) {
-        alert("Invalid type. Please choose from: " + available.join(", "));
-        return;
-      }
-      if (!harvestInventory[type] || harvestInventory[type] < 1) {
-        alert("You do not have any " + type + " in your inventory.");
-        return;
-      }
-      removeItem(type, 1);
-      if (category === 'soil') {
-        soilSlots[slotNum - 1] = { slot: slotNum, type: type, watered: false, timer: null };
-      } else {
-        stumpSlots[slotNum - 1] = { slot: slotNum, type: type, watered: false, timer: null };
-      }
-      renderGardenSlots();
-    }
+function openPlantSelection(slotNum, category) {
+  // Determine allowed types based on category
+  let available = (category === 'soil') ? seedTypes : mushroomTypes;
+  // Filter the allowed types by those that exist in the player's inventory
+  let inventoryOptions = available.filter(type => harvestInventory[type] && harvestInventory[type] > 0);
+  
+  // If no available items in inventory, alert and exit
+  if (inventoryOptions.length === 0) {
+    alert("You do not have any " + (category === 'soil' ? "seeds" : "mushrooms") + " in your inventory.");
+    return;
+  }
+  
+  // Automatically select the first available type from the inventory
+  let selectedType = inventoryOptions[0];
+  
+  // Remove one unit of the selected item from the inventory
+  removeItem(selectedType, 1);
+  
+  // Update the appropriate garden slot with the selected type
+  if (category === 'soil') {
+    soilSlots[slotNum - 1] = { slot: slotNum, type: selectedType, watered: false, timer: null };
+  } else {
+    stumpSlots[slotNum - 1] = { slot: slotNum, type: selectedType, watered: false, timer: null };
+  }
+  
+  // Re-render the garden slots to show the update
+  renderGardenSlots();
+}
     function waterPlant(slotNum, category) {
       if (waterInventory < 1) {
         alert("No water available. Please collect water.");
