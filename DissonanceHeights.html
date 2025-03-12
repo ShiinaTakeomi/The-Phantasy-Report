@@ -1722,21 +1722,34 @@
       }
     }
 
-    function updateGarbageDisplay() {
-      document.getElementById('garbageDisplay').textContent = garbageLevel;
-      const now = Date.now();
-      const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
-      if (elapsedMinutes > 0) {
-        garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
-        lastGarbageUpdate = now;
-        localStorage.setItem('garbageLevel', garbageLevel);
-        localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
-        document.getElementById('garbageDisplay').textContent = garbageLevel;
-        if (garbageLevel > 80) {
-          alert("High garbage levels detected! The community is getting sick.");
-        }
-      }
+function updateGarbageDisplay() {
+  // Update the garbage display number
+  document.getElementById('garbageDisplay').textContent = garbageLevel;
+  
+  const now = Date.now();
+  const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
+  
+  if (elapsedMinutes > 0) {
+    garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
+    lastGarbageUpdate = now;
+    localStorage.setItem('garbageLevel', garbageLevel);
+    localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
+    
+    // Update the display with the new garbage level
+    document.getElementById('garbageDisplay').textContent = garbageLevel;
+    
+    // Append a log entry with a timestamp
+    const logDiv = document.getElementById('garbageLog');
+    const timestamp = new Date().toLocaleTimeString();
+    const logMessage = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>`;
+    logDiv.innerHTML = logMessage + logDiv.innerHTML; // Prepend new log message
+
+    if (garbageLevel > 80) {
+      alert("High garbage levels detected! The community is getting sick.");
     }
+  }
+}
+
 
     function logPowerMessage(message) {
       const logDiv = document.getElementById('minigameLog');
