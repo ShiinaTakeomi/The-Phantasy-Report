@@ -583,7 +583,7 @@
         <h3>Garbage Log:</h3>
         <div id="garbageLog"></div>
       </div>
-      <!-- Grocery Stand Tabbed Section Start -->
+      <!-- Grocery Stand Tabbed Section -->
       <div id="grocery-panel" class="panel">
         <h2>Grocery Store</h2>
         <p>Purchase essential items. Prices may vary with electricity availability.</p>
@@ -653,7 +653,6 @@
         </div>
         <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
       </div>
-      <!-- Grocery Stand Tabbed Section End -->
       <!-- Community Garden Panel -->
       <div id="garden-panel" class="panel">
         <h2>Community Garden</h2>
@@ -687,7 +686,7 @@
         <div id="recipeListContainer" style="max-height:300px; overflow-y:auto;"></div>
         <button onclick="hidePanel('recipePanel'); openKitchenPanel();">Cancel</button>
       </div>
-      <!-- Water Supplies Panel (with refined water pressure calculation) -->
+      <!-- Water Supplies Panel -->
       <div id="water-panel" class="panel">
         <h2>Water Supplies (Laundry)</h2>
         <p>Water pressure is directly linked to the performance of the power panel and the environmental efficiency (affected by garbage levels). Use the washing machine to clean clothes – remember, low power output or high garbage may result in lower water pressure.</p>
@@ -718,7 +717,6 @@
         <input type="text" id="chatInput" placeholder="Type your message...">
         <button onclick="sendChatMessage()">Send</button>
         <button onclick="closeChat()">Close Chat</button>
-        <!-- Rest button will appear here for room owners -->
         <div id="restContainer" style="margin-top:10px;"></div>
       </div>
     </div>
@@ -735,7 +733,7 @@
       </div>
       <button onclick="closeDoorModal()">Cancel</button>
     </div>
-    <!-- NEW: Spelunking Game Container (triggered in Room 5) -->
+    <!-- Spelunking Game Container -->
     <div id="spelunkingGame">
       <canvas id="spelunkingCanvas"></canvas>
       <button id="exitSpelunking" onclick="exitSpelunkingGame()">Exit Cave</button>
@@ -817,7 +815,7 @@
     ];
 
     // ----------------------------
-    // Centralized Recipes Array – now with numeric benefits!
+    // Centralized Recipes Array
     // ----------------------------
     const recipes = [];
     for (let i = 0; i < 10; i++) {
@@ -1017,9 +1015,13 @@
       document.getElementById('waterInventoryDisplay').textContent = waterInventory;
     }
 
+    // ----------------------------
+    // Updated hidePanel() Function (Fix)
+    // ----------------------------
     function hidePanel(panelId) {
       document.getElementById(panelId).style.display = 'none';
       document.getElementById('main-screen').style.display = 'block';
+      // Reset background to original main menu background
       document.body.style.backgroundImage = "url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
       document.body.style.backgroundRepeat = "no-repeat";
       document.body.style.backgroundAttachment = "fixed";
@@ -1460,7 +1462,6 @@
     // ----------------------------
     function openRoomInteraction(roomName) {
       currentRoom = roomName;
-      // If the player enters Room 5, start the spelunking minigame
       if (roomName === "Room 5") {
         initSpelunkingGame();
         return;
@@ -1489,7 +1490,6 @@
       document.getElementById('chatPanel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
       listenForMessages(roomName);
-      // Add the Rest button for the room owner
       document.getElementById('restContainer').innerHTML = '<button onclick="restInRoom()" id="restButton">Rest (Recover Health)</button>';
     }
     function openDoorChat(roomName) {
@@ -1498,7 +1498,6 @@
       document.getElementById('chatLog').innerHTML = "";
       document.getElementById('chatPanel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
-      // Remove the rest button when not the owner
       document.getElementById('restContainer').innerHTML = '';
       listenForMessages(roomName);
     }
@@ -1778,10 +1777,9 @@
       const playerName = localStorage.getItem('playerName');
       if (!playerName) return;
       const safePlayerName = sanitizePlayerName(playerName);
-      let iterations = 12; // 12 iterations of 5 seconds = 60 seconds
+      let iterations = 12;
       let interval = setInterval(() => {
         iterations--;
-        // Update player's health: increase by 2 points (max health is 100)
         db.collection('players').doc(safePlayerName).get().then(doc => {
           if (doc.exists) {
             let currentHealth = doc.data().health || 100;
@@ -1831,26 +1829,18 @@
     // New Spelunking Minigame Functions
     // ----------------------------
     function initSpelunkingGame() {
-      // Hide main game and show spelunking container
       document.getElementById('mainGame').style.display = 'none';
       document.getElementById('spelunkingGame').style.display = 'block';
-
       const canvas = document.getElementById('spelunkingCanvas');
       const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-
-      // Initialize game state for spelunking
       const gameState = {
         player: { x: canvas.width / 2, y: canvas.height - 60, width: 30, height: 30, speed: 4 },
         cave: generateCaveLayout(canvas.width, canvas.height),
-        enemies: [] // Can add enemy objects later
+        enemies: []
       };
-
-      // Set up keyboard controls for the spelunking game
       setupSpelunkingControls(gameState);
-
-      // Start the game loop
       function gameLoop() {
         updateGameState(gameState);
         renderGame(ctx, gameState);
@@ -1868,7 +1858,6 @@
       for (let i = 0; i < rows; i++) {
         cave[i] = [];
         for (let j = 0; j < cols; j++) {
-          // 0: open space, 1: wall; adjust probability as needed for jagged cave walls.
           cave[i][j] = Math.random() < 0.2 ? 1 : 0;
         }
       }
@@ -1876,24 +1865,20 @@
     }
 
     function updateGameState(gameState) {
-      // You can add collision detection and enemy updates here
-      // Currently, the player movement is handled by keyboard events
+      // Add game state updates or collision detection here if needed.
     }
 
     function renderGame(ctx, gameState) {
-      // Clear the canvas
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      // Draw cave layout
       const cave = gameState.cave;
       for (let i = 0; i < cave.rows; i++) {
         for (let j = 0; j < cave.cols; j++) {
           if (cave.grid[i][j] === 1) {
-            ctx.fillStyle = '#222'; // Wall color
+            ctx.fillStyle = '#222';
             ctx.fillRect(j * cave.cellWidth, i * cave.cellHeight, cave.cellWidth, cave.cellHeight);
           }
         }
       }
-      // Draw player as a rectangle
       ctx.fillStyle = '#FFD700';
       ctx.fillRect(gameState.player.x, gameState.player.y, gameState.player.width, gameState.player.height);
     }
@@ -1921,10 +1906,6 @@
       document.getElementById('spelunkingGame').style.display = 'none';
       document.getElementById('mainGame').style.display = 'block';
     }
-
-    // ----------------------------
-    // End of Spelunking Functions
-    // ----------------------------
 
     window.onload = function() {
       var roomSelect = document.getElementById('roomNumber');
@@ -2030,9 +2011,7 @@
       }, 300000);
     }
 
-    // Updated generateGroceryItems() with grouped categories
     function generateGroceryItems() {
-      // Populate Seeds container
       let seedContainer = document.getElementById("seedList");
       seedContainer.innerHTML = "";
       seedTypes.forEach(seed => {
@@ -2042,7 +2021,6 @@
                          <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
         seedContainer.appendChild(div);
       });
-      // Populate Mushrooms container
       let mushroomContainer = document.getElementById("mushroomList");
       mushroomContainer.innerHTML = "";
       mushroomTypes.forEach(mushroom => {
@@ -2052,7 +2030,6 @@
                          <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
         mushroomContainer.appendChild(div);
       });
-      // Populate Health Items container
       let healthContainer = document.getElementById("healthItemList");
       if (!healthContainer) {
         healthContainer = document.createElement("div");
