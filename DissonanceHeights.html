@@ -47,6 +47,65 @@
       padding: 10px;
       border-radius: 8px;
     }
+    /* --- Absolute Positioned Buttons (restored) --- */
+    .garbage-chute {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 50px;
+      height: 520px;
+      background-color: rgba(211,211,211,0.3);
+      border: 2px solid #999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      writing-mode: vertical-rl;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 5px;
+      border-radius: 4px;
+    }
+    .exit-button {
+      position: absolute;
+      left: 0;
+      top: 530px;
+      padding: 10px 15px;
+      background-color: #FF4136;
+      border: 2px solid #fff;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 4px;
+      color: #fff;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      z-index: 1001;
+    }
+    .garden-button {
+      position: absolute;
+      left: 210px;
+      top: 10px;
+      padding: 10px;
+      background-color: #5DADE2;
+      border: 2px solid #fff;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .power-room {
+      position: absolute;
+      top: 210px;
+      left: calc(60px + 520px + 10px);
+      width: 100px;
+      height: 100px;
+      background-color: rgba(192,192,255,0.5);
+      border: 2px solid #666;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 4px;
+    }
+    /* --- End Absolute Positioned Buttons --- */
+
     /* Navigation Links – these link to the modular pages */
     .nav-links {
       display: flex;
@@ -233,10 +292,22 @@
       <!-- Main Screen -->
       <div id="main-screen">
         <div class="container">
-          <!-- Navigation Links to Modular Pages -->
+          <!-- Absolute Positioned Buttons (restored) -->
+          <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
+          <button class="exit-button" onclick="signOutUser()">Exit</button>
+          <script>
+            function signOutUser() {
+              firebase.auth().signOut().then(() => {
+                clearGameState();
+                window.location.href = 'index.html';
+              }).catch((error) => {
+                console.error("Error signing out: ", error);
+              });
+            }
+          </script>
+          <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
+          <!-- Navigation Links to Modular Pages (also available in the hub grid) -->
           <div class="nav-links">
-            <a href="garbage-chute.html"><button>Garbage Chute</button></a>
-            <a href="community-garden.html"><button>Community Garden</button></a>
             <a href="community-kitchen.html"><button>Community Kitchen</button></a>
             <a href="groceries-stand.html"><button>Groceries Stand</button></a>
             <a href="water-supplies.html"><button>Water Supplies (Laundry)</button></a>
@@ -308,6 +379,7 @@
       measurementId: "G-9MS36H0YV4"
     };
     firebase.initializeApp(firebaseConfig);
+    // Authentication functions removed per requirement.
     const db = firebase.firestore();
     const storage = firebase.storage();
 
@@ -340,7 +412,7 @@
       "Room 25": "0025"
     };
 
-    // Global Variables
+    // Global variables
     let currentRoom = "";
     let doorChatMode = false;
     let harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
@@ -360,7 +432,7 @@
       timer: null
     }));
 
-    // Seeds and Mushrooms
+    // Seeds and Mushrooms (exactly 5 each)
     const seedTypes = [
       "Sunflower Seed", "Pumpkin Seed", "Corn Seed", "Wheat Seed", "Rice Seed"
     ];
@@ -368,7 +440,7 @@
       "Button Mushroom", "Portobello Mushroom", "Shiitake Mushroom", "Oyster Mushroom", "Enoki Mushroom"
     ];
 
-    // Cookie Recipes
+    // Cookie Recipes (exactly 4 types)
     const recipes = [
       {
         name: "Vitality Cookie",
@@ -396,7 +468,7 @@
       }
     ];
 
-    // Helper Functions for Updating Stats
+    // Helper Functions: Update Mood, Hunger, Health, Reputation
     function updateMood(delta) {
       let playerName = localStorage.getItem('playerName') || "Guest";
       const safePlayerName = sanitizePlayerName(playerName);
@@ -498,9 +570,56 @@
       keys.forEach(key => localStorage.removeItem(key));
     }
 
-    // (Panel showing/hiding functions are not needed here since each module is separate)
+    // Panel Navigation Functions
+    function showGarbagePanel() {
+      document.getElementById('garbage-panel').style.display = 'block';
+      document.getElementById('main-screen').style.display = 'none';
+    }
+    function showPowerPanel() {
+      document.body.style.backgroundImage = "url('https://i.pinimg.com/736x/2d/d9/76/2dd9762815138628d3c380fe097241d2.jpg')";
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center center";
+      document.getElementById('minigame-panel').style.display = 'block';
+      document.getElementById('main-screen').style.display = 'none';
+    }
+    function openGroceryPanel() {
+      document.getElementById('grocery-panel').style.display = 'block';
+      document.getElementById('main-screen').style.display = 'none';
+      generateGroceryItems();
+      updateHarvestInventoryUI();
+    }
+    function openGardenPanel() {
+      document.body.style.backgroundImage = "url('https://i.pinimg.com/736x/1a/97/af/1a97af089b326864a32ddb9f788c7c2d.jpg')";
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center center";
+      document.getElementById('garden-panel').style.display = 'block';
+      document.getElementById('main-screen').style.display = 'none';
+      renderGardenSlots();
+    }
+    function openKitchenPanel() {
+      document.getElementById('kitchen-panel').style.display = 'block';
+      document.getElementById('main-screen').style.display = 'none';
+      openKitchenTab(null, 'kitchenChatTab'); // Activate chat tab by default
+      listenForKitchenChat();
+    }
+    function openWaterPanel() {
+      document.getElementById('water-panel').style.display = 'block';
+      document.getElementById('main-screen').style.display = 'none';
+      updateWaterPressure(); // Update water pressure display immediately
+      document.getElementById('waterInventoryDisplay').textContent = waterInventory;
+    }
+    function hidePanel(panelId) {
+      document.getElementById(panelId).style.display = 'none';
+      document.getElementById('main-screen').style.display = 'block';
+      // Reset background to main menu
+      document.body.style.backgroundImage = "url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+      document.body.style.backgroundRepeat = "no-repeat";
+      document.body.style.backgroundAttachment = "fixed";
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center center";
+    }
 
-    // Purchase and Inventory Functions (already defined above)
+    // Purchase and Inventory Functions
     function buyItem(item) {
       const prices = {
         'Food Staples': 10,
@@ -995,7 +1114,7 @@
       }
     }
 
-    // Door Modal Functions (Knocking & PIN system)
+    // Door Modal Functions
     function showDoorModal(roomName) {
       currentRoom = roomName;
       document.getElementById('doorTitle').textContent = "You are at the door of " + roomName;
@@ -1149,7 +1268,7 @@
       }
     }
     function updateGarbageDisplay() {
-      // This function is now only relevant for modules that include a "garbageDisplay" element.
+      // Only update if the element exists (for modules that include "garbageDisplay")
       const garbageElem = document.getElementById('garbageDisplay');
       if (garbageElem) {
         garbageElem.textContent = garbageLevel;
