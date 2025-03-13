@@ -1295,19 +1295,27 @@
       }
     }
 function updateGarbageDisplay() {
-  document.getElementById('garbageDisplay').textContent = garbageLevel;
+  const garbageDisplayElem = document.getElementById('garbageDisplay');
+  if (!garbageDisplayElem) return; // Exit if element is not found
+
+  garbageDisplayElem.textContent = garbageLevel;
   const now = Date.now();
   const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
+  
   if (elapsedMinutes > 0) {
     garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
     lastGarbageUpdate = now;
     localStorage.setItem('garbageLevel', garbageLevel);
     localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
-    document.getElementById('garbageDisplay').textContent = garbageLevel;
+    garbageDisplayElem.textContent = garbageLevel;
+    
     const logDiv = document.getElementById('garbageLog');
-    const timestamp = new Date().toLocaleTimeString();
-    const logMessage = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>`;
-    logDiv.innerHTML = logMessage + logDiv.innerHTML;
+    if (logDiv) {
+      const timestamp = new Date().toLocaleTimeString();
+      const logMessage = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>`;
+      logDiv.innerHTML = logMessage + logDiv.innerHTML;
+    }
+    
     if (garbageLevel > 80) {
       alert("High garbage levels detected! The community is getting sick.");
     }
