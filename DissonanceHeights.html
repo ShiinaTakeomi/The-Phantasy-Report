@@ -163,7 +163,7 @@
       border: 2px solid #444;
       padding: 10px;
       font-size: 14px;
-      display: none; /* You can choose to hide or remove this block if no auth is needed */
+      display: none;
       color: #fff;
       border-radius: 8px;
       background: rgba(0,0,0,0.7);
@@ -251,7 +251,7 @@
       border-radius: 4px;
       background: rgba(255,255,255,0.1);
     }
-    /* Garden Slots – (Now using two separate sections below) */
+    /* Garden Slots */
     #garden-panel .slot {
       margin: 10px 0;
       padding: 5px;
@@ -352,7 +352,7 @@
     .grocery-item button:hover {
       background-color: #009acd;
     }
-    /* Environmental Status Panel – New! */
+    /* Environmental Status Panel */
     #envStatus {
       padding: 10px;
       text-align: center;
@@ -425,6 +425,7 @@
       <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
     </div>
 
+    <!-- Music Player JavaScript -->
     <script>
       // Consolidated toggleMusicPlayer function.
       // When toggled open, it loads the full playlist with native YouTube controls.
@@ -441,6 +442,17 @@
           iframe.src = "https://www.youtube.com/embed/htjeRgEYn0s?autoplay=1&loop=1&playlist=htjeRgEYn0s";
           container.style.left = "-9999px";
         }
+      }
+
+      // (Optional) Function to switch to the next song manually.
+      const playlist = ["htjeRgEYn0s", "DP3rDP02lE0", "n_eMdEEejcA", "p-SWkpGKdP8", "9Aa0LQShRhU", "LmwfxVrbyGw"];
+      let currentSongIndex = 0;
+      function nextSong() {
+        currentSongIndex = (currentSongIndex + 1) % playlist.length;
+        const videoId = playlist[currentSongIndex];
+        const iframe = document.getElementById("bgMusic");
+        // Update the iframe's src so that only the current video loops.
+        iframe.src = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&loop=1&playlist=" + videoId;
       }
     </script>
   function toggleMusicPlayer() {
