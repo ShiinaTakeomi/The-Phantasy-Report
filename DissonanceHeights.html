@@ -329,7 +329,8 @@
       <div id="main-screen">
         <div class="container">
           <!-- Absolute Positioned Buttons -->
-          <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
+          <!-- Redirect absolute buttons to corresponding pages -->
+          <button class="garbage-chute" onclick="window.location.href='garbage-chute.html'">Garbage Chute</button>
           <button class="exit-button" onclick="signOutUser()">Exit</button>
           <script>
             function signOutUser() {
@@ -341,7 +342,7 @@
               });
             }
           </script>
-          <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
+          <button class="garden-button" onclick="window.location.href='community-garden.html'">Community Garden</button>
           <!-- Navigation Links to Modular Pages -->
           <div class="nav-links">
             <a href="community-kitchen.html"><button>Community Kitchen</button></a>
@@ -401,22 +402,6 @@
   </div>
 
   <script>
-    // --- Added Stub Functions to Prevent JS Errors ---
-    function checkCharacterExistence() {
-      // For testing, simply show the main game section.
-      document.getElementById('characterCreation').style.display = 'none';
-      document.getElementById('mainGame').style.display = 'block';
-    }
-    function listenForKitchenChat() {
-      // Stub: Implement chat listener if needed.
-      console.log("Listening for kitchen chat (stub)");
-    }
-    function listenForLaundryChat() {
-      // Stub: Implement chat listener if needed.
-      console.log("Listening for laundry chat (stub)");
-    }
-    // --- End Stub Functions ---
-
     // Store original background settings
     const originalBackground = "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed";
 
@@ -520,10 +505,1069 @@
       }
     ];
 
-    // (Other functions remain the same...)
-    // ...
-    // For brevity, the rest of your code remains unchanged.
-    // ...
+    // Helper Functions: Update Mood, Hunger, Health, Reputation
+    function updateMood(delta) {
+      let playerName = localStorage.getItem('playerName') || "Guest";
+      const safePlayerName = sanitizePlayerName(playerName);
+      db.collection('players').doc(safePlayerName).get().then(doc => {
+        if (doc.exists) {
+          let currentMood = doc.data().mood || 100;
+          let newMood = Math.max(0, currentMood + delta);
+          db.collection('players').doc(safePlayerName).set({ mood: newMood, lastUpdated: Date.now() }, { merge: true });
+        }
+      });
+    }
+    function updateHunger(delta) {
+      let playerName = localStorage.getItem('playerName') || "Guest";
+      const safePlayerName = sanitizePlayerName(playerName);
+      db.collection('players').doc(safePlayerName).get().then(doc => {
+        if (doc.exists) {
+          let currentHunger = doc.data().hunger || 0;
+          let newHunger = Math.max(0, currentHunger + delta);
+          db.collection('players').doc(safePlayerName).set({ hunger: newHunger, lastUpdated: Date.now() }, { merge: true });
+        }
+      });
+    }
+    function updateHealth(delta) {
+      let playerName = localStorage.getItem('playerName') || "Guest";
+      const safePlayerName = sanitizePlayerName(playerName);
+      db.collection('players').doc(safePlayerName).get().then(doc => {
+        if (doc.exists) {
+          let currentHealth = doc.data().health || 100;
+          let newHealth = Math.min(100, Math.max(0, currentHealth + delta));
+          db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+        }
+      });
+    }
+    function updateReputation(delta) {
+      let playerName = localStorage.getItem('playerName') || "Guest";
+      const safePlayerName = sanitizePlayerName(playerName);
+      db.collection('players').doc(safePlayerName).get().then(doc => {
+        if (doc.exists) {
+          let currentRep = doc.data().reputation || 0;
+          let newRep = currentRep + delta;
+          db.collection('players').doc(safePlayerName).set({ reputation: newRep, lastUpdated: Date.now() }, { merge: true });
+        }
+      });
+    }
+
+    // Inventory Functions
+    function addItem(item, qty = 1) {
+      harvestInventory[item] = (harvestInventory[item] || 0) + qty;
+      localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
+      updateHarvestInventoryUI();
+    }
+    function removeItem(item, qty = 1) {
+      if (harvestInventory[item]) {
+        harvestInventory[item] = Math.max(0, harvestInventory[item] - qty);
+        if (harvestInventory[item] === 0) delete harvestInventory[item];
+      }
+      localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
+      updateHarvestInventoryUI();
+    }
+    function updateHarvestInventoryUI() {
+      const invDiv = document.getElementById('harvestInventory');
+      if (invDiv) {
+        let html = "";
+        for (let item in harvestInventory) {
+          html += `<p>${item}: ${harvestInventory[item]}</p>`;
+        }
+        invDiv.innerHTML = html || "<p>None</p>";
+      }
+    }
+
+    // In-App Notification Listener
+    function listenForNotifications() {
+      let playerName = localStorage.getItem('playerName') || "Guest";
+      if (!playerName) return;
+      db.collection("notifications")
+        .where("owner", "==", playerName)
+        .orderBy("timestamp", "desc")
+        .onSnapshot(snapshot => {
+          let notifications = "";
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            notifications += `<p>${data.message}</p>`;
+          });
+          const panel = document.getElementById("notificationPanel");
+          if (panel) {
+            if (notifications) {
+              panel.innerHTML = notifications;
+              panel.style.display = "block";
+            } else {
+              panel.style.display = "none";
+            }
+          }
+        });
+    }
+
+    // Utility: Clear Game State
+    function clearGameState() {
+      const keys = ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate', 'harvestInventory', 'water'];
+      keys.forEach(key => localStorage.removeItem(key));
+    }
+
+    // Panel Navigation Functions (now redirected)
+    function showGarbagePanel() {
+      window.location.href = "garbage-chute.html";
+    }
+    function openGardenPanel() {
+      window.location.href = "community-garden.html";
+    }
+    function openKitchenPanel() {
+      window.location.href = "community-kitchen.html";
+    }
+    function openGroceryPanel() {
+      window.location.href = "groceries-stand.html";
+    }
+    function openWaterPanel() {
+      window.location.href = "water-supplies.html";
+    }
+    // Purchase and Inventory Functions
+    function buyItem(item) {
+      const prices = {
+        'Food Staples': 10,
+        'Lubricant Oil': 5,
+        'Alcohol': 3,
+        'Cigarettes': 4,
+        'Flour': 3,
+        'Sugar': 2,
+        'Egg': 1,
+        'Butter': 4
+      };
+      let price = prices[item] || 2;
+      let money = parseInt(localStorage.getItem('money')) || 50;
+      if (money >= price) {
+        money -= price;
+        localStorage.setItem('money', money);
+        alert("Purchased " + item + " for $" + price + ". Remaining money: $" + money);
+        addItem(item, 1);
+        applyItemEffects(item);
+        updatePlayerStatus();
+      } else {
+        alert("Not enough money to purchase " + item);
+      }
+    }
+    function applyItemEffects(item) {
+      switch(item) {
+        case "Food Staples":
+          updateHunger(-5);
+          updateMood(2);
+          break;
+        case "Lubricant Oil":
+          updateMood(1);
+          break;
+        default:
+          if(item.includes("Seed")) {
+            updateMood(2);
+          } else if(item.includes("Mushroom")) {
+            updateMood(1);
+            updateHunger(-1);
+          } else if(item === "Alcohol") {
+            updateMood(3);
+            updateHunger(1);
+          } else if(item === "Cigarettes") {
+            updateMood(2);
+            updateHunger(1);
+          }
+          break;
+      }
+    }
+    function consumeFirstAidKit() {
+      if (harvestInventory["First Aid Kit"] && harvestInventory["First Aid Kit"] > 0) {
+        removeItem("First Aid Kit", 1);
+        let playerName = localStorage.getItem('playerName') || "Guest";
+        const safePlayerName = sanitizePlayerName(playerName);
+        db.collection('players').doc(safePlayerName).get().then(doc => {
+          if (doc.exists) {
+            let currentHealth = doc.data().health || 100;
+            let newHealth = Math.min(100, currentHealth + 20);
+            db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+            alert("You used a First Aid Kit. Your health is now " + newHealth + ".");
+          }
+        });
+      } else {
+        alert("You don't have any First Aid Kits to use.");
+      }
+    }
+
+    // Character Creation Functions
+    if (!localStorage.getItem('playerName')) {
+      localStorage.setItem('playerName', 'Guest');
+    }
+    function sanitizePlayerName(name) {
+      return name.replace(/[\/\\]/g, '_');
+    }
+    function checkCharacterExistence() {
+      let playerName = localStorage.getItem('playerName');
+      if (!playerName) return;
+      const safePlayerName = sanitizePlayerName(playerName);
+      db.collection('players').doc(safePlayerName).get().then((doc) => {
+        if (doc.exists) {
+          document.getElementById('characterCreation').style.display = 'none';
+          document.getElementById('mainGame').style.display = 'block';
+          updatePlayerStatus();
+        } else {
+          document.getElementById('characterCreation').style.display = 'block';
+          document.getElementById('mainGame').style.display = 'none';
+          document.getElementById('displayName').innerText = playerName;
+          document.getElementById('charName').value = playerName;
+        }
+      }).catch((error) => {
+        console.error("Error checking character existence:", error);
+      });
+    }
+    function createCharacter() {
+      let playerName = localStorage.getItem('playerName');
+      if (!playerName) return;
+      const safePlayerName = sanitizePlayerName(playerName);
+      const charName = document.getElementById('charName').value;
+      const charAge = document.getElementById('charAge').value;
+      const charGender = document.getElementById('charGender').value;
+      const charReason = document.getElementById('charReason').value;
+      const charBackstory = document.getElementById('charBackstory').value;
+      const charSkills = document.getElementById('charSkills').value;
+      const charInventory = document.getElementById('charInventory').value;
+      const charAlliances = document.getElementById('charAlliances').value;
+      const charRivalries = document.getElementById('charRivalries').value;
+      const charReputation = document.getElementById('charReputation').value;
+      const roomNumber = document.getElementById('roomNumber').value;
+      const playerData = {
+        name: charName,
+        age: charAge,
+        gender: charGender,
+        reason: charReason,
+        backstory: charBackstory,
+        skills: charSkills.split(',').map(s => s.trim()),
+        inventory: charInventory.split(',').map(i => i.trim()),
+        alliances: charAlliances ? charAlliances.split(',').map(a => a.trim()) : [],
+        rivalries: charRivalries ? charRivalries.split(',').map(r => r.trim()) : [],
+        reputation: parseInt(charReputation) || 0,
+        roomNumber: roomNumber,
+        health: 100,
+        hunger: 0,
+        injury: 0,
+        mood: 100,
+        conditions: {
+          physical: "Healthy",
+          mental: "Content",
+          activity: "Idle"
+        },
+        lastUpdated: Date.now()
+      };
+      db.collection('players').doc(safePlayerName).set(playerData, { merge: true })
+        .then(() => {
+          localStorage.setItem('characterName', charName);
+          document.getElementById('characterCreation').style.display = 'none';
+          document.getElementById('mainGame').style.display = 'block';
+          updatePlayerStatus();
+          db.collection('rooms').doc('Room ' + roomNumber).set({ owner: playerName }, { merge: true });
+        })
+        .catch((error) => {
+          console.error("Error creating character:", error);
+        });
+    }
+    let isEditing = false;
+    function enableEdit() {
+      isEditing = true;
+      updatePlayerStatus();
+    }
+    function cancelEdit() {
+      isEditing = false;
+      updatePlayerStatus();
+    }
+    function togglePlayerStatus() {
+      const biodataDiv = document.getElementById('playerStatus');
+      biodataDiv.style.display = (biodataDiv.style.display === "none" || biodataDiv.style.display === "") ? "block" : "none";
+    }
+    function updatePlayerStatus() {
+      let playerName = localStorage.getItem('playerName');
+      if (!playerName) return;
+      const safePlayerName = sanitizePlayerName(playerName);
+      db.collection('players').doc(safePlayerName)
+        .onSnapshot((doc) => {
+          if (doc.exists) {
+            const data = doc.data();
+            localStorage.setItem('characterName', data.name);
+            let statusHTML = `<h3>Biodata</h3>`;
+            if (!isEditing) {
+              let coreStatsHTML = `<h4>Core Stats</h4>`;
+              coreStatsHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
+              coreStatsHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+              coreStatsHTML += `<div style="background:#444; border:1px solid #222; width:100%; height:20px; border-radius:5px; margin:5px 0;">
+                   <div style="background:#4CAF50; width:${data.health}%; height:100%; border-radius:5px;"></div>
+                  </div>`;
+              coreStatsHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+              coreStatsHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+              coreStatsHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+              coreStatsHTML += `<p><strong>Room:</strong> ${data.roomNumber ? "Room " + data.roomNumber : "Not set"}</p>`;
+              coreStatsHTML += `<p><strong>Reputation:</strong> ${data.reputation || 0}</p>`;
+              let narrativeHTML = `<h4>Background</h4>`;
+              narrativeHTML += `<p><strong>Reason:</strong> ${data.reason || "N/A"}</p>`;
+              narrativeHTML += `<p><strong>Backstory:</strong> ${data.backstory || "N/A"}</p>`;
+              narrativeHTML += `<p><strong>Skills:</strong> ${data.skills ? data.skills.join(", ") : "N/A"}</p>`;
+              narrativeHTML += `<p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>`;
+              narrativeHTML += `<p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>`;
+              let inventoryHTML = `<h4>Inventory</h4>`;
+              for (let item in harvestInventory) {
+                inventoryHTML += `<p>${item}: ${harvestInventory[item]}</p>`;
+              }
+              if (!inventoryHTML) inventoryHTML += `<p>None</p>`;
+              statusHTML += `<div id="coreStats">${coreStatsHTML}</div>`;
+              statusHTML += `<div id="narrativeStats" style="display:none;">${narrativeHTML}</div>`;
+              statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
+              statusHTML += `<button onclick="enableEdit()">Edit Biodata</button>`;
+              statusHTML += inventoryHTML;
+            } else {
+              statusHTML += `<h3>Edit Character</h3>`;
+              statusHTML += `<div><strong>Core Stats</strong><br>`;
+              statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" style="height:40px; font-size:16px;" /></p>`;
+              statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+              statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+              statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+              statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+              statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25" style="height:40px; font-size:16px;" /></p>`;
+              statusHTML += `<p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" style="height:40px; font-size:16px;" /></p></div>`;
+              statusHTML += `<div><strong>Background</strong><br>`;
+              statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason" style="height:80px; font-size:16px;">${data.reason}</textarea></p>`;
+              statusHTML += `<p><strong>Backstory:</strong> <textarea id="editBackstory" style="height:80px; font-size:16px;">${data.backstory || ""}</textarea></p>`;
+              statusHTML += `<p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>`;
+              statusHTML += `<p><strong>Alliances:</strong> <input type="text" id="editAlliances" value="${data.alliances ? data.alliances.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>`;
+              statusHTML += `<p><strong>Rivalries:</strong> <input type="text" id="editRivalries" value="${data.rivalries ? data.rivalries.join(", ") : ""}" style="height:40px; font-size:16px;" /></p></div>`;
+              statusHTML += `<button onclick="saveBiodata()">Save Changes</button>`;
+              statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
+            }
+            statusHTML += `<p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>`;
+            statusHTML += `<p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>`;
+            statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
+            document.getElementById('playerStatus').innerHTML = statusHTML;
+            updateHarvestInventoryUI();
+          }
+        }, (error) => {
+          console.error("Error getting player status:", error);
+        });
+    }
+    function toggleNarrative() {
+      const narrativeDiv = document.getElementById('narrativeStats');
+      const toggleButton = document.getElementById('toggleNarrative');
+      if (narrativeDiv.style.display === "none") {
+        narrativeDiv.style.display = "block";
+        toggleButton.textContent = "Hide Narrative";
+      } else {
+        narrativeDiv.style.display = "none";
+        toggleButton.textContent = "Show Narrative";
+      }
+    }
+    function saveBiodata() {
+      let playerName = localStorage.getItem('playerName');
+      if (!playerName) return;
+      const safePlayerName = sanitizePlayerName(playerName);
+      const updatedData = {
+        name: document.getElementById('editName').value,
+        roomNumber: document.getElementById('editRoomNumber').value,
+        reputation: parseInt(document.getElementById('editReputation').value) || 0,
+        reason: document.getElementById('editReason').value,
+        backstory: document.getElementById('editBackstory').value,
+        skills: document.getElementById('editSkills').value.split(',').map(s => s.trim()),
+        alliances: document.getElementById('editAlliances').value.split(',').map(a => a.trim()),
+        rivalries: document.getElementById('editRivalries').value.split(',').map(r => r.trim()),
+        lastUpdated: Date.now()
+      };
+      db.collection('players').doc(safePlayerName).set(updatedData, { merge: true })
+        .then(() => { isEditing = false; updatePlayerStatus(); })
+        .catch(error => {
+          console.error("Error saving biodata:", error);
+        });
+    }
+
+    // Recipe Book Functions (Community Kitchen)
+    function renderRecipes() {
+      const container = document.getElementById('recipeContainer');
+      container.innerHTML = "";
+      recipes.forEach((recipe, index) => {
+        let ingredientList = "";
+        for (let ingredient in recipe.ingredients) {
+          ingredientList += `${ingredient}: ${recipe.ingredients[ingredient]}<br>`;
+        }
+        let benefitsText = "";
+        for (let stat in recipe.benefits) {
+          benefitsText += `+${recipe.benefits[stat]} ${stat}<br>`;
+        }
+        let consText = "";
+        for (let stat in recipe.cons) {
+          consText += `${recipe.cons[stat] >= 0 ? "+" : ""}${recipe.cons[stat]} ${stat}<br>`;
+        }
+        const recipeHTML = `
+          <h4>${recipe.name}</h4>
+          <p><strong>Ingredients Required:</strong><br>${ingredientList}</p>
+          <p><strong>Benefits:</strong><br>${benefitsText}</p>
+          <p><strong>Cons:</strong><br>${consText}</p>
+          <button id="createBtn${index}" onclick="createRecipe(${index})">Create ${recipe.name}</button>
+        `;
+        let recipeDiv = document.createElement('div');
+        recipeDiv.className = "recipe";
+        recipeDiv.innerHTML = recipeHTML;
+        container.appendChild(recipeDiv);
+      });
+    }
+    function createRecipe(index) {
+      const recipe = recipes[index];
+      for (let ingredient in recipe.ingredients) {
+        if (!harvestInventory[ingredient] || harvestInventory[ingredient] < recipe.ingredients[ingredient]) {
+          alert(`You are missing enough ${ingredient} to make ${recipe.name}.`);
+          return;
+        }
+      }
+      for (let ingredient in recipe.ingredients) {
+        removeItem(ingredient, recipe.ingredients[ingredient]);
+      }
+      document.getElementById("cookingProcess").style.display = "block";
+      const btn = document.getElementById(`createBtn${index}`);
+      btn.disabled = true;
+      btn.textContent = "Creating... (1 min wait)";
+      setTimeout(() => {
+        if (recipe.benefits.health) updateHealth(recipe.benefits.health);
+        if (recipe.benefits.mood) updateMood(recipe.benefits.mood);
+        if (recipe.benefits.hunger) updateHunger(recipe.benefits.hunger);
+        if (recipe.benefits.reputation) updateReputation(recipe.benefits.reputation);
+        if (recipe.cons.health) updateHealth(recipe.cons.health);
+        if (recipe.cons.mood) updateMood(recipe.cons.mood);
+        if (recipe.cons.hunger) updateHunger(recipe.cons.hunger);
+        if (recipe.cons.reputation) updateReputation(recipe.cons.reputation);
+        alert(`${recipe.name} has been created and its effects applied!`);
+        btn.disabled = false;
+        btn.textContent = `Create ${recipe.name}`;
+        document.getElementById("cookingProcess").style.display = "none";
+        updatePlayerStatus();
+      }, 60000);
+    }
+
+    // Community Kitchen Chat Functions
+    function sendKitchenChat() {
+      const msg = document.getElementById('kitchenChatInput').value;
+      if (msg.trim() !== "") {
+        db.collection("messages").add({
+          room: "Community Kitchen",
+          sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Guest",
+          content: msg,
+          chatType: "kitchen",
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('kitchenChatInput').value = "";
+      }
+    }
+    function listenForKitchenChat() {
+      const chatLog = document.getElementById('kitchenChatLog');
+      db.collection("messages")
+        .where("room", "==", "Community Kitchen")
+        .where("chatType", "==", "kitchen")
+        .orderBy("timestamp")
+        .onSnapshot((querySnapshot) => {
+          chatLog.innerHTML = "";
+          querySnapshot.forEach((doc) => {
+            const message = doc.data();
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+            chatLog.appendChild(p);
+          });
+          chatLog.scrollTop = chatLog.scrollHeight;
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      const kitchenChatInput = document.getElementById('kitchenChatInput');
+      if (kitchenChatInput) {
+        kitchenChatInput.addEventListener('keydown', function(event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            sendKitchenChat();
+          }
+        });
+      }
+    });
+
+    // Water Supplies Chat Functions
+    function sendLaundryChat() {
+      const msg = document.getElementById('laundryChatInput').value;
+      if (msg.trim() !== "") {
+        db.collection("messages").add({
+          room: "Water Supplies",
+          sender: localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Guest",
+          content: msg,
+          chatType: "laundry",
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('laundryChatInput').value = "";
+      }
+    }
+    function listenForLaundryChat() {
+      const chatLog = document.getElementById('laundryChatLog');
+      db.collection("messages")
+        .where("room", "==", "Water Supplies")
+        .where("chatType", "==", "laundry")
+        .orderBy("timestamp")
+        .onSnapshot((querySnapshot) => {
+          chatLog.innerHTML = "";
+          querySnapshot.forEach((doc) => {
+            const message = doc.data();
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+            chatLog.appendChild(p);
+          });
+          chatLog.scrollTop = chatLog.scrollHeight;
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      const laundryChatInput = document.getElementById('laundryChatInput');
+      if (laundryChatInput) {
+        laundryChatInput.addEventListener('keydown', function(event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            sendLaundryChat();
+          }
+        });
+      }
+    });
+
+    function washClothes() {
+      alert("You washed your clothes. Your health improves slightly.");
+      updateMood(3);
+    }
+
+    // Room Interaction & Chat Functions (Room grid redirection)
+    function openRoomInteraction(roomName) {
+      // Instead of showing inline door modal or chat, simply redirect to the room page.
+      // Extract room number and redirect to "roomX.html"
+      let roomNum = roomName.split(" ")[1];
+      window.location.href = "room" + roomNum + ".html";
+    }
+    function openRoomChat(roomName) {
+      doorChatMode = false;
+      document.getElementById('chatRoomTitle').textContent = roomName + " Chat (Inside)";
+      document.getElementById('chatLog').innerHTML = "";
+      document.getElementById('chatPanel').style.display = 'block';
+      document.getElementById('main-screen').style.display = 'none';
+      listenForMessages(roomName);
+      document.getElementById('restContainer').innerHTML = '<button onclick="restInRoom()" id="restButton">Rest (Recover Health)</button>';
+    }
+    function openDoorChat(roomName) {
+      doorChatMode = true;
+      document.getElementById('chatRoomTitle').textContent = roomName + " Door Chat (Visitor)";
+      document.getElementById('chatLog').innerHTML = "";
+      document.getElementById('chatPanel').style.display = 'block';
+      document.getElementById('main-screen').style.display = 'none';
+      document.getElementById('restContainer').innerHTML = '';
+      listenForMessages(roomName);
+    }
+    function listenForMessages(roomName) {
+      const chatLog = document.getElementById('chatLog');
+      const messagesRef = db.collection("messages");
+      messagesRef
+        .where("room", "==", roomName)
+        .where("chatType", "==", doorChatMode ? "door" : "room")
+        .orderBy("timestamp")
+        .onSnapshot((querySnapshot) => {
+          chatLog.innerHTML = "";
+          querySnapshot.forEach((doc) => {
+            const message = doc.data();
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>${message.sender}</strong>: ${message.content}`;
+            chatLog.appendChild(p);
+          });
+          chatLog.scrollTop = chatLog.scrollHeight;
+        });
+    }
+    function closeChat() {
+      document.getElementById('chatPanel').style.display = 'none';
+      document.getElementById('main-screen').style.display = 'block';
+      currentRoom = "";
+    }
+    async function sendChatMessage() {
+      const msg = document.getElementById('chatInput').value;
+      if (msg.trim() !== "") {
+        const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Guest";
+        try {
+          await db.collection("messages").add({
+            room: currentRoom,
+            sender: characterName,
+            content: msg,
+            chatType: doorChatMode ? "door" : "room",
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          document.getElementById('chatInput').value = "";
+        } catch (error) {
+          console.error("Error sending message:", error);
+        }
+      }
+    }
+
+    // Door Modal Functions
+    function showDoorModal(roomName) {
+      currentRoom = roomName;
+      document.getElementById('doorTitle').textContent = "You are at the door of " + roomName;
+      document.getElementById('doorModal').style.display = 'block';
+      document.getElementById('passwordDiv').style.display = 'none';
+      document.getElementById('doorPassword').value = "";
+    }
+    function closeDoorModal() {
+      document.getElementById('doorModal').style.display = 'none';
+    }
+    function showPasswordInput() {
+      document.getElementById('passwordDiv').style.display = 'block';
+    }
+    function verifyPassword() {
+      const enteredPassword = document.getElementById('doorPassword').value;
+      const correctPassword = roomPasswords[currentRoom];
+      if (enteredPassword === correctPassword) {
+        alert("Password correct. You now enter the room.");
+        closeDoorModal();
+        openRoomChat(currentRoom);
+      } else {
+        alert("Incorrect password. Please try again or choose to knock.");
+      }
+    }
+    function handleKnock() {
+      alert("You knocked on the door. Please wait for the owner’s response.");
+      db.collection("rooms").doc(currentRoom).get().then(doc => {
+        if (doc.exists) {
+          const owner = doc.data().owner;
+          const visitor = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Guest";
+          db.collection("notifications").add({
+            owner: owner,
+            room: currentRoom,
+            message: `${visitor} knocked on your door of ${currentRoom}.`,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+      }).catch(error => {
+        console.error("Error sending knock notification:", error);
+      });
+      closeDoorModal();
+      openDoorChat(currentRoom);
+    }
+
+    // Power Panel Functions
+    let windSpeed = localStorage.getItem('windSpeed') || 50;
+    let electricalOutput = false;
+    let lastInteractionTime = localStorage.getItem('lastInteractionTime') || Date.now();
+    let garbageLevel = localStorage.getItem('garbageLevel') || 0;
+    let lastGarbageUpdate = localStorage.getItem('lastGarbageUpdate') || Date.now();
+    let powerStatus = "Unknown";
+    function updateWindSpeed() {
+      windSpeed = document.getElementById('windSpeedSlider').value;
+      document.getElementById('windSpeedValue').textContent = windSpeed;
+      localStorage.setItem('windSpeed', windSpeed);
+      updateVoltage();
+      updateLastInteraction();
+      updateElectricalStatus();
+      updateWaterPressure();
+    }
+    function toggleElectricalOutput() {
+      electricalOutput = !electricalOutput;
+      document.getElementById('outputLeverButton').textContent = electricalOutput ? "Output On" : "Output Off";
+      updateLastInteraction();
+      updateElectricalStatus();
+      updateWaterPressure();
+    }
+    function checkWaterPressure() {
+      const pressure = Math.floor(Math.random() * 41) + 80;
+      alert("Current Water Pressure: " + pressure + " PSI.\nOptimal is above 90 PSI.");
+      updateLastInteraction();
+      updateElectricalStatus();
+      updateWaterPressure();
+    }
+    function checkHeaterLevel() {
+      const heater = Math.floor(Math.random() * 41) + 80;
+      alert("Current Heater Level: " + heater + ".\nOptimal is above 90.");
+      updateLastInteraction();
+      updateElectricalStatus();
+      updateWaterPressure();
+    }
+    function updateElectricalStatus() {
+      if (windSpeed >= 40 && windSpeed <= 70 && electricalOutput) {
+        powerStatus = "On";
+        document.getElementById('lightStatusDisplay').textContent = "Lights On";
+      } else {
+        powerStatus = "Off";
+        document.getElementById('lightStatusDisplay').textContent = "Lights Off";
+      }
+      document.getElementById('powerStatusDisplay').textContent = powerStatus;
+    }
+    function updateVoltage() {
+      let factor = electricalOutput ? 1.0 : 0.5;
+      let voltage = Math.round(windSpeed * factor + (Math.random() * 10 - 5));
+      voltage = Math.max(0, voltage);
+      const voltageDisplayElement = document.getElementById('voltageDisplay');
+      if (voltageDisplayElement) {
+        voltageDisplayElement.textContent = voltage.toFixed(1);
+      }
+      localStorage.setItem('voltage', voltage);
+      updateWaterPressure();
+    }
+    function updateWaterPressure() {
+      const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
+      const efficiency = Math.max(0.5, 1 - (garbageLevel / 200));
+      const minVoltageThreshold = 20;
+      const basePressure = voltage >= minVoltageThreshold ? voltage * 0.8 : 0;
+      const pressure = Math.round(basePressure * efficiency);
+      const wpDisplay = document.getElementById('waterPressureDisplay');
+      if (wpDisplay) {
+        wpDisplay.textContent = pressure;
+        wpDisplay.style.color = pressure < 50 ? "red" : "#fff";
+      }
+    }
+    function simulatePowerEvent() {
+      if (Date.now() - lastInteractionTime > 60000) {
+        const malfunctionType = Math.floor(Math.random() * 5);
+        let malfunctionMessage = "";
+        switch(malfunctionType) {
+          case 0:
+            malfunctionMessage = "Wind calibration error: Re-adjust the wind speed slider to bring it into the optimal range (40–70).";
+            break;
+          case 1:
+            malfunctionMessage = "Electrical output fluctuation: Toggle the electrical output lever to stabilize the system.";
+            break;
+          case 2:
+            malfunctionMessage = "Water pressure drop: Press 'Check Water' to review and fix water pressure issues.";
+            break;
+          case 3:
+            malfunctionMessage = "Heater level fluctuation: Press 'Check Heater' to ensure heater levels are optimal.";
+            break;
+          case 4:
+            malfunctionMessage = "Sensor error: Re-check all controls (wind speed, output lever, water, heater) to recalibrate the system.";
+            break;
+        }
+        alert("Malfunction Detected!\n" + malfunctionMessage);
+        let playerEmail = localStorage.getItem('playerName') || "Guest";
+        const safePlayerName = sanitizePlayerName(playerEmail);
+        db.collection('players').doc(safePlayerName).get().then(doc => {
+          if (doc.exists) {
+            let currentHealth = doc.data().health || 100;
+            let newHealth = Math.max(0, currentHealth - 5);
+            db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+            if (newHealth === 0) {
+              playerDied();
+            }
+          }
+        });
+        updateLastInteraction();
+        updateWaterPressure();
+      }
+    }
+    function updateGarbageDisplay() {
+      document.getElementById('garbageDisplay').textContent = garbageLevel;
+      const now = Date.now();
+      const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
+      if (elapsedMinutes > 0) {
+        garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
+        lastGarbageUpdate = now;
+        localStorage.setItem('garbageLevel', garbageLevel);
+        localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
+        document.getElementById('garbageDisplay').textContent = garbageLevel;
+        const logDiv = document.getElementById('garbageLog');
+        const timestamp = new Date().toLocaleTimeString();
+        const logMessage = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>`;
+        logDiv.innerHTML = logMessage + logDiv.innerHTML;
+        if (garbageLevel > 80) {
+          alert("High garbage levels detected! The community is getting sick.");
+        }
+      }
+    }
+    function logPowerMessage(message) {
+      const logDiv = document.getElementById('minigameLog');
+      const timestamp = new Date().toLocaleTimeString();
+      logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+    function toggleInstructions() {
+      const instrDiv = document.getElementById("instructions");
+      instrDiv.style.display = (instrDiv.style.display === "none" || instrDiv.style.display === "") ? "block" : "none";
+    }
+    function updateLastInteraction() {
+      lastInteractionTime = Date.now();
+      localStorage.setItem('lastInteractionTime', lastInteractionTime);
+    }
+    function simulateHealthDecline() {
+      if (garbageLevel > 80) {
+        let playerEmail = localStorage.getItem('playerName') || "Guest";
+        const safePlayerName = sanitizePlayerName(playerEmail);
+        db.collection('players').doc(safePlayerName).get().then((doc) => {
+          if (doc.exists) {
+            let data = doc.data();
+            let currentHealth = data.health || 100;
+            let extraDecline = 0;
+            if (data.hunger > 70) extraDecline += 1;
+            if (data.mood < 30) extraDecline += 1;
+            let newHealth = Math.max(0, currentHealth - 1 - extraDecline);
+            db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+            if (newHealth === 0) {
+              playerDied();
+            }
+          }
+        }).catch((error) => {
+          console.error("Error decreasing health: ", error);
+        });
+      }
+    }
+    function playerDied() {
+      alert("Your health has reached zero. You have died.");
+      clearGameState();
+      window.location.href = "index.html";
+    }
+    function restInRoom() {
+      let restButton = document.getElementById("restButton");
+      if (!restButton) return;
+      restButton.disabled = true;
+      restButton.textContent = "Resting...";
+      let playerName = localStorage.getItem('playerName') || "Guest";
+      const safePlayerName = sanitizePlayerName(playerName);
+      let iterations = 12;
+      let interval = setInterval(() => {
+        iterations--;
+        db.collection('players').doc(safePlayerName).get().then(doc => {
+          if (doc.exists) {
+            let currentHealth = doc.data().health || 100;
+            let newHealth = Math.min(100, currentHealth + 2);
+            db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+          }
+        });
+        if (iterations <= 0) {
+          clearInterval(interval);
+          restButton.disabled = false;
+          restButton.textContent = "Rest (Recover Health)";
+          alert("Rest complete! Your health has improved.");
+        }
+      }, 5000);
+    }
+    function toggleMusicPlayer() {
+      var player = document.getElementById("bgMusic");
+      if (player.style.display === "none" || player.style.display === "" || player.style.width === "0px") {
+        player.style.display = "block";
+        player.style.width = "300px";
+        player.style.height = "200px";
+        player.style.position = "relative";
+        player.style.left = "0";
+      } else {
+        player.style.display = "none";
+        player.style.width = "0";
+        player.style.height = "0";
+        player.style.position = "absolute";
+        player.style.left = "-9999px";
+      }
+    }
+    function updateEnvironmentStatus() {
+      const envDiv = document.getElementById('envStatus');
+      const currentWind = windSpeed;
+      const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
+      const efficiency = Math.max(0.5, 1 - (garbageLevel / 200));
+      const minVoltageThreshold = 20;
+      const basePressure = voltage >= minVoltageThreshold ? voltage * 0.8 : 0;
+      const waterPressure = Math.round(basePressure * efficiency);
+      const currentGarbage = garbageLevel;
+      if (envDiv) {
+        envDiv.innerHTML = `Wind Speed: ${currentWind} | Voltage: ${voltage}V | Water Pressure: ${waterPressure} PSI | Garbage Level: ${currentGarbage}/100`;
+      }
+    }
+
+    // Community Garden Functions
+    function renderGardenSlots() {
+      const container = document.getElementById("plantSlots");
+      if (!container) return;
+      container.innerHTML = "";
+      container.innerHTML += "<h4>Soil (Seeds)</h4>";
+      soilSlots.forEach(slot => {
+        let div = document.createElement("div");
+        div.className = "slot";
+        if (!slot.type) {
+          div.innerHTML = `Slot ${slot.slot}: <span class="status">Empty</span> <button onclick="openPlantSelection(${slot.slot}, 'soil')">Plant Seed</button>`;
+        } else {
+          let status = slot.watered ? "Watered, growing..." : "Planted: " + slot.type + " (needs water)";
+          div.innerHTML = `Slot ${slot.slot}: <span class="status">${status}</span>`;
+          if (!slot.watered) {
+            div.innerHTML += ` <button onclick="waterPlant(${slot.slot}, 'soil')">Water Plant</button>`;
+          }
+        }
+        container.appendChild(div);
+      });
+      container.innerHTML += "<h4>Tree Stump (Mushrooms)</h4>";
+      stumpSlots.forEach(slot => {
+        let div = document.createElement("div");
+        div.className = "slot";
+        if (!slot.type) {
+          div.innerHTML = `Slot ${slot.slot}: <span class="status">Empty</span> <button onclick="openPlantSelection(${slot.slot}, 'stump')">Plant Mushroom</button>`;
+        } else {
+          let status = slot.watered ? "Watered, growing..." : "Planted: " + slot.type + " (needs water)";
+          div.innerHTML = `Slot ${slot.slot}: <span class="status">${status}</span>`;
+          if (!slot.watered) {
+            div.innerHTML += ` <button onclick="waterPlant(${slot.slot}, 'stump')">Water Plant</button>`;
+          }
+        }
+        container.appendChild(div);
+      });
+    }
+    function openPlantSelection(slotNum, category) {
+      let available = (category === 'soil') ? seedTypes : mushroomTypes;
+      let inventoryOptions = available.filter(type => harvestInventory[type] && harvestInventory[type] > 0);
+      if (inventoryOptions.length === 0) {
+        alert("You do not have any " + (category === 'soil' ? "seeds" : "mushrooms") + " in your inventory.");
+        return;
+      }
+      let selectedType = inventoryOptions[0];
+      removeItem(selectedType, 1);
+      if (category === 'soil') {
+        soilSlots[slotNum - 1] = { slot: slotNum, type: selectedType, watered: false, timer: null };
+      } else {
+        stumpSlots[slotNum - 1] = { slot: slotNum, type: selectedType, watered: false, timer: null };
+      }
+      renderGardenSlots();
+    }
+    function waterPlant(slotNum, category) {
+      if (waterInventory < 1) {
+        alert("No water available. Please collect water.");
+        return;
+      }
+      waterInventory--;
+      localStorage.setItem('water', waterInventory);
+      const waterInvDisplay = document.getElementById('waterInventoryDisplay');
+      if (waterInvDisplay) {
+        waterInvDisplay.textContent = waterInventory;
+      }
+      let slotArray = (category === 'soil') ? soilSlots : stumpSlots;
+      slotArray[slotNum - 1].watered = true;
+      renderGardenSlots();
+      slotArray[slotNum - 1].timer = setTimeout(() => {
+        const matureType = slotArray[slotNum - 1].type;
+        alert("Your " + matureType + " has matured!");
+        addItem(matureType, 1);
+        slotArray[slotNum - 1] = { slot: slotNum, type: null, watered: false, timer: null };
+        renderGardenSlots();
+      }, 300000);
+    }
+
+    // Grocery Stand Functions
+    function generateGroceryItems() {
+      let seedContainer = document.getElementById("seedList");
+      if (seedContainer) {
+        seedContainer.innerHTML = "";
+        seedTypes.forEach(seed => {
+          let div = document.createElement("div");
+          div.className = "grocery-item";
+          div.innerHTML = `<p><strong>${seed}</strong> - $2<br><em>${seed} is essential for growth.</em></p>
+                           <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
+          seedContainer.appendChild(div);
+        });
+      }
+      let mushroomContainer = document.getElementById("mushroomList");
+      if (mushroomContainer) {
+        mushroomContainer.innerHTML = "";
+        mushroomTypes.forEach(mushroom => {
+          let div = document.createElement("div");
+          div.className = "grocery-item";
+          div.innerHTML = `<p><strong>${mushroom}</strong> - $2<br><em>${mushroom} adds flavor and nutrients.</em></p>
+                           <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
+          mushroomContainer.appendChild(div);
+        });
+      }
+      let healthContainer = document.getElementById("healthItemList");
+      if (!healthContainer && document.getElementById("grocery-panel")) {
+        healthContainer = document.createElement("div");
+        healthContainer.id = "healthItemList";
+        healthContainer.innerHTML = `<h4>Health Items</h4>`;
+        document.getElementById("grocery-panel").appendChild(healthContainer);
+      } else if (healthContainer) {
+        healthContainer.innerHTML = `<h4>Health Items</h4>`;
+      }
+      let div = document.createElement("div");
+      div.className = "grocery-item";
+      div.innerHTML = `<p><strong>First Aid Kit</strong> - $8<br><em>Restores 20 health.</em></p>
+                       <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>`;
+      if (healthContainer) {
+        healthContainer.appendChild(div);
+      }
+    }
+    function sellHarvest() {
+      const checkboxes = document.querySelectorAll('.sell-checkbox:checked');
+      if (!checkboxes.length) {
+        alert("Select at least one item to sell.");
+        return;
+      }
+      const sellPrices = { 'Food Staples': 5, 'Lubricant Oil': 2.5, 'Alcohol': 1.5, 'Cigarettes': 2 };
+      checkboxes.forEach(cb => {
+        const item = cb.getAttribute('data-item');
+        const qty = harvestInventory[item];
+        const price = sellPrices[item] || 1;
+        let money = parseInt(localStorage.getItem('money')) || 50;
+        money += price * qty;
+        localStorage.setItem('money', money);
+        removeItem(item, qty);
+        alert(`Sold ${qty} ${item}(s) for $${price * qty}.`);
+      });
+      updateSellInventory();
+      updatePlayerStatus();
+    }
+    function toggleBuySell(mode) {
+      if (mode === 'buy') {
+        document.getElementById('buySection').style.display = 'grid';
+        document.getElementById('sellSection').style.display = 'none';
+      } else {
+        document.getElementById('buySection').style.display = 'none';
+        document.getElementById('sellSection').style.display = 'block';
+        updateSellInventory();
+      }
+    }
+    function updateSellInventory() {
+      const sellDiv = document.getElementById('sellInventory');
+      if (sellDiv) {
+        sellDiv.innerHTML = "";
+        for (let item in harvestInventory) {
+          const qty = harvestInventory[item];
+          if (qty > 0) {
+            let div = document.createElement('div');
+            div.className = "sell-item";
+            div.innerHTML = `<label>
+                              <input type="checkbox" class="sell-checkbox" data-item="${item}" data-qty="${qty}">
+                              ${item} - Quantity: ${qty}
+                             </label>`;
+            sellDiv.appendChild(div);
+          }
+        }
+        if (!sellDiv.innerHTML) sellDiv.innerHTML = "<p>You have no items to sell.</p>";
+      }
+    }
+    function openTab(evt, tabName) {
+      const tabs = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < tabs.length; i++) { tabs[i].style.display = "none"; }
+      const btns = document.getElementsByClassName("tab-button");
+      for (let i = 0; i < btns.length; i++) { btns[i].classList.remove("active"); }
+      document.getElementById(tabName).style.display = "block";
+      evt.currentTarget.classList.add("active");
+    }
+
+    // Community Kitchen Tab Functions
+    function openKitchenTab(evt, tabName) {
+      const tabcontents = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < tabcontents.length; i++) {
+        tabcontents[i].classList.remove("active");
+      }
+      const tabbuttons = document.getElementsByClassName("tab-button");
+      for (let i = 0; i < tabbuttons.length; i++) {
+        tabbuttons[i].classList.remove("active");
+      }
+      document.getElementById(tabName).classList.add("active");
+      if (evt) {
+        evt.currentTarget.classList.add("active");
+      }
+      if (tabName === 'cookbookTab') {
+        renderRecipes();
+      }
+    }
+
+    // Spelunking Game Functions (for Room 5)
+    function initSpelunkingGame() {
+      window.location.href = "room5.html";
+    }
+    function exitSpelunkingGame() {
+      window.location.href = "index.html";
+    }
 
     // Onload Initialization
     window.onload = function() {
@@ -563,7 +1607,7 @@
         updateGarbageDisplay();
       }
       updateEnvironmentStatus();
-      checkCharacterExistence();  // Now defined
+      checkCharacterExistence();
       harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
       waterInventory = parseInt(localStorage.getItem('water')) || 0;
       generateGroceryItems();
@@ -575,8 +1619,8 @@
       setInterval(updateVoltage, 5000);
       setInterval(simulateHealthDecline, 60000);
       setInterval(updateEnvironmentStatus, 5000);
-      listenForKitchenChat();  // Stubbed
-      listenForLaundryChat();  // Stubbed
+      listenForKitchenChat();
+      listenForLaundryChat();
       
       // Chat input listeners
       const chatInput = document.getElementById('chatInput');
