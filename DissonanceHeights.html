@@ -430,31 +430,32 @@
       // Toggle the music player:
       // When open, load the full playlist with YouTube controls.
       // When closed, revert to ambient mode (a single looping video).
-function toggleMusicPlayer() {
-  const container = document.getElementById("musicPlayerContainer");
-  const iframe = document.getElementById("bgMusic");
-  if (container.style.left === "-9999px") {
-    // Show the player and load the full playlist.
-    iframe.src = "https://www.youtube.com/embed/htjeRgEYn0s?controls=1&playlist=htjeRgEYn0s,DP3rDP02lE0,n_eMdEEejcA,p-SWkpGKdP8,9Aa0LQShRhU,LmwfxVrbyGw";
-    container.style.left = "0";
-  } else {
-    // Hide the player and revert to ambient mode.
-    iframe.src = "https://www.youtube.com/embed/htjeRgEYn0s?autoplay=1&loop=1&playlist=htjeRgEYn0s";
-    container.style.left = "-9999px";
-  }
-}
+      function toggleMusicPlayer() {
+        const container = document.getElementById("musicPlayerContainer");
+        const iframe = document.getElementById("bgMusic");
+        if (container.style.left === "-9999px") {
+          // Show the player and load the full playlist.
+          iframe.src = "https://www.youtube.com/embed/htjeRgEYn0s?controls=1&playlist=htjeRgEYn0s,DP3rDP02lE0,n_eMdEEejcA,p-SWkpGKdP8,9Aa0LQShRhU,LmwfxVrbyGw";
+          container.style.left = "0";
+        } else {
+          // Hide the player and revert to ambient mode.
+          iframe.src = "https://www.youtube.com/embed/htjeRgEYn0s?autoplay=1&loop=1&playlist=htjeRgEYn0s";
+          container.style.left = "-9999px";
+        }
+      }
 
-// Function to switch to the next song manually.
-const playlist = ["htjeRgEYn0s", "DP3rDP02lE0", "n_eMdEEejcA", "p-SWkpGKdP8", "9Aa0LQShRhU", "LmwfxVrbyGw"];
-let currentSongIndex = 0;
-function nextSong() {
-  currentSongIndex = (currentSongIndex + 1) % playlist.length;
-  const videoId = playlist[currentSongIndex];
-  const iframe = document.getElementById("bgMusic");
-  // Update the iframe's src so that only the current video loops.
-  iframe.src = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&loop=1&playlist=" + videoId;
-}
+      // Function to switch to the next song manually.
+      const playlist = ["htjeRgEYn0s", "DP3rDP02lE0", "n_eMdEEejcA", "p-SWkpGKdP8", "9Aa0LQShRhU", "LmwfxVrbyGw"];
+      let currentSongIndex = 0;
+      function nextSong() {
+        currentSongIndex = (currentSongIndex + 1) % playlist.length;
+        const videoId = playlist[currentSongIndex];
+        const iframe = document.getElementById("bgMusic");
+        // Update the iframe's src so that only the current video loops.
+        iframe.src = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&loop=1&playlist=" + videoId;
+      }
     </script>
+
     <!-- Character Creation Section (optional; you may auto-assign a default guest name) -->
     <div id="characterCreation">
       <h3>Create Your Character</h3>
@@ -490,17 +491,17 @@ function nextSong() {
         <div class="container">
           <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
           <!-- Re-added Exit Button below Garbage Chute -->
-<button class="exit-button" onclick="signOutUser()">Exit</button>
-<script>
-  function signOutUser() {
-    firebase.auth().signOut().then(() => {
-      clearGameState();
-      window.location.href = 'index.html';
-    }).catch((error) => {
-      console.error("Error signing out: ", error);
-    });
-  }
-</script>
+          <button class="exit-button" onclick="signOutUser()">Exit</button>
+          <script>
+            function signOutUser() {
+              firebase.auth().signOut().then(() => {
+                clearGameState();
+                window.location.href = 'index.html';
+              }).catch((error) => {
+                console.error("Error signing out: ", error);
+              });
+            }
+          </script>
           <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
           <div class="grid">
             <!-- Room buttons generated dynamically -->
@@ -1346,7 +1347,6 @@ function nextSong() {
           chatLog.scrollTop = chatLog.scrollHeight;
         });
     }
-    // Added event listener to allow sending kitchen chat via Enter key
     document.addEventListener('DOMContentLoaded', function() {
       const kitchenChatInput = document.getElementById('kitchenChatInput');
       if (kitchenChatInput) {
@@ -1390,7 +1390,6 @@ function nextSong() {
           chatLog.scrollTop = chatLog.scrollHeight;
         });
     }
-    // Added event listener for laundry chat Enter key
     document.addEventListener('DOMContentLoaded', function() {
       const laundryChatInput = document.getElementById('laundryChatInput');
       if (laundryChatInput) {
@@ -1604,7 +1603,6 @@ function nextSong() {
       const wpDisplay = document.getElementById('waterPressureDisplay');
       if (wpDisplay) {
         wpDisplay.textContent = pressure;
-        // Visual feedback: if pressure is low, color red; otherwise, white
         wpDisplay.style.color = pressure < 50 ? "red" : "#fff";
       }
     }
@@ -1800,33 +1798,20 @@ function nextSong() {
         container.appendChild(div);
       });
     }
-    // Improved planting interaction: automatically check player's inventory and use first available seed/mushroom.
     function openPlantSelection(slotNum, category) {
-      // Determine allowed types based on category
       let available = (category === 'soil') ? seedTypes : mushroomTypes;
-      // Filter the allowed types by those that exist in the player's inventory
       let inventoryOptions = available.filter(type => harvestInventory[type] && harvestInventory[type] > 0);
-      
-      // If no available items in inventory, alert and exit
       if (inventoryOptions.length === 0) {
         alert("You do not have any " + (category === 'soil' ? "seeds" : "mushrooms") + " in your inventory.");
         return;
       }
-      
-      // Automatically select the first available type from the inventory
       let selectedType = inventoryOptions[0];
-      
-      // Remove one unit of the selected item from the inventory
       removeItem(selectedType, 1);
-      
-      // Update the appropriate garden slot with the selected type
       if (category === 'soil') {
         soilSlots[slotNum - 1] = { slot: slotNum, type: selectedType, watered: false, timer: null };
       } else {
         stumpSlots[slotNum - 1] = { slot: slotNum, type: selectedType, watered: false, timer: null };
       }
-      
-      // Re-render the garden slots to show the update
       renderGardenSlots();
     }
     function waterPlant(slotNum, category) {
@@ -1840,7 +1825,6 @@ function nextSong() {
       let slotArray = (category === 'soil') ? soilSlots : stumpSlots;
       slotArray[slotNum - 1].watered = true;
       renderGardenSlots();
-      // 5 minutes maturity (300000 ms)
       slotArray[slotNum - 1].timer = setTimeout(() => {
         const matureType = slotArray[slotNum - 1].type;
         alert("Your " + matureType + " has matured!");
@@ -1852,7 +1836,6 @@ function nextSong() {
 
     // Grocery Stand Functions
     function generateGroceryItems() {
-      // Seeds
       let seedContainer = document.getElementById("seedList");
       seedContainer.innerHTML = "";
       seedTypes.forEach(seed => {
@@ -1862,7 +1845,6 @@ function nextSong() {
                          <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
         seedContainer.appendChild(div);
       });
-      // Mushrooms
       let mushroomContainer = document.getElementById("mushroomList");
       mushroomContainer.innerHTML = "";
       mushroomTypes.forEach(mushroom => {
@@ -1872,7 +1854,6 @@ function nextSong() {
                          <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
         mushroomContainer.appendChild(div);
       });
-      // Health Items
       let healthContainer = document.getElementById("healthItemList");
       if (!healthContainer) {
         healthContainer = document.createElement("div");
@@ -1965,17 +1946,14 @@ function nextSong() {
 
     // Stub functions for missing features
     function collectWater() {
-      // Calculate water collected based on current voltage and efficiency
       const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
       const efficiency = Math.max(0.5, 1 - (garbageLevel / 200));
       const minVoltageThreshold = 20;
       const basePressure = voltage >= minVoltageThreshold ? voltage * 0.8 : 0;
       const pressure = Math.round(basePressure * efficiency);
-      // For example, water collected = floor(pressure/10) + 5
       const waterCollected = Math.floor(pressure / 10) + 5;
       waterInventory += waterCollected;
       localStorage.setItem('water', waterInventory);
-      // Update display
       const waterInvDisplay = document.getElementById('waterInventoryDisplay');
       if (waterInvDisplay) {
         waterInvDisplay.textContent = waterInventory;
@@ -1988,7 +1966,6 @@ function nextSong() {
 
     // Single window.onload initialization
     window.onload = function() {
-      // Populate room numbers
       var roomSelect = document.getElementById('roomNumber');
       if (roomSelect) {
         for (let i = 1; i <= 25; i++) {
@@ -1998,7 +1975,6 @@ function nextSong() {
           roomSelect.appendChild(option);
         }
       }
-      // Generate Room buttons in the grid
       var gridContainer = document.querySelector(".grid");
       if (gridContainer) {
         const rooms = [21,22,23,24,25,16,17,18,19,20,11,12,13,14,15,6,7,8,9,10,1,2,3,4,5];
@@ -2009,7 +1985,6 @@ function nextSong() {
           gridContainer.appendChild(btn);
         });
       }
-      // Render Garden Slots (using soilSlots and stumpSlots)
       var plantSlotsDiv = document.getElementById("plantSlots");
       if (plantSlotsDiv) {
         renderGardenSlots();
@@ -2019,7 +1994,6 @@ function nextSong() {
       updateVoltage();
       updateGarbageDisplay();
       updateEnvironmentStatus();
-      // Check character existence (if using character creation; if not, defaults to Guest)
       checkCharacterExistence();
       harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
       waterInventory = parseInt(localStorage.getItem('water')) || 0;
@@ -2031,8 +2005,6 @@ function nextSong() {
       setInterval(updateEnvironmentStatus, 5000);
       listenForKitchenChat();
       listenForLaundryChat();
-      
-      // Add chat input listener for Chat Panel (Enter key)
       const chatInput = document.getElementById('chatInput');
       if (chatInput) {
         chatInput.addEventListener('keydown', function(event) {
@@ -2042,7 +2014,6 @@ function nextSong() {
           }
         });
       }
-      // Add chat input listener for Community Kitchen chat (Enter key)
       const kitchenChatInput = document.getElementById('kitchenChatInput');
       if (kitchenChatInput) {
         kitchenChatInput.addEventListener('keydown', function(event) {
@@ -2052,7 +2023,6 @@ function nextSong() {
           }
         });
       }
-      // Add chat input listener for Water Supplies chat (Enter key)
       const laundryChatInput = document.getElementById('laundryChatInput');
       if (laundryChatInput) {
         laundryChatInput.addEventListener('keydown', function(event) {
