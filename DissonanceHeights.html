@@ -328,8 +328,7 @@
       <!-- Main Screen -->
       <div id="main-screen">
         <div class="container">
-          <!-- Absolute Positioned Buttons -->
-          <!-- Redirect absolute buttons to corresponding pages -->
+          <!-- Absolute Positioned Buttons with Redirection -->
           <button class="garbage-chute" onclick="window.location.href='garbage-chute.html'">Garbage Chute</button>
           <button class="exit-button" onclick="signOutUser()">Exit</button>
           <script>
@@ -356,9 +355,15 @@
           <div class="grid">
             <!-- Room buttons generated dynamically -->
           </div>
+          <button class="power-room" onclick="window.location.href='power-room.html'">
+            Power Room <span id="powerAlert" style="display:none; font-size:1.2em; color:red;">!</span>
+          </button>
         </div>
         <div class="facilities">
           <!-- Quick access for biodata -->
+          <button onclick="openKitchenPanel()">Community Kitchen</button>
+          <button onclick="openGroceryPanel()">Groceries Stand</button>
+          <button onclick="openWaterPanel()">Water Supplies (Laundry)</button>
           <button onclick="togglePlayerStatus()">Biodata</button>
         </div>
         <!-- Environmental Status Panel -->
@@ -607,7 +612,7 @@
       keys.forEach(key => localStorage.removeItem(key));
     }
 
-    // Panel Navigation Functions (now redirected)
+    // Panel Navigation Functions – Updated to redirect
     function showGarbagePanel() {
       window.location.href = "garbage-chute.html";
     }
@@ -623,6 +628,7 @@
     function openWaterPanel() {
       window.location.href = "water-supplies.html";
     }
+
     // Purchase and Inventory Functions
     function buyItem(item) {
       const prices = {
@@ -1035,8 +1041,7 @@
 
     // Room Interaction & Chat Functions (Room grid redirection)
     function openRoomInteraction(roomName) {
-      // Instead of showing inline door modal or chat, simply redirect to the room page.
-      // Extract room number and redirect to "roomX.html"
+      // Extract room number and redirect to corresponding room page
       let roomNum = roomName.split(" ")[1];
       window.location.href = "room" + roomNum + ".html";
     }
@@ -1602,7 +1607,6 @@
         document.getElementById('windSpeedValue').textContent = windSpeed;
       }
       updateVoltage();
-      // Only call updateGarbageDisplay if the element exists (it may be in a separate module)
       if (document.getElementById('garbageDisplay')) {
         updateGarbageDisplay();
       }
@@ -1612,7 +1616,6 @@
       waterInventory = parseInt(localStorage.getItem('water')) || 0;
       generateGroceryItems();
       setInterval(simulatePowerEvent, 60000);
-      // Only update garbage display if the element exists
       if (document.getElementById('garbageDisplay')) {
         setInterval(updateGarbageDisplay, 60000);
       }
