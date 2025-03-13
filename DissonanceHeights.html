@@ -263,7 +263,6 @@
       padding: 3px 6px;
       font-size: 12px;
     }
-    /* Removed Login Panel entirely (authentication removed) */
     /* In-App Notification Panel */
     #notificationPanel {
       position: fixed;
@@ -392,7 +391,7 @@
       cursor: pointer;
       z-index: 1200;
     }
-    /* --- New: Recipe Book Cooking Indicator --- */
+    /* Recipe Book Cooking Indicator */
     #cookingProcess {
       display: none;
       background: #222;
@@ -411,22 +410,39 @@
 </head>
 <body>
   <div class="wrapper">
-<!-- Music Player Container (hidden by default) -->
-<div id="musicPlayerContainer" style="position:absolute; left:-9999px;">
-  <iframe id="bgMusic" width="300" height="200" 
-    src="https://www.youtube.com/embed/htjeRgEYn0s?autoplay=1&loop=1&playlist=htjeRgEYn0s" 
-    frameborder="0" 
-    allow="autoplay; encrypted-media" 
-    allowfullscreen>
-  </iframe>
-</div>
+    <!-- Music Player Container (hidden by default) -->
+    <div id="musicPlayerContainer" style="position:absolute; left:-9999px;">
+      <iframe id="bgMusic" width="300" height="200" 
+        src="https://www.youtube.com/embed/htjeRgEYn0s?autoplay=1&loop=1&playlist=htjeRgEYn0s" 
+        frameborder="0" 
+        allow="autoplay; encrypted-media" 
+        allowfullscreen>
+      </iframe>
+    </div>
 
-<!-- Music Controls -->
-<div style="text-align:center; margin-top:10px;">
-  <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
-</div>
+    <!-- Music Controls -->
+    <div style="text-align:center; margin-top:10px;">
+      <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
+    </div>
 
-<script>
+    <script>
+      // Consolidated toggleMusicPlayer function.
+      // When toggled open, it loads the full playlist with native YouTube controls.
+      // When toggled closed, it reverts to ambient mode with a single looping video.
+      function toggleMusicPlayer() {
+        const container = document.getElementById("musicPlayerContainer");
+        const iframe = document.getElementById("bgMusic");
+        if (container.style.left === "-9999px") {
+          // Show the player and load the full playlist.
+          iframe.src = "https://www.youtube.com/embed/htjeRgEYn0s?controls=1&playlist=htjeRgEYn0s,DP3rDP02lE0,n_eMdEEejcA,p-SWkpGKdP8,9Aa0LQShRhU,LmwfxVrbyGw";
+          container.style.left = "0";
+        } else {
+          // Hide the player and revert to ambient mode.
+          iframe.src = "https://www.youtube.com/embed/htjeRgEYn0s?autoplay=1&loop=1&playlist=htjeRgEYn0s";
+          container.style.left = "-9999px";
+        }
+      }
+    </script>
   function toggleMusicPlayer() {
     const container = document.getElementById("musicPlayerContainer");
     const iframe = document.getElementById("bgMusic");
