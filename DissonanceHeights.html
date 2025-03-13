@@ -47,7 +47,7 @@
       padding: 10px;
       border-radius: 8px;
     }
-    /* Navigation links for the separate modules */
+    /* Navigation Links – these link to the modular pages */
     .nav-links {
       display: flex;
       flex-wrap: wrap;
@@ -72,7 +72,7 @@
     .nav-links button:hover {
       background-color: #4a90e2;
     }
-    /* Grid of Rooms (for room interactions that remain in the hub) */
+    /* Grid of Rooms (if you want some interactive room buttons in the hub) */
     .grid {
       display: grid;
       grid-template-columns: repeat(5, 100px);
@@ -117,7 +117,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    /* Chat Panel */
+    /* Chat Panel (if you need in-hub chat functionality) */
     #chatPanel {
       display: none;
       border: 2px solid #444;
@@ -149,7 +149,7 @@
       border-radius: 8px;
       background: rgba(0,0,0,0.7);
     }
-    /* Door Modal (Knocking & PIN system) */
+    /* Door Modal (for knocking and PIN system) */
     .modal, #doorModal {
       display: none;
       position: fixed;
@@ -244,9 +244,9 @@
             <a href="room5.html"><button>Room 5</button></a>
             <a href="room14.html"><button>Room 14</button></a>
           </div>
-          <!-- Optional: Grid of Room Buttons (for additional room interactions) -->
+          <!-- Optional: Grid of Room Buttons for additional interactions -->
           <div class="grid">
-            <!-- Room buttons generated dynamically -->
+            <!-- Room buttons generated dynamically (if needed) -->
           </div>
         </div>
         <div class="facilities">
@@ -261,7 +261,7 @@
         </div>
       </div>
       
-      <!-- Chat Modal (for direct room chat if needed) -->
+      <!-- Chat Modal (if inline room chat is needed) -->
       <div id="chatPanel">
         <h2 id="chatRoomTitle"></h2>
         <div id="chatLog"></div>
@@ -458,11 +458,13 @@
     }
     function updateHarvestInventoryUI() {
       const invDiv = document.getElementById('harvestInventory');
-      let html = "";
-      for (let item in harvestInventory) {
-        html += `<p>${item}: ${harvestInventory[item]}</p>`;
+      if (invDiv) {
+        let html = "";
+        for (let item in harvestInventory) {
+          html += `<p>${item}: ${harvestInventory[item]}</p>`;
+        }
+        invDiv.innerHTML = html || "<p>None</p>";
       }
-      invDiv.innerHTML = html || "<p>None</p>";
     }
 
     // In-App Notification Listener
@@ -479,11 +481,13 @@
             notifications += `<p>${data.message}</p>`;
           });
           const panel = document.getElementById("notificationPanel");
-          if (notifications) {
-            panel.innerHTML = notifications;
-            panel.style.display = "block";
-          } else {
-            panel.style.display = "none";
+          if (panel) {
+            if (notifications) {
+              panel.innerHTML = notifications;
+              panel.style.display = "block";
+            } else {
+              panel.style.display = "none";
+            }
           }
         });
     }
@@ -494,10 +498,9 @@
       keys.forEach(key => localStorage.removeItem(key));
     }
 
-    // (Since panels are now in separate files, these functions for showing/hiding panels are not used in the hub.)
-    function hidePanel(panelId) { /* Not used here */ }
+    // (Panel showing/hiding functions are not needed here since each module is separate)
 
-    // Purchase and Inventory Functions
+    // Purchase and Inventory Functions (already defined above)
     function buyItem(item) {
       const prices = {
         'Food Staples': 10,
@@ -911,7 +914,7 @@
     function openRoomInteraction(roomName) {
       currentRoom = roomName;
       if (roomName === "Room 5") {
-        // For Room 5, go to the separate spelunking page.
+        // For Room 5, go to the separate spelunking game page.
         window.location.href = "room5.html";
         return;
       }
@@ -1146,33 +1149,43 @@
       }
     }
     function updateGarbageDisplay() {
-      document.getElementById('garbageDisplay').textContent = garbageLevel;
-      const now = Date.now();
-      const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
-      if (elapsedMinutes > 0) {
-        garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
-        lastGarbageUpdate = now;
-        localStorage.setItem('garbageLevel', garbageLevel);
-        localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
-        document.getElementById('garbageDisplay').textContent = garbageLevel;
-        const logDiv = document.getElementById('garbageLog');
-        const timestamp = new Date().toLocaleTimeString();
-        const logMessage = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>`;
-        logDiv.innerHTML = logMessage + logDiv.innerHTML;
-        if (garbageLevel > 80) {
-          alert("High garbage levels detected! The community is getting sick.");
+      // This function is now only relevant for modules that include a "garbageDisplay" element.
+      const garbageElem = document.getElementById('garbageDisplay');
+      if (garbageElem) {
+        garbageElem.textContent = garbageLevel;
+        const now = Date.now();
+        const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
+        if (elapsedMinutes > 0) {
+          garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
+          lastGarbageUpdate = now;
+          localStorage.setItem('garbageLevel', garbageLevel);
+          localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
+          garbageElem.textContent = garbageLevel;
+          const logDiv = document.getElementById('garbageLog');
+          if (logDiv) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>`;
+            logDiv.innerHTML = logMessage + logDiv.innerHTML;
+          }
+          if (garbageLevel > 80) {
+            alert("High garbage levels detected! The community is getting sick.");
+          }
         }
       }
     }
     function logPowerMessage(message) {
       const logDiv = document.getElementById('minigameLog');
-      const timestamp = new Date().toLocaleTimeString();
-      logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
-      logDiv.scrollTop = logDiv.scrollHeight;
+      if (logDiv) {
+        const timestamp = new Date().toLocaleTimeString();
+        logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
+        logDiv.scrollTop = logDiv.scrollHeight;
+      }
     }
     function toggleInstructions() {
       const instrDiv = document.getElementById("instructions");
-      instrDiv.style.display = (instrDiv.style.display === "none" || instrDiv.style.display === "") ? "block" : "none";
+      if (instrDiv) {
+        instrDiv.style.display = (instrDiv.style.display === "none" || instrDiv.style.display === "") ? "block" : "none";
+      }
     }
     function updateLastInteraction() {
       lastInteractionTime = Date.now();
@@ -1255,12 +1268,15 @@
       const basePressure = voltage >= minVoltageThreshold ? voltage * 0.8 : 0;
       const waterPressure = Math.round(basePressure * efficiency);
       const currentGarbage = garbageLevel;
-      envDiv.innerHTML = `Wind Speed: ${currentWind} | Voltage: ${voltage}V | Water Pressure: ${waterPressure} PSI | Garbage Level: ${currentGarbage}/100`;
+      if (envDiv) {
+        envDiv.innerHTML = `Wind Speed: ${currentWind} | Voltage: ${voltage}V | Water Pressure: ${waterPressure} PSI | Garbage Level: ${currentGarbage}/100`;
+      }
     }
 
     // Community Garden Functions
     function renderGardenSlots() {
       const container = document.getElementById("plantSlots");
+      if (!container) return;
       container.innerHTML = "";
       container.innerHTML += "<h4>Soil (Seeds)</h4>";
       soilSlots.forEach(slot => {
@@ -1316,7 +1332,10 @@
       }
       waterInventory--;
       localStorage.setItem('water', waterInventory);
-      document.getElementById('waterInventoryDisplay').textContent = waterInventory;
+      const waterInvDisplay = document.getElementById('waterInventoryDisplay');
+      if (waterInvDisplay) {
+        waterInvDisplay.textContent = waterInventory;
+      }
       let slotArray = (category === 'soil') ? soilSlots : stumpSlots;
       slotArray[slotNum - 1].watered = true;
       renderGardenSlots();
@@ -1332,37 +1351,43 @@
     // Grocery Stand Functions
     function generateGroceryItems() {
       let seedContainer = document.getElementById("seedList");
-      seedContainer.innerHTML = "";
-      seedTypes.forEach(seed => {
-        let div = document.createElement("div");
-        div.className = "grocery-item";
-        div.innerHTML = `<p><strong>${seed}</strong> - $2<br><em>${seed} is essential for growth.</em></p>
-                         <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
-        seedContainer.appendChild(div);
-      });
+      if (seedContainer) {
+        seedContainer.innerHTML = "";
+        seedTypes.forEach(seed => {
+          let div = document.createElement("div");
+          div.className = "grocery-item";
+          div.innerHTML = `<p><strong>${seed}</strong> - $2<br><em>${seed} is essential for growth.</em></p>
+                           <button onclick="buyItem('${seed}')">Buy ${seed}</button>`;
+          seedContainer.appendChild(div);
+        });
+      }
       let mushroomContainer = document.getElementById("mushroomList");
-      mushroomContainer.innerHTML = "";
-      mushroomTypes.forEach(mushroom => {
-        let div = document.createElement("div");
-        div.className = "grocery-item";
-        div.innerHTML = `<p><strong>${mushroom}</strong> - $2<br><em>${mushroom} adds flavor and nutrients.</em></p>
-                         <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
-        mushroomContainer.appendChild(div);
-      });
+      if (mushroomContainer) {
+        mushroomContainer.innerHTML = "";
+        mushroomTypes.forEach(mushroom => {
+          let div = document.createElement("div");
+          div.className = "grocery-item";
+          div.innerHTML = `<p><strong>${mushroom}</strong> - $2<br><em>${mushroom} adds flavor and nutrients.</em></p>
+                           <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
+          mushroomContainer.appendChild(div);
+        });
+      }
       let healthContainer = document.getElementById("healthItemList");
-      if (!healthContainer) {
+      if (!healthContainer && document.getElementById("grocery-panel")) {
         healthContainer = document.createElement("div");
         healthContainer.id = "healthItemList";
         healthContainer.innerHTML = `<h4>Health Items</h4>`;
         document.getElementById("grocery-panel").appendChild(healthContainer);
-      } else {
+      } else if (healthContainer) {
         healthContainer.innerHTML = `<h4>Health Items</h4>`;
       }
       let div = document.createElement("div");
       div.className = "grocery-item";
       div.innerHTML = `<p><strong>First Aid Kit</strong> - $8<br><em>Restores 20 health.</em></p>
                        <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>`;
-      healthContainer.appendChild(div);
+      if (healthContainer) {
+        healthContainer.appendChild(div);
+      }
     }
     function sellHarvest() {
       const checkboxes = document.querySelectorAll('.sell-checkbox:checked');
@@ -1396,20 +1421,22 @@
     }
     function updateSellInventory() {
       const sellDiv = document.getElementById('sellInventory');
-      sellDiv.innerHTML = "";
-      for (let item in harvestInventory) {
-        const qty = harvestInventory[item];
-        if (qty > 0) {
-          let div = document.createElement('div');
-          div.className = "sell-item";
-          div.innerHTML = `<label>
-                            <input type="checkbox" class="sell-checkbox" data-item="${item}" data-qty="${qty}">
-                            ${item} - Quantity: ${qty}
-                           </label>`;
-          sellDiv.appendChild(div);
+      if (sellDiv) {
+        sellDiv.innerHTML = "";
+        for (let item in harvestInventory) {
+          const qty = harvestInventory[item];
+          if (qty > 0) {
+            let div = document.createElement('div');
+            div.className = "sell-item";
+            div.innerHTML = `<label>
+                              <input type="checkbox" class="sell-checkbox" data-item="${item}" data-qty="${qty}">
+                              ${item} - Quantity: ${qty}
+                             </label>`;
+            sellDiv.appendChild(div);
+          }
         }
+        if (!sellDiv.innerHTML) sellDiv.innerHTML = "<p>You have no items to sell.</p>";
       }
-      if (!sellDiv.innerHTML) sellDiv.innerHTML = "<p>You have no items to sell.</p>";
     }
     function openTab(evt, tabName) {
       const tabs = document.getElementsByClassName("tab-content");
@@ -1439,7 +1466,7 @@
       }
     }
 
-    // Spelunking Game Functions (Room 5)
+    // Spelunking Game Functions (for Room 5)
     function initSpelunkingGame() {
       window.location.href = "room5.html";
     }
@@ -1459,10 +1486,9 @@
           roomSelect.appendChild(option);
         }
       }
-      // Generate Room buttons in the grid
+      // Generate Room buttons in the grid (if used)
       var gridContainer = document.querySelector(".grid");
       if (gridContainer) {
-        // Using a custom order (as in your original code)
         const rooms = [21,22,23,24,25,16,17,18,19,20,11,12,13,14,15,6,7,8,9,10,1,2,3,4,5];
         rooms.forEach(function(room) {
           let btn = document.createElement("button");
@@ -1471,7 +1497,7 @@
           gridContainer.appendChild(btn);
         });
       }
-      // Render Garden Slots if present (for inline testing)
+      // Render Garden Slots if the element exists (for inline testing)
       var plantSlotsDiv = document.getElementById("plantSlots");
       if (plantSlotsDiv) {
         renderGardenSlots();
@@ -1481,14 +1507,20 @@
         document.getElementById('windSpeedValue').textContent = windSpeed;
       }
       updateVoltage();
-      updateGarbageDisplay();
+      // Only call updateGarbageDisplay if the element exists (it may be in a separate module)
+      if (document.getElementById('garbageDisplay')) {
+        updateGarbageDisplay();
+      }
       updateEnvironmentStatus();
       checkCharacterExistence();
       harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
       waterInventory = parseInt(localStorage.getItem('water')) || 0;
       generateGroceryItems();
       setInterval(simulatePowerEvent, 60000);
-      setInterval(updateGarbageDisplay, 60000);
+      // Only update garbage display if the element exists
+      if (document.getElementById('garbageDisplay')) {
+        setInterval(updateGarbageDisplay, 60000);
+      }
       setInterval(updateVoltage, 5000);
       setInterval(simulateHealthDecline, 60000);
       setInterval(updateEnvironmentStatus, 5000);
