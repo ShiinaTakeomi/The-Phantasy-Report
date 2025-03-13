@@ -412,10 +412,10 @@
   <div class="wrapper">
     <!-- Music Player Container (hidden by default) -->
     <div id="musicPlayerContainer" style="position:absolute; left:-9999px;">
-      <iframe id="bgMusic" width="300" height="200" 
-        src="https://www.youtube.com/embed/htjeRgEYn0s?autoplay=1&loop=1&playlist=htjeRgEYn0s" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
+      <iframe id="bgMusic" width="300" height="200"
+        src="https://www.youtube.com/embed/htjeRgEYn0s?autoplay=1&loop=1&playlist=htjeRgEYn0s"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
         allowfullscreen>
       </iframe>
     </div>
@@ -425,11 +425,11 @@
       <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
     </div>
 
-    <!-- Music Player JavaScript -->
+    <!-- Consolidated Music Player JavaScript -->
     <script>
-      // Consolidated toggleMusicPlayer function.
-      // When toggled open, it loads the full playlist with native YouTube controls.
-      // When toggled closed, it reverts to ambient mode with a single looping video.
+      // Toggle the music player:
+      // When open, load the full playlist with controls.
+      // When closed, revert to a single looping ambient video.
       function toggleMusicPlayer() {
         const container = document.getElementById("musicPlayerContainer");
         const iframe = document.getElementById("bgMusic");
@@ -444,7 +444,7 @@
         }
       }
 
-      // (Optional) Function to switch to the next song manually.
+      // Function to switch to the next song manually.
       const playlist = ["htjeRgEYn0s", "DP3rDP02lE0", "n_eMdEEejcA", "p-SWkpGKdP8", "9Aa0LQShRhU", "LmwfxVrbyGw"];
       let currentSongIndex = 0;
       function nextSong() {
