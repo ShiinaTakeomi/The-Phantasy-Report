@@ -411,18 +411,46 @@
 </head>
 <body>
   <div class="wrapper">
-    <!-- Hidden YouTube Player for Ambient Music -->
-<iframe id="bgMusic" width="0" height="0" 
-  src="https://www.youtube.com/embed/htjeRgEYn0s?autoplay=1&loop=1&playlist=htjeRgEYn0s,DP3rDP02lE0,n_eMdEEejcA,p-SWkpGKdP8,9Aa0LQShRhU,LmwfxVrbyGw" 
-  frameborder="0" 
-  allow="autoplay; encrypted-media" 
-  allowfullscreen 
-  style="position:absolute; left:-9999px;">
+<!-- Music Player Container (hidden by default) -->
+<div id="musicPlayerContainer" style="position:absolute; left:-9999px;">
+  <iframe id="bgMusic" width="300" height="200" 
+    src="https://www.youtube.com/embed/htjeRgEYn0s?autoplay=1&loop=1&playlist=htjeRgEYn0s" 
+    frameborder="0" 
+    allow="autoplay; encrypted-media" 
+    allowfullscreen>
   </iframe>
-    <!-- Toggle Music Player Button -->
-    <div style="text-align:center; margin-top:10px;">
-      <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
-    </div>
+</div>
+
+<!-- Music Controls -->
+<div style="text-align:center; margin-top:10px;">
+  <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
+  <button onclick="nextSong()">Next Song</button>
+</div>
+
+<script>
+  // Array of your song video IDs
+  const playlist = ["htjeRgEYn0s", "DP3rDP02lE0", "n_eMdEEejcA", "p-SWkpGKdP8", "9Aa0LQShRhU", "LmwfxVrbyGw"];
+  let currentSongIndex = 0;
+
+  // Function to switch to the next song manually
+  function nextSong() {
+    currentSongIndex = (currentSongIndex + 1) % playlist.length;
+    const videoId = playlist[currentSongIndex];
+    const iframe = document.getElementById("bgMusic");
+    // Update the iframe's src so that only the current video loops.
+    iframe.src = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&loop=1&playlist=" + videoId;
+  }
+
+  // Function to toggle the music player display
+  function toggleMusicPlayer() {
+    const container = document.getElementById("musicPlayerContainer");
+    if (container.style.left === "-9999px") {
+      container.style.left = "0";
+    } else {
+      container.style.left = "-9999px";
+    }
+  }
+</script>
     <!-- Removed Login Panel (authentication removed) -->
     
     <!-- Character Creation Section (optional; you may auto-assign a default guest name) -->
