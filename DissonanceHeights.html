@@ -287,12 +287,48 @@
 </head>
 <body>
   <div class="wrapper">
-    <!-- Hidden YouTube Player for Ambient Music -->
-    <iframe id="bgMusic" width="0" height="0" src="https://www.youtube.com/embed/gSwi1Tk1gV8?autoplay=1&loop=1&playlist=gSwi1Tk1gV8" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute; left:-9999px;"></iframe>
-    <!-- Toggle Music Player Button -->
-    <div style="text-align:center; margin-top:10px;">
-      <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
-    </div>
+<!-- Hidden YouTube Player for Ambient Music -->
+<iframe id="bgMusic" width="0" height="0" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute; left:-9999px;"></iframe>
+<!-- Toggle Music Player Button -->
+<div style="text-align:center; margin-top:10px;">
+  <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
+</div>
+<script>
+  // Array of YouTube embed URLs for ambient music tracks.
+  const musicTracks = [
+    "https://www.youtube.com/embed/LmwfxVrbyGw?autoplay=1&loop=1",
+    "https://www.youtube.com/embed/p-SWkpGKdP8?autoplay=1&loop=1",
+    "https://www.youtube.com/embed/r9k74AGYZoU?autoplay=1&loop=1",
+    "https://www.youtube.com/embed/htjeRgEYn0s?autoplay=1&loop=1",
+    "https://www.youtube.com/embed/DP3rDP02lE0?autoplay=1&loop=1"
+  ];
+  
+  let currentTrackIndex = 0;
+  
+  function toggleMusicPlayer() {
+    const player = document.getElementById("bgMusic");
+    if (player.style.display === "none" || player.style.display === "" || player.style.width === "0px") {
+      // Show the player with the current track.
+      player.style.display = "block";
+      player.style.width = "300px";
+      player.style.height = "200px";
+      player.style.position = "relative";
+      player.style.left = "0";
+      // Set the src with the current track and loop it.
+      player.src = musicTracks[currentTrackIndex] + "&playlist=" + musicTracks[currentTrackIndex];
+    } else {
+      // Hide the player.
+      player.style.display = "none";
+      player.style.width = "0";
+      player.style.height = "0";
+      player.style.position = "absolute";
+      player.style.left = "-9999px";
+      // Cycle to the next track for the next time the player is shown.
+      currentTrackIndex = (currentTrackIndex + 1) % musicTracks.length;
+    }
+  }
+</script>
+
     
     <!-- Character Creation Section -->
     <div id="characterCreation">
