@@ -19,7 +19,7 @@
       color: #eee;
       position: relative;
     }
-    /* Full-page dark overlay */
+    /* Apply full-page dark overlay using a pseudo-element */
     body::before {
       content: "";
       position: fixed;
@@ -46,6 +46,42 @@
       margin: 20px auto;
       padding: 10px;
       border-radius: 8px;
+    }
+    .panel {
+      display: none;
+      border: 2px solid #444;
+      padding: 20px;
+      width: 600px;
+      margin: 20px auto;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.7);
+    }
+    .panel h2, .modal h2 {
+      text-align: center;
+      color: #fff;
+    }
+    /* Grid of Rooms */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 100px);
+      grid-template-rows: repeat(5, 100px);
+      gap: 5px;
+      margin: 20px 0;
+      justify-content: center;
+    }
+    .grid button {
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255,255,255,0.2);
+      border: 1px solid #777;
+      cursor: pointer;
+      font-size: 14px;
+      color: #eee;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    .grid button:hover {
+      background-color: rgba(255,255,255,0.4);
     }
     /* --- Absolute Positioned Buttons (restored) --- */
     .garbage-chute {
@@ -292,7 +328,7 @@
       <!-- Main Screen -->
       <div id="main-screen">
         <div class="container">
-          <!-- Absolute Positioned Buttons (restored) -->
+          <!-- Absolute Positioned Buttons -->
           <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
           <button class="exit-button" onclick="signOutUser()">Exit</button>
           <script>
@@ -306,7 +342,7 @@
             }
           </script>
           <button class="garden-button" onclick="openGardenPanel()">Community Garden</button>
-          <!-- Navigation Links to Modular Pages (also available in the hub grid) -->
+          <!-- Navigation Links to Modular Pages -->
           <div class="nav-links">
             <a href="community-kitchen.html"><button>Community Kitchen</button></a>
             <a href="groceries-stand.html"><button>Groceries Stand</button></a>
@@ -317,7 +353,7 @@
           </div>
           <!-- Optional: Grid of Room Buttons for additional interactions -->
           <div class="grid">
-            <!-- Room buttons generated dynamically (if needed) -->
+            <!-- Room buttons generated dynamically -->
           </div>
         </div>
         <div class="facilities">
@@ -1268,43 +1304,33 @@
       }
     }
     function updateGarbageDisplay() {
-      // Only update if the element exists (for modules that include "garbageDisplay")
-      const garbageElem = document.getElementById('garbageDisplay');
-      if (garbageElem) {
-        garbageElem.textContent = garbageLevel;
-        const now = Date.now();
-        const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
-        if (elapsedMinutes > 0) {
-          garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
-          lastGarbageUpdate = now;
-          localStorage.setItem('garbageLevel', garbageLevel);
-          localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
-          garbageElem.textContent = garbageLevel;
-          const logDiv = document.getElementById('garbageLog');
-          if (logDiv) {
-            const timestamp = new Date().toLocaleTimeString();
-            const logMessage = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>`;
-            logDiv.innerHTML = logMessage + logDiv.innerHTML;
-          }
-          if (garbageLevel > 80) {
-            alert("High garbage levels detected! The community is getting sick.");
-          }
+      document.getElementById('garbageDisplay').textContent = garbageLevel;
+      const now = Date.now();
+      const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
+      if (elapsedMinutes > 0) {
+        garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
+        lastGarbageUpdate = now;
+        localStorage.setItem('garbageLevel', garbageLevel);
+        localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
+        document.getElementById('garbageDisplay').textContent = garbageLevel;
+        const logDiv = document.getElementById('garbageLog');
+        const timestamp = new Date().toLocaleTimeString();
+        const logMessage = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>`;
+        logDiv.innerHTML = logMessage + logDiv.innerHTML;
+        if (garbageLevel > 80) {
+          alert("High garbage levels detected! The community is getting sick.");
         }
       }
     }
     function logPowerMessage(message) {
       const logDiv = document.getElementById('minigameLog');
-      if (logDiv) {
-        const timestamp = new Date().toLocaleTimeString();
-        logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
-        logDiv.scrollTop = logDiv.scrollHeight;
-      }
+      const timestamp = new Date().toLocaleTimeString();
+      logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
+      logDiv.scrollTop = logDiv.scrollHeight;
     }
     function toggleInstructions() {
       const instrDiv = document.getElementById("instructions");
-      if (instrDiv) {
-        instrDiv.style.display = (instrDiv.style.display === "none" || instrDiv.style.display === "") ? "block" : "none";
-      }
+      instrDiv.style.display = (instrDiv.style.display === "none" || instrDiv.style.display === "") ? "block" : "none";
     }
     function updateLastInteraction() {
       lastInteractionTime = Date.now();
