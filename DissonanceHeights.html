@@ -47,8 +47,7 @@
       padding: 10px;
       border-radius: 8px;
     }
-    /* Removed inline panels – they now exist as separate HTML files */
-    /* Navigation buttons for the separate pages */
+    /* Navigation links for the separate modules */
     .nav-links {
       display: flex;
       flex-wrap: wrap;
@@ -73,7 +72,7 @@
     .nav-links button:hover {
       background-color: #4a90e2;
     }
-    /* Grid of Rooms (for room interactions that are not fully modularized) */
+    /* Grid of Rooms (for room interactions that remain in the hub) */
     .grid {
       display: grid;
       grid-template-columns: repeat(5, 100px);
@@ -118,7 +117,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    /* Chat Panel and Modal styles remain */
+    /* Chat Panel */
     #chatPanel {
       display: none;
       border: 2px solid #444;
@@ -139,6 +138,7 @@
       color: #fff;
       border-radius: 4px;
     }
+    /* Player Biodata Panel */
     #playerStatus {
       margin: 20px auto;
       max-width: 300px;
@@ -149,7 +149,7 @@
       border-radius: 8px;
       background: rgba(0,0,0,0.7);
     }
-    /* Door Modal (Knocking and PIN system) */
+    /* Door Modal (Knocking & PIN system) */
     .modal, #doorModal {
       display: none;
       position: fixed;
@@ -198,8 +198,8 @@
     <div style="text-align:center; margin-top:10px;">
       <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
     </div>
-
-    <!-- Character Creation Section (if no character exists) -->
+    
+    <!-- Character Creation Section -->
     <div id="characterCreation">
       <h3>Create Your Character</h3>
       <p>Welcome, <span id="displayName"></span>!</p>
@@ -225,7 +225,7 @@
         <button type="submit">Create Character</button>
       </form>
     </div>
-
+    
     <!-- Main Game Section -->
     <div id="mainGame" style="display: none;">
       <!-- Notification Panel -->
@@ -233,7 +233,7 @@
       <!-- Main Screen -->
       <div id="main-screen">
         <div class="container">
-          <!-- Top controls (these buttons originally opened inline panels) are now replaced by navigation links -->
+          <!-- Navigation Links to Modular Pages -->
           <div class="nav-links">
             <a href="garbage-chute.html"><button>Garbage Chute</button></a>
             <a href="community-garden.html"><button>Community Garden</button></a>
@@ -244,24 +244,24 @@
             <a href="room5.html"><button>Room 5</button></a>
             <a href="room14.html"><button>Room 14</button></a>
           </div>
-          <!-- Additionally, here is a grid of rooms for interactive room chat (if needed) -->
+          <!-- Optional: Grid of Room Buttons (for additional room interactions) -->
           <div class="grid">
-            <!-- Generate room buttons dynamically -->
+            <!-- Room buttons generated dynamically -->
           </div>
         </div>
         <div class="facilities">
-          <!-- You can also include additional navigation or quick access links here -->
+          <!-- Quick access for biodata -->
           <button onclick="togglePlayerStatus()">Biodata</button>
         </div>
         <!-- Environmental Status Panel -->
         <div id="envStatus"></div>
         <!-- Biodata Panel -->
         <div id="playerStatus">
-          <!-- Biodata updated dynamically -->
+          <!-- Biodata dynamically updated -->
         </div>
       </div>
-
-      <!-- Chat Modal (for room interactions that are not separated) -->
+      
+      <!-- Chat Modal (for direct room chat if needed) -->
       <div id="chatPanel">
         <h2 id="chatRoomTitle"></h2>
         <div id="chatLog"></div>
@@ -271,7 +271,7 @@
         <div id="restContainer" style="margin-top:10px;"></div>
       </div>
     </div>
-
+    
     <!-- Door Modal (Knocking & PIN system) -->
     <div id="doorModal">
       <h2 id="doorTitle">Door Interaction</h2>
@@ -285,7 +285,7 @@
       </div>
       <button onclick="closeDoorModal()">Cancel</button>
     </div>
-
+    
     <!-- Spelunking Game Container (for Room 5) -->
     <div id="spelunkingGame">
       <canvas id="spelunkingCanvas"></canvas>
@@ -296,7 +296,7 @@
   <script>
     // Store original background settings
     const originalBackground = "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed";
-    
+
     // Firebase Initialization & Config
     const firebaseConfig = {
       apiKey: "AIzaSyD5avvNbSB5L_YtpyxbBYYnvUpjMa0WglE",
@@ -340,13 +340,13 @@
       "Room 25": "0025"
     };
 
-    // Global variables
+    // Global Variables
     let currentRoom = "";
     let doorChatMode = false;
     let harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
     let waterInventory = parseInt(localStorage.getItem('water')) || 0;
 
-    // Community Garden arrays (Soil and Tree Stump slots)
+    // Community Garden Arrays (Soil and Tree Stump)
     let soilSlots = Array.from({length: 5}, (_, i) => ({
       slot: i + 1,
       type: null,
@@ -396,7 +396,7 @@
       }
     ];
 
-    // Helper Functions (updateMood, updateHunger, updateHealth, updateReputation)
+    // Helper Functions for Updating Stats
     function updateMood(delta) {
       let playerName = localStorage.getItem('playerName') || "Guest";
       const safePlayerName = sanitizePlayerName(playerName);
@@ -494,17 +494,8 @@
       keys.forEach(key => localStorage.removeItem(key));
     }
 
-    // Panel Navigation Functions – these now mostly handle showing/hiding the main game screen.
-    function showGarbagePanel() { /* For room grid interactions if needed */ }
-    function showPowerPanel() { /* For room grid interactions if needed */ }
-    function openGroceryPanel() { /* For room grid interactions if needed */ }
-    function openGardenPanel() { /* For room grid interactions if needed */ }
-    function openKitchenPanel() { /* For room grid interactions if needed */ }
-    function openWaterPanel() { /* For room grid interactions if needed */ }
-    function hidePanel(panelId) { /* For room grid interactions if needed */ }
-
-    // (Note: All detailed panel code is now in separate files.
-    // The main file now relies on navigation links below.)
+    // (Since panels are now in separate files, these functions for showing/hiding panels are not used in the hub.)
+    function hidePanel(panelId) { /* Not used here */ }
 
     // Purchase and Inventory Functions
     function buyItem(item) {
@@ -920,11 +911,10 @@
     function openRoomInteraction(roomName) {
       currentRoom = roomName;
       if (roomName === "Room 5") {
-        // For Room 5, redirect to the separate spelunking game page
+        // For Room 5, go to the separate spelunking page.
         window.location.href = "room5.html";
         return;
       }
-      // For other rooms that are still handled here, fetch room data:
       db.collection("rooms").doc(roomName).get().then(doc => {
         if (doc.exists) {
           const roomData = doc.data();
@@ -1215,8 +1205,6 @@
       clearGameState();
       window.location.href = "index.html";
     }
-
-    // Rest Functionality (1 minute total, 12 iterations of 5 seconds)
     function restInRoom() {
       let restButton = document.getElementById("restButton");
       if (!restButton) return;
@@ -1242,8 +1230,6 @@
         }
       }, 5000);
     }
-
-    // Music Player Toggle
     function toggleMusicPlayer() {
       var player = document.getElementById("bgMusic");
       if (player.style.display === "none" || player.style.display === "" || player.style.width === "0px") {
@@ -1260,8 +1246,6 @@
         player.style.left = "-9999px";
       }
     }
-
-    // Environment Status
     function updateEnvironmentStatus() {
       const envDiv = document.getElementById('envStatus');
       const currentWind = windSpeed;
@@ -1455,19 +1439,17 @@
       }
     }
 
-    // Spelunking Game Functions (for Room 5)
+    // Spelunking Game Functions (Room 5)
     function initSpelunkingGame() {
-      // Initialize the spelunking game; details omitted for brevity.
       window.location.href = "room5.html";
     }
     function exitSpelunkingGame() {
-      // Exit spelunking game logic; details omitted.
       window.location.href = "index.html";
     }
 
-    // Document onload initialization
+    // Onload Initialization
     window.onload = function() {
-      // Populate room numbers for character creation select
+      // Populate room numbers for character creation
       var roomSelect = document.getElementById('roomNumber');
       if (roomSelect) {
         for (let i = 1; i <= 25; i++) {
@@ -1480,7 +1462,7 @@
       // Generate Room buttons in the grid
       var gridContainer = document.querySelector(".grid");
       if (gridContainer) {
-        // Order of rooms: descending by row (as in your original code)
+        // Using a custom order (as in your original code)
         const rooms = [21,22,23,24,25,16,17,18,19,20,11,12,13,14,15,6,7,8,9,10,1,2,3,4,5];
         rooms.forEach(function(room) {
           let btn = document.createElement("button");
@@ -1489,13 +1471,15 @@
           gridContainer.appendChild(btn);
         });
       }
-      // Render Garden Slots if the element exists (for inline testing)
+      // Render Garden Slots if present (for inline testing)
       var plantSlotsDiv = document.getElementById("plantSlots");
       if (plantSlotsDiv) {
         renderGardenSlots();
       }
-      document.getElementById('windSpeedSlider').value = windSpeed;
-      document.getElementById('windSpeedValue').textContent = windSpeed;
+      if (document.getElementById('windSpeedSlider')) {
+        document.getElementById('windSpeedSlider').value = windSpeed;
+        document.getElementById('windSpeedValue').textContent = windSpeed;
+      }
       updateVoltage();
       updateGarbageDisplay();
       updateEnvironmentStatus();
@@ -1511,7 +1495,7 @@
       listenForKitchenChat();
       listenForLaundryChat();
       
-      // Add chat input listener for main chat panel
+      // Chat input listeners
       const chatInput = document.getElementById('chatInput');
       if (chatInput) {
         chatInput.addEventListener('keydown', function(event) {
@@ -1521,7 +1505,6 @@
           }
         });
       }
-      // Add chat input listener for Community Kitchen chat
       const kitchenChatInput = document.getElementById('kitchenChatInput');
       if (kitchenChatInput) {
         kitchenChatInput.addEventListener('keydown', function(event) {
@@ -1531,7 +1514,6 @@
           }
         });
       }
-      // Add chat input listener for Water Supplies chat
       const laundryChatInput = document.getElementById('laundryChatInput');
       if (laundryChatInput) {
         laundryChatInput.addEventListener('keydown', function(event) {
