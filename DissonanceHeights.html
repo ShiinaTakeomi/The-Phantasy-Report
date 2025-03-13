@@ -429,6 +429,15 @@
 <script>
   function toggleMusicPlayer() {
     const container = document.getElementById("musicPlayerContainer");
+    if (container.style.left === "-9999px") {
+      container.style.left = "0";
+    } else {
+      container.style.left = "-9999px";
+    }
+  }
+</script>
+  function toggleMusicPlayer() {
+    const container = document.getElementById("musicPlayerContainer");
     const iframe = document.getElementById("bgMusic");
     if (container.style.left === "-9999px") {
       // Show the player and load the full playlist with native controls.
