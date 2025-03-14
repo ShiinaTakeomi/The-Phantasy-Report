@@ -427,34 +427,26 @@
 
     <!-- Music Player JavaScript (Consolidated) -->
     <script>
-      // Toggle the music player:
-      // When open, load the full playlist with YouTube controls.
-      // When closed, revert to ambient mode (a single looping video).
+      // Toggle the music player without resetting the current song.
       function toggleMusicPlayer() {
         const container = document.getElementById("musicPlayerContainer");
-        const iframe = document.getElementById("bgMusic");
         console.log("Toggle Music Player invoked. Current container.left:", container.style.left);
         if (container.style.left === "-9999px" || container.style.left === "") {
-          // Show the player and load the full playlist.
-          iframe.src = "https://www.youtube.com/embed/htjeRgEYn0s?controls=1&playlist=htjeRgEYn0s,DP3rDP02lE0,n_eMdEEejcA,p-SWkpGKdP8,9Aa0LQShRhU,LmwfxVrbyGw";
           container.style.left = "0";
           console.log("Music player shown");
         } else {
-          // Hide the player and revert to ambient mode.
-          iframe.src = "https://www.youtube.com/embed/htjeRgEYn0s?autoplay=1&loop=1&playlist=htjeRgEYn0s";
           container.style.left = "-9999px";
           console.log("Music player hidden");
         }
       }
 
-      // Function to switch to the next song manually.
+      // Function to switch to the next song manually (if needed in the future).
       const playlist = ["htjeRgEYn0s", "DP3rDP02lE0", "n_eMdEEejcA", "p-SWkpGKdP8", "9Aa0LQShRhU", "LmwfxVrbyGw"];
       let currentSongIndex = 0;
       function nextSong() {
         currentSongIndex = (currentSongIndex + 1) % playlist.length;
         const videoId = playlist[currentSongIndex];
         const iframe = document.getElementById("bgMusic");
-        // Update the iframe's src so that only the current video loops.
         iframe.src = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&loop=1&playlist=" + videoId;
       }
     </script>
@@ -977,19 +969,18 @@
     function openKitchenPanel() {
       document.getElementById('kitchen-panel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
-      openKitchenTab(null, 'kitchenChatTab'); // Activate chat tab by default
+      openKitchenTab(null, 'kitchenChatTab');
       listenForKitchenChat();
     }
     function openWaterPanel() {
       document.getElementById('water-panel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
-      updateWaterPressure(); // Update water pressure display immediately
+      updateWaterPressure();
       document.getElementById('waterInventoryDisplay').textContent = waterInventory;
     }
     function hidePanel(panelId) {
       document.getElementById(panelId).style.display = 'none';
       document.getElementById('main-screen').style.display = 'block';
-      // Reset background to main menu
       document.body.style.backgroundImage = "url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
       document.body.style.backgroundRepeat = "no-repeat";
       document.body.style.backgroundAttachment = "fixed";
@@ -1065,12 +1056,10 @@
       }
     }
 
-    // Since authentication is removed, assign a default guest name if none exists.
     if (!localStorage.getItem('playerName')) {
       localStorage.setItem('playerName', 'Guest');
     }
     
-    // For character creation (optional)
     function sanitizePlayerName(name) {
       return name.replace(/[\/\\]/g, '_');
     }
@@ -1297,7 +1286,6 @@
       for (let ingredient in recipe.ingredients) {
         removeItem(ingredient, recipe.ingredients[ingredient]);
       }
-      // Show cooking process indicator (in the cookbook tab)
       document.getElementById("cookingProcess").style.display = "block";
       const btn = document.getElementById(`createBtn${index}`);
       btn.disabled = true;
@@ -1596,7 +1584,6 @@
       localStorage.setItem('voltage', voltage);
       updateWaterPressure();
     }
-    // New function to update water pressure display based on current voltage and garbage level
     function updateWaterPressure() {
       const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
       const efficiency = Math.max(0.5, 1 - (garbageLevel / 200));
@@ -1735,25 +1722,19 @@
       }, 5000);
     }
 
-    // Single toggleMusicPlayer() function (duplicate removed)
+    // Single toggleMusicPlayer() function (duplicate removed and updated)
     function toggleMusicPlayer() {
       const container = document.getElementById("musicPlayerContainer");
-      const iframe = document.getElementById("bgMusic");
       console.log("Toggle Music Player invoked. Current container.left:", container.style.left);
       if (container.style.left === "-9999px" || container.style.left === "") {
-        // Show the player and load the full playlist.
-        iframe.src = "https://www.youtube.com/embed/htjeRgEYn0s?controls=1&playlist=htjeRgEYn0s,DP3rDP02lE0,n_eMdEEejcA,p-SWkpGKdP8,9Aa0LQShRhU,LmwfxVrbyGw";
         container.style.left = "0";
         console.log("Music player shown");
       } else {
-        // Hide the player and revert to ambient mode.
-        iframe.src = "https://www.youtube.com/embed/htjeRgEYn0s?autoplay=1&loop=1&playlist=htjeRgEYn0s";
         container.style.left = "-9999px";
         console.log("Music player hidden");
       }
     }
 
-    // Environment Status
     function updateEnvironmentStatus() {
       const envDiv = document.getElementById('envStatus');
       const currentWind = windSpeed;
