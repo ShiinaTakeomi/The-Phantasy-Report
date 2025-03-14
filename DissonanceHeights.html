@@ -413,7 +413,7 @@
     <!-- Music Player Container (hidden by default) -->
     <div id="musicPlayerContainer" style="position:absolute; left:-9999px;">
       <iframe id="bgMusic" width="300" height="200"
-        src="https://www.youtube.com/embed/A6WJVzEIQa4?autoplay=1&loop=1&playlist=A6WJVzEIQa4"
+        src="https://www.youtube.com/embed/A6WJVzEIQa4?autoplay=1"
         frameborder="0"
         allow="autoplay; encrypted-media"
         allowfullscreen>
@@ -423,10 +423,16 @@
     <!-- Music Controls -->
     <div style="text-align:center; margin-top:10px;">
       <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
+      <!-- New Toggle Loop Button -->
+      <button onclick="toggleLoop()">Toggle Loop</button>
     </div>
 
     <!-- Music Player JavaScript (Consolidated) -->
     <script>
+      // Global variables for music control
+      let loopEnabled = false;
+      let currentVideoId = "A6WJVzEIQa4"; // Default video id
+
       // Toggle the music player without resetting the current song.
       function toggleMusicPlayer() {
         const container = document.getElementById("musicPlayerContainer");
@@ -440,14 +446,31 @@
         }
       }
 
+      // Toggle the loop setting for the current video.
+      function toggleLoop() {
+        loopEnabled = !loopEnabled;
+        const iframe = document.getElementById("bgMusic");
+        if (loopEnabled) {
+          iframe.src = "https://www.youtube.com/embed/" + currentVideoId + "?autoplay=1&loop=1&playlist=" + currentVideoId;
+          console.log("Loop enabled");
+        } else {
+          iframe.src = "https://www.youtube.com/embed/" + currentVideoId + "?autoplay=1";
+          console.log("Loop disabled");
+        }
+      }
+
       // Function to switch to the next song manually (if needed in the future).
       const playlist = ["A6WJVzEIQa4", "LmwfxVrbyGw", "DP3rDP02lE0", "r9k74AGYZoU", "kQk5fO3YZ9c", "LlN8MPS7KQs"];
       let currentSongIndex = 0;
       function nextSong() {
         currentSongIndex = (currentSongIndex + 1) % playlist.length;
-        const videoId = playlist[currentSongIndex];
+        currentVideoId = playlist[currentSongIndex];
         const iframe = document.getElementById("bgMusic");
-        iframe.src = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&loop=1&playlist=" + videoId;
+        if (loopEnabled) {
+          iframe.src = "https://www.youtube.com/embed/" + currentVideoId + "?autoplay=1&loop=1&playlist=" + currentVideoId;
+        } else {
+          iframe.src = "https://www.youtube.com/embed/" + currentVideoId + "?autoplay=1";
+        }
       }
     </script>
 
@@ -477,6 +500,7 @@
         <button type="submit">Create Character</button>
       </form>
     </div>
+
     <!-- Main Game Section -->
     <div id="mainGame" style="display: none;">
       <!-- Notification Panel -->
