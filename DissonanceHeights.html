@@ -427,52 +427,56 @@
       <button onclick="toggleLoop()">Toggle Loop</button>
     </div>
 
-    <!-- Music Player JavaScript (Consolidated) -->
-    <script>
-      // Global variables for music control
-      let loopEnabled = false;
-      let currentVideoId = "A6WJVzEIQa4"; // Default video id
-      const playlist = ["A6WJVzEIQa4", "LmwfxVrbyGw", "DP3rDP02lE0", "r9k74AGYZoU", "kQk5fO3YZ9c", "LlN8MPS7KQs"];
-      let currentSongIndex = 0;
+<!-- Music Controls -->
+<div style="text-align:center; margin-top:10px;">
+  <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
+  <button onclick="toggleLoop()">Toggle Loop</button>
+  <button onclick="nextSong()">Next Song</button> <!-- New Next Song button added -->
+</div>
 
-      // Toggle the music player without resetting the current song.
-      function toggleMusicPlayer() {
-        const container = document.getElementById("musicPlayerContainer");
-        console.log("Toggle Music Player invoked. Current container.left:", container.style.left);
-        if (container.style.left === "-9999px" || container.style.left === "") {
-          container.style.left = "0";
-          console.log("Music player shown");
-        } else {
-          container.style.left = "-9999px";
-          console.log("Music player hidden");
-        }
-      }
+<script>
+  // Global variables for music control
+  let loopEnabled = false;
+  let currentVideoId = "A6WJVzEIQa4"; // Default video id
+  const playlist = ["A6WJVzEIQa4", "LmwfxVrbyGw", "DP3rDP02lE0", "r9k74AGYZoU", "kQk5fO3YZ9c", "LlN8MPS7KQs"];
+  let currentSongIndex = 0;
 
-      // New: Toggle the loop setting for the current video.
-      function toggleLoop() {
-        loopEnabled = !loopEnabled;
-        const iframe = document.getElementById("bgMusic");
-        if (loopEnabled) {
-          iframe.src = "https://www.youtube.com/embed/" + currentVideoId + "?autoplay=1&loop=1&playlist=" + currentVideoId;
-          console.log("Loop enabled");
-        } else {
-          iframe.src = "https://www.youtube.com/embed/" + currentVideoId + "?autoplay=1";
-          console.log("Loop disabled");
-        }
-      }
+  function toggleMusicPlayer() {
+    const container = document.getElementById("musicPlayerContainer");
+    console.log("Toggle Music Player invoked. Current container.left:", container.style.left);
+    if (container.style.left === "-9999px" || container.style.left === "") {
+      container.style.left = "0";
+      console.log("Music player shown");
+    } else {
+      container.style.left = "-9999px";
+      console.log("Music player hidden");
+    }
+  }
 
-      // Updated nextSong() function uses the new loop setting.
-      function nextSong() {
-        currentSongIndex = (currentSongIndex + 1) % playlist.length;
-        currentVideoId = playlist[currentSongIndex];
-        const iframe = document.getElementById("bgMusic");
-        if (loopEnabled) {
-          iframe.src = "https://www.youtube.com/embed/" + currentVideoId + "?autoplay=1&loop=1&playlist=" + currentVideoId;
-        } else {
-          iframe.src = "https://www.youtube.com/embed/" + currentVideoId + "?autoplay=1";
-        }
-      }
-    </script>
+  function toggleLoop() {
+    loopEnabled = !loopEnabled;
+    const iframe = document.getElementById("bgMusic");
+    if (loopEnabled) {
+      iframe.src = "https://www.youtube.com/embed/" + currentVideoId + "?autoplay=1&loop=1&playlist=" + currentVideoId;
+      console.log("Loop enabled");
+    } else {
+      iframe.src = "https://www.youtube.com/embed/" + currentVideoId + "?autoplay=1";
+      console.log("Loop disabled");
+    }
+  }
+
+  // Updated nextSong() function uses the new loop setting.
+  function nextSong() {
+    currentSongIndex = (currentSongIndex + 1) % playlist.length;
+    currentVideoId = playlist[currentSongIndex];
+    const iframe = document.getElementById("bgMusic");
+    if (loopEnabled) {
+      iframe.src = "https://www.youtube.com/embed/" + currentVideoId + "?autoplay=1&loop=1&playlist=" + currentVideoId;
+    } else {
+      iframe.src = "https://www.youtube.com/embed/" + currentVideoId + "?autoplay=1";
+    }
+  }
+</script>
 
     <!-- Character Creation Section (optional; you may auto-assign a default guest name) -->
     <div id="characterCreation">
