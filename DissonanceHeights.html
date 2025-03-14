@@ -420,12 +420,6 @@
       </iframe>
     </div>
 
-    <!-- Music Controls -->
-    <div style="text-align:center; margin-top:10px;">
-      <button onclick="toggleMusicPlayer()">Toggle Music Player</button>
-      <!-- New Toggle Loop Button -->
-      <button onclick="toggleLoop()">Toggle Loop</button>
-    </div>
 
 <!-- Music Controls -->
 <div style="text-align:center; margin-top:10px;">
@@ -1748,19 +1742,6 @@
           alert("Rest complete! Your health has improved.");
         }
       }, 5000);
-    }
-
-    // Single toggleMusicPlayer() function (duplicate removed and updated)
-    function toggleMusicPlayer() {
-      const container = document.getElementById("musicPlayerContainer");
-      console.log("Toggle Music Player invoked. Current container.left:", container.style.left);
-      if (container.style.left === "-9999px" || container.style.left === "") {
-        container.style.left = "0";
-        console.log("Music player shown");
-      } else {
-        container.style.left = "-9999px";
-        console.log("Music player hidden");
-      }
     }
 
     function updateEnvironmentStatus() {
