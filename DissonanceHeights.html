@@ -611,11 +611,22 @@ function clearGarbage() {
   localStorage.setItem('garbageLevel', garbageLevel);
   // Update the on-screen display for garbage
   updateGarbageDisplay();
-  // Optionally, log the action
-  logPowerMessage("Garbage cleared!");
-  // Provide feedback to the user
-  alert("Garbage has been cleared!");
-}
+  // Get the current character's name (fallback to "Guest" if not set)
+  const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Guest";
+    // Log the action in your system log so it appears on-screen
+    logPowerMessage("Garbage cleared by " + characterName);
+    // Post a notification to Firebase so that others (your friends) can see it
+    db.collection("notifications").add({
+      owner: characterName,
+      message: `${characterName} has cleared the garbage!`,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .catch((error) => {
+      console.error("Error posting notification: ", error);
+    });
+    // Provide feedback to the user
+    alert("Garbage has been cleared!");
+  }
 </script>
       <!-- Grocery Stand Panel -->
       <div id="grocery-panel" class="panel">
