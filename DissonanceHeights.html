@@ -1666,25 +1666,36 @@ function updatePlayerStatus() {
         updateWaterPressure();
       }
     }
-    function updateGarbageDisplay() {
-      document.getElementById('garbageDisplay').textContent = garbageLevel;
-      const now = Date.now();
-      const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
-      if (elapsedMinutes > 0) {
-        garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
-        lastGarbageUpdate = now;
-        localStorage.setItem('garbageLevel', garbageLevel);
-        localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
-        document.getElementById('garbageDisplay').textContent = garbageLevel;
-        const logDiv = document.getElementById('garbageLog');
-        const timestamp = new Date().toLocaleTimeString();
-        const logMessage = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>`;
-        logDiv.innerHTML = logMessage + logDiv.innerHTML;
-        if (garbageLevel > 80) {
-          alert("High garbage levels detected! The community is getting sick.");
-        }
-      }
+// Declare this once outside the function (at the top of your script)
+let lastLoggedGarbageLevel = 0;
+
+function updateGarbageDisplay() {
+  // Update the on-screen display regardless
+  document.getElementById('garbageDisplay').textContent = garbageLevel;
+  const now = Date.now();
+  const elapsedMinutes = Math.floor((now - lastGarbageUpdate) / 60000);
+  if (elapsedMinutes > 0) {
+    // Increase garbage level based on elapsed time
+    garbageLevel = Math.min(100, Number(garbageLevel) + elapsedMinutes);
+    lastGarbageUpdate = now;
+    localStorage.setItem('garbageLevel', garbageLevel);
+    localStorage.setItem('lastGarbageUpdate', lastGarbageUpdate);
+    document.getElementById('garbageDisplay').textContent = garbageLevel;
+
+    // Only log if garbage level has increased by at least 10 since last log
+    if (garbageLevel - lastLoggedGarbageLevel >= 10) {
+      const logDiv = document.getElementById('garbageLog');
+      const timestamp = new Date().toLocaleTimeString();
+      const logMessage = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>`;
+      logDiv.innerHTML = logMessage + logDiv.innerHTML;
+      lastLoggedGarbageLevel = garbageLevel;
     }
+
+    if (garbageLevel > 80) {
+      alert("High garbage levels detected! The community is getting sick.");
+    }
+  }
+}
     function logPowerMessage(message) {
       const logDiv = document.getElementById('minigameLog');
       const timestamp = new Date().toLocaleTimeString();
