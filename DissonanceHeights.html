@@ -1151,64 +1151,67 @@ function updatePlayerStatus() {
   let playerName = localStorage.getItem('playerName');
   if (!playerName) return;
   const safePlayerName = sanitizePlayerName(playerName);
-  db.collection('players').doc(safePlayerName).onSnapshot((doc) => {
-    if (doc.exists) {
-      const data = doc.data();
-      localStorage.setItem('characterName', data.name);
+  db.collection('players').doc(safePlayerName).onSnapshot(
+    (doc) => {
       let statusHTML = `<h3>Biodata</h3>`;
-      if (!isEditing) {
-        let coreStatsHTML = `<h4>Core Stats</h4>`;
-        coreStatsHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
-        coreStatsHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
-        coreStatsHTML += `<div style="background:#444; border:1px solid #222; width:100%; height:20px; border-radius:5px; margin:5px 0;">
-             <div style="background:#4CAF50; width:${data.health}%; height:100%; border-radius:5px;"></div>
-            </div>`;
-        coreStatsHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
-        coreStatsHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
-        coreStatsHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
-        coreStatsHTML += `<p><strong>Room:</strong> ${data.roomNumber ? "Room " + data.roomNumber : "Not set"}</p>`;
-        coreStatsHTML += `<p><strong>Reputation:</strong> ${data.reputation || 0}</p>`;
-        let narrativeHTML = `<h4>Background</h4>`;
-        narrativeHTML += `<p><strong>Reason:</strong> ${data.reason || "N/A"}</p>`;
-        narrativeHTML += `<p><strong>Backstory:</strong> ${data.backstory || "N/A"}</p>`;
-        narrativeHTML += `<p><strong>Skills:</strong> ${data.skills ? data.skills.join(", ") : "N/A"}</p>`;
-        narrativeHTML += `<p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>`;
-        narrativeHTML += `<p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>`;
-        let inventoryHTML = `<h4>Inventory</h4>`;
-        for (let item in harvestInventory) {
-          inventoryHTML += `<p>${item}: ${harvestInventory[item]}</p>`;
+      if (doc.exists) {
+        const data = doc.data();
+        localStorage.setItem('characterName', data.name);
+        if (!isEditing) {
+          let coreStatsHTML = `<h4>Core Stats</h4>`;
+          coreStatsHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
+          coreStatsHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+          coreStatsHTML += `<div style="background:#444; border:1px solid #222; width:100%; height:20px; border-radius:5px; margin:5px 0;">
+            <div style="background:#4CAF50; width:${data.health}%; height:100%; border-radius:5px;"></div>
+          </div>`;
+          coreStatsHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+          coreStatsHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+          coreStatsHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+          coreStatsHTML += `<p><strong>Room:</strong> ${data.roomNumber ? "Room " + data.roomNumber : "Not set"}</p>`;
+          coreStatsHTML += `<p><strong>Reputation:</strong> ${data.reputation || 0}</p>`;
+          let narrativeHTML = `<h4>Background</h4>`;
+          narrativeHTML += `<p><strong>Reason:</strong> ${data.reason || "N/A"}</p>`;
+          narrativeHTML += `<p><strong>Backstory:</strong> ${data.backstory || "N/A"}</p>`;
+          narrativeHTML += `<p><strong>Skills:</strong> ${data.skills ? data.skills.join(", ") : "N/A"}</p>`;
+          narrativeHTML += `<p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>`;
+          narrativeHTML += `<p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>`;
+          let inventoryHTML = `<h4>Inventory</h4>`;
+          for (let item in harvestInventory) {
+            inventoryHTML += `<p>${item}: ${harvestInventory[item]}</p>`;
+          }
+          // (Note: the check below is unnecessary since inventoryHTML already contains a header)
+          statusHTML += `<div id="coreStats">${coreStatsHTML}</div>`;
+          statusHTML += `<div id="narrativeStats" style="display:none;">${narrativeHTML}</div>`;
+          statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
+          statusHTML += `<button onclick="enableEdit()">Edit Biodata</button>`;
+          statusHTML += inventoryHTML;
+        } else {
+          statusHTML += `<h3>Edit Character</h3>`;
+          statusHTML += `<div><strong>Core Stats</strong><br>`;
+          statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" style="height:40px; font-size:16px;" /></p>`;
+          statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+          statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+          statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+          statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+          statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25" style="height:40px; font-size:16px;" /></p>`;
+          statusHTML += `<p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" style="height:40px; font-size:16px;" /></p></div>`;
+          statusHTML += `<div><strong>Background</strong><br>`;
+          statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason" style="height:80px; font-size:16px;">${data.reason}</textarea></p>`;
+          statusHTML += `<p><strong>Backstory:</strong> <textarea id="editBackstory" style="height:80px; font-size:16px;">${data.backstory || ""}</textarea></p>`;
+          statusHTML += `<p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>`;
+          statusHTML += `<p><strong>Alliances:</strong> <input type="text" id="editAlliances" value="${data.alliances ? data.alliances.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>`;
+          statusHTML += `<p><strong>Rivalries:</strong> <input type="text" id="editRivalries" value="${data.rivalries ? data.rivalries.join(", ") : ""}" style="height:40px; font-size:16px;" /></p></div>`;
+          statusHTML += `<button onclick="saveBiodata()">Save Changes</button>`;
+          statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
         }
-        if (!inventoryHTML) inventoryHTML += `<p>None</p>`;
-        statusHTML += `<div id="coreStats">${coreStatsHTML}</div>`;
-        statusHTML += `<div id="narrativeStats" style="display:none;">${narrativeHTML}</div>`;
-        statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
-        statusHTML += `<button onclick="enableEdit()">Edit Biodata</button>`;
-        statusHTML += inventoryHTML;
-      } else {
-        statusHTML += `<h3>Edit Character</h3>`;
-        statusHTML += `<div><strong>Core Stats</strong><br>`;
-        statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" style="height:40px; font-size:16px;" /></p>`;
-        statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
-        statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
-        statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
-        statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
-        statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25" style="height:40px; font-size:16px;" /></p>`;
-        statusHTML += `<p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" style="height:40px; font-size:16px;" /></p></div>`;
-        statusHTML += `<div><strong>Background</strong><br>`;
-        statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason" style="height:80px; font-size:16px;">${data.reason}</textarea></p>`;
-        statusHTML += `<p><strong>Backstory:</strong> <textarea id="editBackstory" style="height:80px; font-size:16px;">${data.backstory || ""}</textarea></p>`;
-        statusHTML += `<p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>`;
-        statusHTML += `<p><strong>Alliances:</strong> <input type="text" id="editAlliances" value="${data.alliances ? data.alliances.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>`;
-        statusHTML += `<p><strong>Rivalries:</strong> <input type="text" id="editRivalries" value="${data.rivalries ? data.rivalries.join(", ") : ""}" style="height:40px; font-size:16px;" /></p></div>`;
-        statusHTML += `<button onclick="saveBiodata()">Save Changes</button>`;
-        statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
+        statusHTML += `<p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>`;
+        statusHTML += `<p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>`;
+        statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
+        document.getElementById('playerStatus').innerHTML = statusHTML;
+        updateHarvestInventoryUI();
       }
-      statusHTML += `<p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>`;
-      statusHTML += `<p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>`;
-      statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
-      document.getElementById('playerStatus').innerHTML = statusHTML;
-      updateHarvestInventoryUI();
-    }, (error) => {
+    },
+    (error) => {
       console.error("Error getting player status:", error);
     });
 }
