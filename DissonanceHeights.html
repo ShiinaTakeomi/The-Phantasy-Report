@@ -465,7 +465,7 @@
       }
     </script>
 
-    <!-- Character Creation Section (optional; you may auto-assign a default guest name) -->
+    <!-- Character Creation Section -->
     <div id="characterCreation">
       <h3>Create Your Character</h3>
       <p>Welcome, <span id="displayName"></span>!</p>
@@ -500,7 +500,7 @@
       <div id="main-screen">
         <div class="container">
           <button class="garbage-chute" onclick="showGarbagePanel()">Garbage Chute</button>
-          <!-- Re-added Exit Button below Garbage Chute -->
+          <!-- Exit Button -->
           <button class="exit-button" onclick="signOutUser()">Exit</button>
           <script>
             function signOutUser() {
@@ -526,13 +526,16 @@
           <button onclick="openWaterPanel()">Water Supplies (Laundry)</button>
           <button onclick="togglePlayerStatus()">Biodata</button>
         </div>
-        <!-- New Environmental Status Panel -->
+        <!-- Environmental Status Panel -->
         <div id="envStatus"></div>
+        <!-- Biodata Panel -->
         <div id="playerStatus">
           <!-- Biodata dynamically updated -->
         </div>
       </div>
+
       <!-- Panels -->
+
       <!-- Power Panel -->
       <div id="minigame-panel" class="panel">
         <h2>Wind Turbine Control Panel</h2>
@@ -582,6 +585,7 @@
           <span id="powerStatusDisplay">Unknown</span>
         </div>
       </div>
+
       <!-- Garbage Chute Panel -->
       <div id="garbage-panel" class="panel">
         <h2>Garbage Chute Control</h2>
@@ -599,6 +603,7 @@
         <h3>Garbage Log:</h3>
         <div id="garbageLog"></div>
       </div>
+
       <!-- Grocery Stand Panel -->
       <div id="grocery-panel" class="panel">
         <h2>Grocery Store</h2>
@@ -677,7 +682,8 @@
         </div>
         <button onclick="hidePanel('grocery-panel')">Return to Main Menu</button>
       </div>
-      <!-- Community Garden Panel (Updated Layout) -->
+
+      <!-- Community Garden Panel -->
       <div id="garden-panel" class="panel">
         <h2>Community Garden</h2>
         <p>Manage your rooftop garden. Plant your essential seeds in <strong>Soil</strong> slots and mushrooms in <strong>Tree Stump</strong> slots. Each plant takes 5 minutes to mature and needs water to grow.</p>
@@ -685,7 +691,8 @@
         <button onclick="harvestProduce()">Harvest Produce</button>
         <button onclick="hidePanel('garden-panel')">Return to Main Menu</button>
       </div>
-      <!-- Community Kitchen Panel with Tabs for Chat and Cookbook -->
+
+      <!-- Community Kitchen Panel -->
       <div id="kitchen-panel" class="panel">
         <h2>Community Kitchen</h2>
         <div class="tab-headers">
@@ -704,7 +711,8 @@
         </div>
         <button onclick="hidePanel('kitchen-panel')">Return to Main Menu</button>
       </div>
-      <!-- Water Supplies Panel (Chat area styling updated to match Community Kitchen) -->
+
+      <!-- Water Supplies Panel -->
       <div id="water-panel" class="panel">
         <h2>Water Supplies (Laundry)</h2>
         <p>Water pressure is directly linked to the performance of the power panel and environmental efficiency (affected by garbage levels). Use the washing machine to clean clothes – remember, low power output or high garbage may result in lower water pressure.</p>
@@ -722,13 +730,13 @@
         <div>
           <h4>Washing Machine</h4>
           <button onclick="washClothes()">Wash Clothes</button>
-          <!-- Updated chat area styling to match Community Kitchen -->
           <div class="chatArea" id="laundryChatLog" style="height:150px; overflow-y:auto; background: rgba(255,255,255,0.1); color:#fff; border:1px solid #ccc; padding:10px; border-radius:4px;"></div>
           <input type="text" id="laundryChatInput" placeholder="Type a message...">
           <button onclick="sendLaundryChat()">Send</button>
         </div>
         <button onclick="hidePanel('water-panel')">Return to Main Menu</button>
       </div>
+
       <!-- Chat Panel -->
       <div id="chatPanel" class="panel">
         <h2 id="chatRoomTitle"></h2>
@@ -739,6 +747,7 @@
         <div id="restContainer" style="margin-top:10px;"></div>
       </div>
     </div>
+
     <!-- Door Modal -->
     <div id="doorModal">
       <h2 id="doorTitle">Door Interaction</h2>
@@ -752,16 +761,18 @@
       </div>
       <button onclick="closeDoorModal()">Cancel</button>
     </div>
+
     <!-- Spelunking Game Container -->
     <div id="spelunkingGame">
       <canvas id="spelunkingCanvas"></canvas>
       <button id="exitSpelunking" onclick="exitSpelunkingGame()">Exit Cave</button>
     </div>
   </div>
+
   <script>
-    // Store original background settings (main menu background)
+    // Store original background settings
     const originalBackground = "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed";
-    
+
     // Firebase Initialization & Config
     const firebaseConfig = {
       apiKey: "AIzaSyD5avvNbSB5L_YtpyxbBYYnvUpjMa0WglE",
@@ -773,36 +784,17 @@
       measurementId: "G-9MS36H0YV4"
     };
     firebase.initializeApp(firebaseConfig);
-    // Authentication functions removed per requirement.
     const db = firebase.firestore();
     const storage = firebase.storage();
 
     // Room Password Mapping
     const roomPasswords = {
-      "Room 1": "0001",
-      "Room 2": "1414",
-      "Room 3": "0003",
-      "Room 4": "0004",
-      "Room 5": "0005",
-      "Room 6": "0006",
-      "Room 7": "0007",
-      "Room 8": "0008",
-      "Room 9": "0009",
-      "Room 10": "0010",
-      "Room 11": "0011",
-      "Room 12": "0715",
-      "Room 13": "0013",
-      "Room 14": "0014",
-      "Room 15": "0015",
-      "Room 16": "0016",
-      "Room 17": "0017",
-      "Room 18": "0018",
-      "Room 19": "0019",
-      "Room 20": "0020",
-      "Room 21": "0021",
-      "Room 22": "0022",
-      "Room 23": "0023",
-      "Room 24": "0024",
+      "Room 1": "0001", "Room 2": "1414", "Room 3": "0003", "Room 4": "0004",
+      "Room 5": "0005", "Room 6": "0006", "Room 7": "0007", "Room 8": "0008",
+      "Room 9": "0009", "Room 10": "0010", "Room 11": "0011", "Room 12": "0715",
+      "Room 13": "0013", "Room 14": "0014", "Room 15": "0015", "Room 16": "0016",
+      "Room 17": "0017", "Room 18": "0018", "Room 19": "0019", "Room 20": "0020",
+      "Room 21": "0021", "Room 22": "0022", "Room 23": "0023", "Room 24": "0024",
       "Room 25": "0025"
     };
 
@@ -812,103 +804,65 @@
     let harvestInventory = JSON.parse(localStorage.getItem('harvestInventory') || "{}");
     let waterInventory = parseInt(localStorage.getItem('water')) || 0;
 
-    // --- Community Garden: Two separate arrays (Soil for seeds, Tree Stump for mushrooms) ---
-    let soilSlots = Array.from({length: 5}, (_, i) => ({
-      slot: i + 1,
-      type: null,
-      watered: false,
-      timer: null
-    }));
-    let stumpSlots = Array.from({length: 5}, (_, i) => ({
-      slot: i + 1,
-      type: null,
-      watered: false,
-      timer: null
-    }));
+    // Community Garden Arrays
+    let soilSlots = Array.from({length: 5}, (_, i) => ({ slot: i + 1, type: null, watered: false, timer: null }));
+    let stumpSlots = Array.from({length: 5}, (_, i) => ({ slot: i + 1, type: null, watered: false, timer: null }));
 
-    // Seeds and Mushrooms (exactly 5 each)
-    const seedTypes = [
-      "Sunflower Seed", "Pumpkin Seed", "Corn Seed", "Wheat Seed", "Rice Seed"
-    ];
-    const mushroomTypes = [
-      "Button Mushroom", "Portobello Mushroom", "Shiitake Mushroom", "Oyster Mushroom", "Enoki Mushroom"
-    ];
+    // Seeds and Mushrooms
+    const seedTypes = ["Sunflower Seed", "Pumpkin Seed", "Corn Seed", "Wheat Seed", "Rice Seed"];
+    const mushroomTypes = ["Button Mushroom", "Portobello Mushroom", "Shiitake Mushroom", "Oyster Mushroom", "Enoki Mushroom"];
 
-    // Cookie Recipes (exactly 4 types)
+    // Cookie Recipes
     const recipes = [
-      {
-        name: "Vitality Cookie",
-        ingredients: { "Flour": 2, "Egg": 1, "Butter": 1, "Sugar": 1 },
-        benefits: { health: 20 },
-        cons: { hunger: 5 }
-      },
-      {
-        name: "Cheer Cookie",
-        ingredients: { "Flour": 1, "Egg": 1, "Butter": 1, "Sugar": 2 },
-        benefits: { mood: 20 },
-        cons: { health: -5 }
-      },
-      {
-        name: "Sustenance Cookie",
-        ingredients: { "Flour": 1, "Egg": 2, "Sugar": 1 },
-        benefits: { hunger: -20 },
-        cons: { mood: -5 }
-      },
-      {
-        name: "Ambition Cookie",
-        ingredients: { "Flour": 2, "Egg": 1, "Butter": 1, "Sugar": 2 },
-        benefits: { reputation: 10 },
-        cons: { health: -10 }
-      }
+      { name: "Vitality Cookie", ingredients: { "Flour": 2, "Egg": 1, "Butter": 1, "Sugar": 1 }, benefits: { health: 20 }, cons: { hunger: 5 } },
+      { name: "Cheer Cookie", ingredients: { "Flour": 1, "Egg": 1, "Butter": 1, "Sugar": 2 }, benefits: { mood: 20 }, cons: { health: -5 } },
+      { name: "Sustenance Cookie", ingredients: { "Flour": 1, "Egg": 2, "Sugar": 1 }, benefits: { hunger: -20 }, cons: { mood: -5 } },
+      { name: "Ambition Cookie", ingredients: { "Flour": 2, "Egg": 1, "Butter": 1, "Sugar": 2 }, benefits: { reputation: 10 }, cons: { health: -10 } }
     ];
 
-    // Helper Functions: Update Mood, Hunger, Health, Reputation
+    // Helper Functions (updateMood, updateHunger, updateHealth, updateReputation)...
     function updateMood(delta) {
       let playerName = localStorage.getItem('playerName') || "Guest";
-      const safePlayerName = sanitizePlayerName(playerName);
+      const safePlayerName = playerName.replace(/[\/\\]/g, '_');
       db.collection('players').doc(safePlayerName).get().then(doc => {
         if (doc.exists) {
           let currentMood = doc.data().mood || 100;
-          let newMood = Math.max(0, currentMood + delta);
-          db.collection('players').doc(safePlayerName).set({ mood: newMood, lastUpdated: Date.now() }, { merge: true });
+          db.collection('players').doc(safePlayerName).set({ mood: Math.max(0, currentMood + delta), lastUpdated: Date.now() }, { merge: true });
         }
       });
     }
     function updateHunger(delta) {
       let playerName = localStorage.getItem('playerName') || "Guest";
-      const safePlayerName = sanitizePlayerName(playerName);
+      const safePlayerName = playerName.replace(/[\/\\]/g, '_');
       db.collection('players').doc(safePlayerName).get().then(doc => {
         if (doc.exists) {
           let currentHunger = doc.data().hunger || 0;
-          let newHunger = Math.max(0, currentHunger + delta);
-          db.collection('players').doc(safePlayerName).set({ hunger: newHunger, lastUpdated: Date.now() }, { merge: true });
+          db.collection('players').doc(safePlayerName).set({ hunger: Math.max(0, currentHunger + delta), lastUpdated: Date.now() }, { merge: true });
         }
       });
     }
     function updateHealth(delta) {
       let playerName = localStorage.getItem('playerName') || "Guest";
-      const safePlayerName = sanitizePlayerName(playerName);
+      const safePlayerName = playerName.replace(/[\/\\]/g, '_');
       db.collection('players').doc(safePlayerName).get().then(doc => {
         if (doc.exists) {
           let currentHealth = doc.data().health || 100;
-          let newHealth = Math.min(100, Math.max(0, currentHealth + delta));
-          db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
+          db.collection('players').doc(safePlayerName).set({ health: Math.min(100, Math.max(0, currentHealth + delta)), lastUpdated: Date.now() }, { merge: true });
         }
       });
     }
     function updateReputation(delta) {
       let playerName = localStorage.getItem('playerName') || "Guest";
-      const safePlayerName = sanitizePlayerName(playerName);
+      const safePlayerName = playerName.replace(/[\/\\]/g, '_');
       db.collection('players').doc(safePlayerName).get().then(doc => {
         if (doc.exists) {
           let currentRep = doc.data().reputation || 0;
-          let newRep = currentRep + delta;
-          db.collection('players').doc(safePlayerName).set({ reputation: newRep, lastUpdated: Date.now() }, { merge: true });
+          db.collection('players').doc(safePlayerName).set({ reputation: currentRep + delta, lastUpdated: Date.now() }, { merge: true });
         }
       });
     }
 
-    // Inventory Functions
+    // Inventory Functions (addItem, removeItem, updateHarvestInventoryUI)
     function addItem(item, qty = 1) {
       harvestInventory[item] = (harvestInventory[item] || 0) + qty;
       localStorage.setItem('harvestInventory', JSON.stringify(harvestInventory));
@@ -931,7 +885,7 @@
       invDiv.innerHTML = html || "<p>None</p>";
     }
 
-    // In-App Notification Listener
+    // In-App Notification Listener...
     function listenForNotifications() {
       let playerName = localStorage.getItem('playerName') || "Guest";
       if (!playerName) return;
@@ -941,26 +895,20 @@
         .onSnapshot(snapshot => {
           let notifications = "";
           snapshot.forEach(doc => {
-            const data = doc.data();
-            notifications += `<p>${data.message}</p>`;
+            notifications += `<p>${doc.data().message}</p>`;
           });
           const panel = document.getElementById("notificationPanel");
-          if (notifications) {
-            panel.innerHTML = notifications;
-            panel.style.display = "block";
-          } else {
-            panel.style.display = "none";
-          }
+          panel.style.display = notifications ? "block" : "none";
+          panel.innerHTML = notifications;
         });
     }
 
     // Utility: Clear All Game State
     function clearGameState() {
-      const keys = ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate', 'harvestInventory', 'water'];
-      keys.forEach(key => localStorage.removeItem(key));
+      ['playerName', 'characterName', 'money', 'seeds', 'mushroomSeeds', 'windSpeed', 'lastInteractionTime', 'garbageLevel', 'lastGarbageUpdate', 'harvestInventory', 'water'].forEach(key => localStorage.removeItem(key));
     }
 
-    // Panel Navigation Functions
+    // Panel Navigation Functions (showGarbagePanel, showPowerPanel, openGroceryPanel, etc.)
     function showGarbagePanel() {
       document.getElementById('garbage-panel').style.display = 'block';
       document.getElementById('main-screen').style.display = 'none';
@@ -1001,7 +949,7 @@
     function hidePanel(panelId) {
       document.getElementById(panelId).style.display = 'none';
       document.getElementById('main-screen').style.display = 'block';
-      document.body.style.backgroundImage = "url('https://images.pexels.com/photos/10741254/pexels-photo-10741254.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+      document.body.style.backgroundImage = originalBackground;
       document.body.style.backgroundRepeat = "no-repeat";
       document.body.style.backgroundAttachment = "fixed";
       document.body.style.backgroundSize = "cover";
@@ -1010,16 +958,7 @@
 
     // Purchase and Inventory Functions
     function buyItem(item) {
-      const prices = {
-        'Food Staples': 10,
-        'Lubricant Oil': 5,
-        'Alcohol': 3,
-        'Cigarettes': 4,
-        'Flour': 3,
-        'Sugar': 2,
-        'Egg': 1,
-        'Butter': 4
-      };
+      const prices = { 'Food Staples': 10, 'Lubricant Oil': 5, 'Alcohol': 3, 'Cigarettes': 4, 'Flour': 3, 'Sugar': 2, 'Egg': 1, 'Butter': 4 };
       let price = prices[item] || 2;
       let money = parseInt(localStorage.getItem('money')) || 50;
       if (money >= price) {
@@ -1033,41 +972,41 @@
         alert("Not enough money to purchase " + item);
       }
     }
-function applyItemEffects(item) {
-  switch(item) {
-    case "Food Staples":
-      updateHunger(-5);
-      updateMood(2);
-      break;
-    case "Lubricant Oil":
-      updateMood(1);
-      break;
-    case "Adrenaline Shot":
-      // New effect: increases mood and health slightly, and could add a temporary boost (if you have such a mechanic)
-      updateMood(5);      // Increase mood by 5 points
-      updateHealth(10);   // Restore 10 health
-      break;
-    default:
-      if(item.includes("Seed")) {
-        updateMood(2);
-      } else if(item.includes("Mushroom")) {
-        updateMood(1);
-        updateHunger(-1);
-      } else if(item === "Alcohol") {
-        updateMood(3);
-        updateHunger(1);
-      } else if(item === "Cigarettes") {
-        updateMood(2);
-        updateHunger(1);
+    function applyItemEffects(item) {
+      switch(item) {
+        case "Food Staples":
+          updateHunger(-5);
+          updateMood(2);
+          break;
+        case "Lubricant Oil":
+          updateMood(1);
+          break;
+        case "Adrenaline Shot":
+          // New effect: increases mood and health slightly
+          updateMood(5);      // Increase mood by 5 points
+          updateHealth(10);   // Restore 10 health
+          break;
+        default:
+          if(item.includes("Seed")) {
+            updateMood(2);
+          } else if(item.includes("Mushroom")) {
+            updateMood(1);
+            updateHunger(-1);
+          } else if(item === "Alcohol") {
+            updateMood(3);
+            updateHunger(1);
+          } else if(item === "Cigarettes") {
+            updateMood(2);
+            updateHunger(1);
+          }
+          break;
       }
-      break;
-  }
-}
+    }
     function consumeFirstAidKit() {
       if (harvestInventory["First Aid Kit"] && harvestInventory["First Aid Kit"] > 0) {
         removeItem("First Aid Kit", 1);
         let playerName = localStorage.getItem('playerName') || "Guest";
-        const safePlayerName = sanitizePlayerName(playerName);
+        const safePlayerName = playerName.replace(/[\/\\]/g, '_');
         db.collection('players').doc(safePlayerName).get().then(doc => {
           if (doc.exists) {
             let currentHealth = doc.data().health || 100;
@@ -1081,10 +1020,10 @@ function applyItemEffects(item) {
       }
     }
 
+    // Ensure a default player name exists
     if (!localStorage.getItem('playerName')) {
       localStorage.setItem('playerName', 'Guest');
     }
-    
     function sanitizePlayerName(name) {
       return name.replace(/[\/\\]/g, '_');
     }
@@ -1138,11 +1077,7 @@ function applyItemEffects(item) {
         hunger: 0,
         injury: 0,
         mood: 100,
-        conditions: {
-          physical: "Healthy",
-          mental: "Content",
-          activity: "Idle"
-        },
+        conditions: { physical: "Healthy", mental: "Content", activity: "Idle" },
         lastUpdated: Date.now()
       };
       db.collection('players').doc(safePlayerName).set(playerData, { merge: true })
@@ -1158,14 +1093,8 @@ function applyItemEffects(item) {
         });
     }
     let isEditing = false;
-    function enableEdit() {
-      isEditing = true;
-      updatePlayerStatus();
-    }
-    function cancelEdit() {
-      isEditing = false;
-      updatePlayerStatus();
-    }
+    function enableEdit() { isEditing = true; updatePlayerStatus(); }
+    function cancelEdit() { isEditing = false; updatePlayerStatus(); }
     function togglePlayerStatus() {
       const biodataDiv = document.getElementById('playerStatus');
       biodataDiv.style.display = (biodataDiv.style.display === "none" || biodataDiv.style.display === "") ? "block" : "none";
@@ -1174,65 +1103,61 @@ function applyItemEffects(item) {
       let playerName = localStorage.getItem('playerName');
       if (!playerName) return;
       const safePlayerName = sanitizePlayerName(playerName);
-      db.collection('players').doc(safePlayerName)
-        .onSnapshot((doc) => {
-          if (doc.exists) {
-            const data = doc.data();
-            localStorage.setItem('characterName', data.name);
-            let statusHTML = `<h3>Biodata</h3>`;
-            if (!isEditing) {
-              let coreStatsHTML = `<h4>Core Stats</h4>`;
-              coreStatsHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
-              coreStatsHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
-              coreStatsHTML += `<div style="background:#444; border:1px solid #222; width:100%; height:20px; border-radius:5px; margin:5px 0;">
+      db.collection('players').doc(safePlayerName).onSnapshot((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          localStorage.setItem('characterName', data.name);
+          let statusHTML = `<h3>Biodata</h3>`;
+          if (!isEditing) {
+            let coreStatsHTML = `<h4>Core Stats</h4>`;
+            coreStatsHTML += `<p><strong>Name:</strong> ${data.name}</p>`;
+            coreStatsHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+            coreStatsHTML += `<div style="background:#444; border:1px solid #222; width:100%; height:20px; border-radius:5px; margin:5px 0;">
                    <div style="background:#4CAF50; width:${data.health}%; height:100%; border-radius:5px;"></div>
                   </div>`;
-              coreStatsHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
-              coreStatsHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
-              coreStatsHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
-              coreStatsHTML += `<p><strong>Room:</strong> ${data.roomNumber ? "Room " + data.roomNumber : "Not set"}</p>`;
-              coreStatsHTML += `<p><strong>Reputation:</strong> ${data.reputation || 0}</p>`;
-              let narrativeHTML = `<h4>Background</h4>`;
-              narrativeHTML += `<p><strong>Reason:</strong> ${data.reason || "N/A"}</p>`;
-              narrativeHTML += `<p><strong>Backstory:</strong> ${data.backstory || "N/A"}</p>`;
-              narrativeHTML += `<p><strong>Skills:</strong> ${data.skills ? data.skills.join(", ") : "N/A"}</p>`;
-              narrativeHTML += `<p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>`;
-              narrativeHTML += `<p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>`;
-              let inventoryHTML = `<h4>Inventory</h4>`;
-              for (let item in harvestInventory) {
-                inventoryHTML += `<p>${item}: ${harvestInventory[item]}</p>`;
-              }
-              if (!inventoryHTML) inventoryHTML += `<p>None</p>`;
-              statusHTML += `<div id="coreStats">${coreStatsHTML}</div>`;
-              statusHTML += `<div id="narrativeStats" style="display:none;">${narrativeHTML}</div>`;
-              statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
-              statusHTML += `<button onclick="enableEdit()">Edit Biodata</button>`;
-              statusHTML += inventoryHTML;
-            } else {
-              statusHTML += `<h3>Edit Character</h3>`;
-              statusHTML += `<div><strong>Core Stats</strong><br>`;
-              statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" style="height:40px; font-size:16px;" /></p>`;
-              statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
-              statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
-              statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
-              statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
-              statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25" style="height:40px; font-size:16px;" /></p>`;
-              statusHTML += `<p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" style="height:40px; font-size:16px;" /></p></div>`;
-              statusHTML += `<div><strong>Background</strong><br>`;
-              statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason" style="height:80px; font-size:16px;">${data.reason}</textarea></p>`;
-              statusHTML += `<p><strong>Backstory:</strong> <textarea id="editBackstory" style="height:80px; font-size:16px;">${data.backstory || ""}</textarea></p>`;
-              statusHTML += `<p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>`;
-              statusHTML += `<p><strong>Alliances:</strong> <input type="text" id="editAlliances" value="${data.alliances ? data.alliances.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>`;
-              statusHTML += `<p><strong>Rivalries:</strong> <input type="text" id="editRivalries" value="${data.rivalries ? data.rivalries.join(", ") : ""}" style="height:40px; font-size:16px;" /></p></div>`;
-              statusHTML += `<button onclick="saveBiodata()">Save Changes</button>`;
-              statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
-            }
-            statusHTML += `<p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>`;
-            statusHTML += `<p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>`;
-            statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
-            document.getElementById('playerStatus').innerHTML = statusHTML;
-            updateHarvestInventoryUI();
+            coreStatsHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+            coreStatsHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+            coreStatsHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+            coreStatsHTML += `<p><strong>Room:</strong> ${data.roomNumber ? "Room " + data.roomNumber : "Not set"}</p>`;
+            coreStatsHTML += `<p><strong>Reputation:</strong> ${data.reputation || 0}</p>`;
+            let narrativeHTML = `<h4>Background</h4>`;
+            narrativeHTML += `<p><strong>Reason:</strong> ${data.reason || "N/A"}</p>`;
+            narrativeHTML += `<p><strong>Backstory:</strong> ${data.backstory || "N/A"}</p>`;
+            narrativeHTML += `<p><strong>Skills:</strong> ${data.skills ? data.skills.join(", ") : "N/A"}</p>`;
+            narrativeHTML += `<p><strong>Alliances:</strong> ${data.alliances ? data.alliances.join(", ") : "None"}</p>`;
+            narrativeHTML += `<p><strong>Rivalries:</strong> ${data.rivalries ? data.rivalries.join(", ") : "None"}</p>`;
+            let inventoryHTML = `<h4>Inventory</h4>`;
+            for (let item in harvestInventory) { inventoryHTML += `<p>${item}: ${harvestInventory[item]}</p>`; }
+            if (!inventoryHTML) inventoryHTML += `<p>None</p>`;
+            statusHTML += `<div id="coreStats">${coreStatsHTML}</div>`;
+            statusHTML += `<div id="narrativeStats" style="display:none;">${narrativeHTML}</div>`;
+            statusHTML += `<button id="toggleNarrative" onclick="toggleNarrative()">Show Narrative</button>`;
+            statusHTML += `<button onclick="enableEdit()">Edit Biodata</button>`;
+            statusHTML += inventoryHTML;
+          } else {
+            statusHTML += `<h3>Edit Character</h3>`;
+            statusHTML += `<div><strong>Core Stats</strong><br>`;
+            statusHTML += `<p><strong>Name:</strong> <input type="text" id="editName" value="${data.name}" style="height:40px; font-size:16px;" /></p>`;
+            statusHTML += `<p><strong>Health:</strong> ${data.health}</p>`;
+            statusHTML += `<p><strong>Hunger:</strong> ${data.hunger}</p>`;
+            statusHTML += `<p><strong>Injury:</strong> ${data.injury}</p>`;
+            statusHTML += `<p><strong>Mood:</strong> ${data.mood}</p>`;
+            statusHTML += `<p><strong>Room:</strong> <input type="number" id="editRoomNumber" value="${data.roomNumber || ''}" min="1" max="25" style="height:40px; font-size:16px;" /></p>`;
+            statusHTML += `<p><strong>Reputation:</strong> <input type="number" id="editReputation" value="${data.reputation || 0}" style="height:40px; font-size:16px;" /></p></div>`;
+            statusHTML += `<div><strong>Background</strong><br>`;
+            statusHTML += `<p><strong>Reason:</strong> <textarea id="editReason" style="height:80px; font-size:16px;">${data.reason}</textarea></p>`;
+            statusHTML += `<p><strong>Backstory:</strong> <textarea id="editBackstory" style="height:80px; font-size:16px;">${data.backstory || ""}</textarea></p>`;
+            statusHTML += `<p><strong>Skills:</strong> <input type="text" id="editSkills" value="${data.skills ? data.skills.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>`;
+            statusHTML += `<p><strong>Alliances:</strong> <input type="text" id="editAlliances" value="${data.alliances ? data.alliances.join(", ") : ""}" style="height:40px; font-size:16px;" /></p>`;
+            statusHTML += `<p><strong>Rivalries:</strong> <input type="text" id="editRivalries" value="${data.rivalries ? data.rivalries.join(", ") : ""}" style="height:40px; font-size:16px;" /></p></div>`;
+            statusHTML += `<button onclick="saveBiodata()">Save Changes</button>`;
+            statusHTML += `<button onclick="cancelEdit()">Cancel</button>`;
           }
+          statusHTML += `<p><strong>Money:</strong> $${localStorage.getItem('money') || 50}</p>`;
+          statusHTML += `<p><strong>Seeds:</strong> ${localStorage.getItem('seeds') || 0}</p>`;
+          statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
+          document.getElementById('playerStatus').innerHTML = statusHTML;
+          updateHarvestInventoryUI();
         }, (error) => {
           console.error("Error getting player status:", error);
         });
@@ -1265,12 +1190,10 @@ function applyItemEffects(item) {
       };
       db.collection('players').doc(safePlayerName).set(updatedData, { merge: true })
         .then(() => { isEditing = false; updatePlayerStatus(); })
-        .catch(error => {
-          console.error("Error saving biodata:", error);
-        });
+        .catch(error => { console.error("Error saving biodata:", error); });
     }
 
-    // Recipe Book Functions (Community Kitchen)
+    // Recipe Book Functions
     function renderRecipes() {
       const container = document.getElementById('recipeContainer');
       container.innerHTML = "";
@@ -1506,6 +1429,7 @@ function applyItemEffects(item) {
         }
       }
     }
+
     // Door Modal Functions
     function showDoorModal(roomName) {
       currentRoom = roomName;
@@ -1644,15 +1568,13 @@ function applyItemEffects(item) {
         }
         alert("Malfunction Detected!\n" + malfunctionMessage);
         let playerEmail = localStorage.getItem('playerName') || "Guest";
-        const safePlayerName = sanitizePlayerName(playerEmail);
+        const safePlayerName = playerEmail.replace(/[\/\\]/g, '_');
         db.collection('players').doc(safePlayerName).get().then(doc => {
           if (doc.exists) {
             let currentHealth = doc.data().health || 100;
             let newHealth = Math.max(0, currentHealth - 5);
             db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
-            if (newHealth === 0) {
-              playerDied();
-            }
+            if (newHealth === 0) { playerDied(); }
           }
         });
         updateLastInteraction();
@@ -1671,8 +1593,7 @@ function applyItemEffects(item) {
         document.getElementById('garbageDisplay').textContent = garbageLevel;
         const logDiv = document.getElementById('garbageLog');
         const timestamp = new Date().toLocaleTimeString();
-        const logMessage = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>`;
-        logDiv.innerHTML = logMessage + logDiv.innerHTML;
+        logDiv.innerHTML = `<p>[${timestamp}] Garbage level updated to ${garbageLevel}</p>` + logDiv.innerHTML;
         if (garbageLevel > 80) {
           alert("High garbage levels detected! The community is getting sick.");
         }
@@ -1695,23 +1616,18 @@ function applyItemEffects(item) {
     function simulateHealthDecline() {
       if (garbageLevel > 80) {
         let playerEmail = localStorage.getItem('playerName') || "Guest";
-        const safePlayerName = sanitizePlayerName(playerEmail);
+        const safePlayerName = playerEmail.replace(/[\/\\]/g, '_');
         db.collection('players').doc(safePlayerName).get().then((doc) => {
           if (doc.exists) {
-            let data = doc.data();
-            let currentHealth = data.health || 100;
+            let currentHealth = doc.data().health || 100;
             let extraDecline = 0;
-            if (data.hunger > 70) extraDecline += 1;
-            if (data.mood < 30) extraDecline += 1;
+            if (doc.data().hunger > 70) extraDecline += 1;
+            if (doc.data().mood < 30) extraDecline += 1;
             let newHealth = Math.max(0, currentHealth - 1 - extraDecline);
             db.collection('players').doc(safePlayerName).set({ health: newHealth, lastUpdated: Date.now() }, { merge: true });
-            if (newHealth === 0) {
-              playerDied();
-            }
+            if (newHealth === 0) { playerDied(); }
           }
-        }).catch((error) => {
-          console.error("Error decreasing health: ", error);
-        });
+        }).catch((error) => { console.error("Error decreasing health: ", error); });
       }
     }
     function playerDied() {
@@ -1719,15 +1635,13 @@ function applyItemEffects(item) {
       clearGameState();
       window.location.href = "index.html";
     }
-
-    // Rest Functionality: 1 minute total (using 12 iterations of 5 seconds)
     function restInRoom() {
       let restButton = document.getElementById("restButton");
       if (!restButton) return;
       restButton.disabled = true;
       restButton.textContent = "Resting...";
       let playerName = localStorage.getItem('playerName') || "Guest";
-      const safePlayerName = sanitizePlayerName(playerName);
+      const safePlayerName = playerName.replace(/[\/\\]/g, '_');
       let iterations = 12;
       let interval = setInterval(() => {
         iterations--;
@@ -1746,7 +1660,6 @@ function applyItemEffects(item) {
         }
       }, 5000);
     }
-
     function updateEnvironmentStatus() {
       const envDiv = document.getElementById('envStatus');
       const currentWind = windSpeed;
@@ -1755,11 +1668,10 @@ function applyItemEffects(item) {
       const minVoltageThreshold = 20;
       const basePressure = voltage >= minVoltageThreshold ? voltage * 0.8 : 0;
       const waterPressure = Math.round(basePressure * efficiency);
-      const currentGarbage = garbageLevel;
-      envDiv.innerHTML = `Wind Speed: ${currentWind} | Voltage: ${voltage}V | Water Pressure: ${waterPressure} PSI | Garbage Level: ${currentGarbage}/100`;
+      envDiv.innerHTML = `Wind Speed: ${currentWind} | Voltage: ${voltage}V | Water Pressure: ${waterPressure} PSI | Garbage Level: ${garbageLevel}/100`;
     }
 
-    // Community Garden Functions: Render two sections (Soil and Tree Stump)
+    // Community Garden Functions
     function renderGardenSlots() {
       const container = document.getElementById("plantSlots");
       container.innerHTML = "";
@@ -1772,9 +1684,7 @@ function applyItemEffects(item) {
         } else {
           let status = slot.watered ? "Watered, growing..." : "Planted: " + slot.type + " (needs water)";
           div.innerHTML = `Slot ${slot.slot}: <span class="status">${status}</span>`;
-          if (!slot.watered) {
-            div.innerHTML += ` <button onclick="waterPlant(${slot.slot}, 'soil')">Water Plant</button>`;
-          }
+          if (!slot.watered) { div.innerHTML += ` <button onclick="waterPlant(${slot.slot}, 'soil')">Water Plant</button>`; }
         }
         container.appendChild(div);
       });
@@ -1787,9 +1697,7 @@ function applyItemEffects(item) {
         } else {
           let status = slot.watered ? "Watered, growing..." : "Planted: " + slot.type + " (needs water)";
           div.innerHTML = `Slot ${slot.slot}: <span class="status">${status}</span>`;
-          if (!slot.watered) {
-            div.innerHTML += ` <button onclick="waterPlant(${slot.slot}, 'stump')">Water Plant</button>`;
-          }
+          if (!slot.watered) { div.innerHTML += ` <button onclick="waterPlant(${slot.slot}, 'stump')">Water Plant</button>`; }
         }
         container.appendChild(div);
       });
@@ -1850,27 +1758,28 @@ function applyItemEffects(item) {
                          <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
         mushroomContainer.appendChild(div);
       });
-let healthContainer = document.getElementById("healthItemList");
-if (!healthContainer) {
-  healthContainer = document.createElement("div");
-  healthContainer.id = "healthItemList";
-  healthContainer.className = "grocery-items-container";
-  document.getElementById("grocery-panel").appendChild(healthContainer);
-}
-
-// Create First Aid Kit item
-let firstAidDiv = document.createElement("div");
-firstAidDiv.className = "grocery-item";
-firstAidDiv.innerHTML = `<p><strong>First Aid Kit</strong> - $8<br><em>Restores 20 health.</em></p>
-                         <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>`;
-healthContainer.appendChild(firstAidDiv);
-
-// Create Adrenaline Shot item
-let adrenalineDiv = document.createElement("div");
-adrenalineDiv.className = "grocery-item";
-adrenalineDiv.innerHTML = `<p><strong>Adrenaline Shot</strong> - $10<br><em>Boosts energy and temporarily increases speed.</em></p>
-                           <button onclick="buyItem('Adrenaline Shot')">Buy Adrenaline Shot</button>`;
-healthContainer.appendChild(adrenalineDiv);
+      // Health Items Section
+      let healthContainer = document.getElementById("healthItemList");
+      if (!healthContainer) {
+        healthContainer = document.createElement("div");
+        healthContainer.id = "healthItemList";
+        healthContainer.className = "grocery-items-container";
+        document.getElementById("grocery-panel").appendChild(healthContainer);
+      } else {
+        healthContainer.innerHTML = ""; // Clear previous content
+      }
+      // Create First Aid Kit item
+      let firstAidDiv = document.createElement("div");
+      firstAidDiv.className = "grocery-item";
+      firstAidDiv.innerHTML = `<p><strong>First Aid Kit</strong> - $8<br><em>Restores 20 health.</em></p>
+                               <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>`;
+      healthContainer.appendChild(firstAidDiv);
+      // Create Adrenaline Shot item
+      let adrenalineDiv = document.createElement("div");
+      adrenalineDiv.className = "grocery-item";
+      adrenalineDiv.innerHTML = `<p><strong>Adrenaline Shot</strong> - $10<br><em>Boosts energy and temporarily increases speed.</em></p>
+                                 <button onclick="buyItem('Adrenaline Shot')">Buy Adrenaline Shot</button>`;
+      healthContainer.appendChild(adrenalineDiv);
     }
     function sellHarvest() {
       const checkboxes = document.querySelectorAll('.sell-checkbox:checked');
@@ -1911,9 +1820,9 @@ healthContainer.appendChild(adrenalineDiv);
           let div = document.createElement('div');
           div.className = "sell-item";
           div.innerHTML = `<label>
-                            <input type="checkbox" class="sell-checkbox" data-item="${item}" data-qty="${qty}">
-                            ${item} - Quantity: ${qty}
-                           </label>`;
+                              <input type="checkbox" class="sell-checkbox" data-item="${item}" data-qty="${qty}">
+                              ${item} - Quantity: ${qty}
+                             </label>`;
           sellDiv.appendChild(div);
         }
       }
@@ -1928,26 +1837,18 @@ healthContainer.appendChild(adrenalineDiv);
       evt.currentTarget.classList.add("active");
     }
 
-    // Community Kitchen Tab Functions (Cookbook and Chat)
+    // Community Kitchen Tab Functions
     function openKitchenTab(evt, tabName) {
       const tabcontents = document.getElementsByClassName("tab-content");
-      for (let i = 0; i < tabcontents.length; i++) {
-        tabcontents[i].classList.remove("active");
-      }
+      for (let i = 0; i < tabcontents.length; i++) { tabcontents[i].classList.remove("active"); }
       const tabbuttons = document.getElementsByClassName("tab-button");
-      for (let i = 0; i < tabbuttons.length; i++) {
-        tabbuttons[i].classList.remove("active");
-      }
+      for (let i = 0; i < tabbuttons.length; i++) { tabbuttons[i].classList.remove("active"); }
       document.getElementById(tabName).classList.add("active");
-      if (evt) {
-        evt.currentTarget.classList.add("active");
-      }
-      if (tabName === 'cookbookTab') {
-        renderRecipes();
-      }
+      if (evt) { evt.currentTarget.classList.add("active"); }
+      if (tabName === 'cookbookTab') { renderRecipes(); }
     }
 
-    // Stub functions for missing features
+    // Stub Functions for Missing Features
     function collectWater() {
       const voltage = parseFloat(localStorage.getItem('voltage')) || 0;
       const efficiency = Math.max(0.5, 1 - (garbageLevel / 200));
@@ -1958,9 +1859,7 @@ healthContainer.appendChild(adrenalineDiv);
       waterInventory += waterCollected;
       localStorage.setItem('water', waterInventory);
       const waterInvDisplay = document.getElementById('waterInventoryDisplay');
-      if (waterInvDisplay) {
-        waterInvDisplay.textContent = waterInventory;
-      }
+      if (waterInvDisplay) { waterInvDisplay.textContent = waterInventory; }
       alert("You collected " + waterCollected + " units of water!");
     }
     function harvestProduce() {
@@ -1989,9 +1888,7 @@ healthContainer.appendChild(adrenalineDiv);
         });
       }
       var plantSlotsDiv = document.getElementById("plantSlots");
-      if (plantSlotsDiv) {
-        renderGardenSlots();
-      }
+      if (plantSlotsDiv) { renderGardenSlots(); }
       document.getElementById('windSpeedSlider').value = windSpeed;
       document.getElementById('windSpeedValue').textContent = windSpeed;
       updateVoltage();
@@ -2011,28 +1908,19 @@ healthContainer.appendChild(adrenalineDiv);
       const chatInput = document.getElementById('chatInput');
       if (chatInput) {
         chatInput.addEventListener('keydown', function(event) {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            sendChatMessage();
-          }
+          if (event.key === "Enter") { event.preventDefault(); sendChatMessage(); }
         });
       }
       const kitchenChatInput = document.getElementById('kitchenChatInput');
       if (kitchenChatInput) {
         kitchenChatInput.addEventListener('keydown', function(event) {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            sendKitchenChat();
-          }
+          if (event.key === "Enter") { event.preventDefault(); sendKitchenChat(); }
         });
       }
       const laundryChatInput = document.getElementById('laundryChatInput');
       if (laundryChatInput) {
         laundryChatInput.addEventListener('keydown', function(event) {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            sendLaundryChat();
-          }
+          if (event.key === "Enter") { event.preventDefault(); sendLaundryChat(); }
         });
       }
     };
