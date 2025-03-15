@@ -1033,31 +1033,36 @@
         alert("Not enough money to purchase " + item);
       }
     }
-    function applyItemEffects(item) {
-      switch(item) {
-        case "Food Staples":
-          updateHunger(-5);
-          updateMood(2);
-          break;
-        case "Lubricant Oil":
-          updateMood(1);
-          break;
-        default:
-          if(item.includes("Seed")) {
-            updateMood(2);
-          } else if(item.includes("Mushroom")) {
-            updateMood(1);
-            updateHunger(-1);
-          } else if(item === "Alcohol") {
-            updateMood(3);
-            updateHunger(1);
-          } else if(item === "Cigarettes") {
-            updateMood(2);
-            updateHunger(1);
-          }
-          break;
+function applyItemEffects(item) {
+  switch(item) {
+    case "Food Staples":
+      updateHunger(-5);
+      updateMood(2);
+      break;
+    case "Lubricant Oil":
+      updateMood(1);
+      break;
+    case "Adrenaline Shot":
+      // New effect: increases mood and health slightly, and could add a temporary boost (if you have such a mechanic)
+      updateMood(5);      // Increase mood by 5 points
+      updateHealth(10);   // Restore 10 health
+      break;
+    default:
+      if(item.includes("Seed")) {
+        updateMood(2);
+      } else if(item.includes("Mushroom")) {
+        updateMood(1);
+        updateHunger(-1);
+      } else if(item === "Alcohol") {
+        updateMood(3);
+        updateHunger(1);
+      } else if(item === "Cigarettes") {
+        updateMood(2);
+        updateHunger(1);
       }
-    }
+      break;
+  }
+}
     function consumeFirstAidKit() {
       if (harvestInventory["First Aid Kit"] && harvestInventory["First Aid Kit"] > 0) {
         removeItem("First Aid Kit", 1);
@@ -1845,19 +1850,27 @@
                          <button onclick="buyItem('${mushroom}')">Buy ${mushroom}</button>`;
         mushroomContainer.appendChild(div);
       });
-      let healthContainer = document.getElementById("healthItemList");
-      if (!healthContainer) {
-        healthContainer = document.createElement("div");
-        healthContainer.id = "healthItemList";
-        healthContainer.className = "grocery-items-container";
-        document.getElementById("grocery-panel").appendChild(healthContainer);
-      } else {
-      }
-      let div = document.createElement("div");
-      div.className = "grocery-item";
-      div.innerHTML = `<p><strong>First Aid Kit</strong> - $8<br><em>Restores 20 health.</em></p>
-                       <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>`;
-      healthContainer.appendChild(div);
+let healthContainer = document.getElementById("healthItemList");
+if (!healthContainer) {
+  healthContainer = document.createElement("div");
+  healthContainer.id = "healthItemList";
+  healthContainer.className = "grocery-items-container";
+  document.getElementById("grocery-panel").appendChild(healthContainer);
+}
+
+// Create First Aid Kit item
+let firstAidDiv = document.createElement("div");
+firstAidDiv.className = "grocery-item";
+firstAidDiv.innerHTML = `<p><strong>First Aid Kit</strong> - $8<br><em>Restores 20 health.</em></p>
+                         <button onclick="buyItem('First Aid Kit')">Buy First Aid Kit</button>`;
+healthContainer.appendChild(firstAidDiv);
+
+// Create Adrenaline Shot item
+let adrenalineDiv = document.createElement("div");
+adrenalineDiv.className = "grocery-item";
+adrenalineDiv.innerHTML = `<p><strong>Adrenaline Shot</strong> - $10<br><em>Boosts energy and temporarily increases speed.</em></p>
+                           <button onclick="buyItem('Adrenaline Shot')">Buy Adrenaline Shot</button>`;
+healthContainer.appendChild(adrenalineDiv);
     }
     function sellHarvest() {
       const checkboxes = document.querySelectorAll('.sell-checkbox:checked');
