@@ -613,6 +613,13 @@ function clearGarbage() {
   updateGarbageDisplay();
   // Get the current character's name (fallback to "Guest" if not set)
   const characterName = localStorage.getItem('characterName') || localStorage.getItem('playerName') || "Guest";
+
+  // Update the Garbage Log element with a new entry
+  const garbageLogDiv = document.getElementById('garbageLog');
+  const timestamp = new Date().toLocaleTimeString();
+  const message = `<p>[${timestamp}] Garbage cleared by ${characterName}</p>`;
+  garbageLogDiv.innerHTML = message + garbageLogDiv.innerHTML;
+
     // Log the action in your system log so it appears on-screen
     logPowerMessage("Garbage cleared by " + characterName);
     // Post a notification to Firebase so that others (your friends) can see it
