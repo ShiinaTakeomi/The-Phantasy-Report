@@ -1811,41 +1811,59 @@ function updateGarbageDisplay() {
         container.appendChild(div);
       });
     }
-    function openPlantSelection(slotNum, category) {
-      let available = (category === 'soil') ? seedTypes : mushroomTypes;
-      let inventoryOptions = available.filter(type => harvestInventory[type] && harvestInventory[type] > 0);
-      if (inventoryOptions.length === 0) {
-        alert("You do not have any " + (category === 'soil' ? "seeds" : "mushrooms") + " in your inventory.");
-        return;
-      }
-      let selectedType = inventoryOptions[0];
-      removeItem(selectedType, 1);
-      if (category === 'soil') {
-        soilSlots[slotNum - 1] = { slot: slotNum, type: selectedType, watered: false, timer: null };
-      } else {
-        stumpSlots[slotNum - 1] = { slot: slotNum, type: selectedType, watered: false, timer: null };
-      }
-      renderGardenSlots();
-    }
-    function waterPlant(slotNum, category) {
-      if (waterInventory < 1) {
-        alert("No water available. Please collect water.");
-        return;
-      }
-      waterInventory--;
-      localStorage.setItem('water', waterInventory);
-      document.getElementById('waterInventoryDisplay').textContent = waterInventory;
-      let slotArray = (category === 'soil') ? soilSlots : stumpSlots;
-      slotArray[slotNum - 1].watered = true;
-      renderGardenSlots();
-      slotArray[slotNum - 1].timer = setTimeout(() => {
-        const matureType = slotArray[slotNum - 1].type;
-        alert("Your " + matureType + " has matured!");
-        addItem(matureType, 1);
-        slotArray[slotNum - 1] = { slot: slotNum, type: null, watered: false, timer: null };
-        renderGardenSlots();
-      }, 300000);
-    }
+function openPlantSelection(slotNum, category) {
+  // Get available types based on category
+  let available = (category === 'soil') ? seedTypes : mushroomTypes;
+  let inventoryOptions = available.filter(type => harvestInventory[type] && harvestInventory[type] > 0);
+  if (inventoryOptions.length === 0) {
+    alert("You do not have any " + (category === 'soil' ? "seeds" : "mushrooms") + " in your inventory.");
+    return;
+  }
+  // Allow the user to choose from the available options
+  let selectionPrompt = "Enter the type you want to plant:\n" + inventoryOptions.join(", ");
+  let selectedType = prompt(selectionPrompt, inventoryOptions[0]);
+  if (!selectedType || !inventoryOptions.includes(selectedType)) {
+    alert("Invalid selection. Please try again.");
+    return;
+  }
+  removeItem(selectedType, 1);
+  // Update the corresponding slot with the selected type
+  const newPlant = { slot: slotNum, type: selectedType, watered: false, timer: null };
+  if (category === 'soil') {
+    soilSlots[slotNum - 1] = newPlant;
+  } else {
+    stumpSlots[slotNum - 1] = newPlant;
+  }
+  // Persist the updated garden state
+  localStorage.setItem('soilSlots', JSON.stringify(soilSlots));
+  localStorage.setItem('stumpSlots', JSON.stringify(stumpSlots));
+  renderGardenSlots();
+}
+
+function waterPlant(slotNum, category) {
+  if (waterInventory < 1) {
+    alert("No water available. Please collect water.");
+    return;
+  }
+  waterInventory--;
+  localStorage.setItem('water', waterInventory);
+  document.getElementById('waterInventoryDisplay').textContent = waterInventory;
+  let slotArray = (category === 'soil') ? soilSlots : stumpSlots;
+  // Mark the plant as watered
+  slotArray[slotNum - 1].watered = true;
+  renderGardenSlots();
+  // Start maturation timer (could be replaced with a more robust scheduler)
+  slotArray[slotNum - 1].timer = setTimeout(() => {
+    const matureType = slotArray[slotNum - 1].type;
+    alert("Your " + matureType + " has matured!");
+    addItem(matureType, 1);
+    // Reset the slot after maturation
+    slotArray[slotNum - 1] = { slot: slotNum, type: null, watered: false, timer: null };
+    // Save updated garden state
+    localStorage.setItem(category === 'soil' ? 'soilSlots' : 'stumpSlots', JSON.stringify(slotArray));
+    renderGardenSlots();
+  }, 300000); // 5 minutes
+}
 
     // Grocery Stand Functions
     function generateGroceryItems() {
