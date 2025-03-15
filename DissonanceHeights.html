@@ -603,6 +603,18 @@
         <h3>Garbage Log:</h3>
         <div id="garbageLog"></div>
       </div>
+function clearGarbage() {
+  // Set the garbage level to zero
+  garbageLevel = 0;
+  // Update the stored value in localStorage (if you use it)
+  localStorage.setItem('garbageLevel', garbageLevel);
+  // Update the on-screen display for garbage
+  updateGarbageDisplay();
+  // Optionally, log the action
+  logPowerMessage("Garbage cleared!");
+  // Provide feedback to the user
+  alert("Garbage has been cleared!");
+}
 
       <!-- Grocery Stand Panel -->
       <div id="grocery-panel" class="panel">
