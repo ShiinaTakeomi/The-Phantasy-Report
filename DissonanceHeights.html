@@ -1208,7 +1208,7 @@
           statusHTML += `<p><strong>Mushroom Seeds:</strong> ${localStorage.getItem('mushroomSeeds') || 0}</p>`;
           document.getElementById('playerStatus').innerHTML = statusHTML;
           updateHarvestInventoryUI();
-        }, (error) => {
+        } (error) => {
           console.error("Error getting player status:", error);
         });
     }
